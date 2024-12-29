@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "salmon-run.sln"
+    "dotnet.defaultSolution": "salmon-run.sln",
+    "dotnet.preferCSharpExtension": true
 }
