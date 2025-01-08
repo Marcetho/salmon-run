@@ -47,10 +47,10 @@ public class UIManager : MonoBehaviour
         float containerWidth = containerRect.rect.width;
         float containerHeight = containerRect.rect.height;
         
-        float spriteSize = Mathf.Min(containerWidth / maxLives * 0.8f, containerHeight * 0.4f);
-        float spacing = spriteSize * 1.2f; 
-        float heightOffset = containerHeight * 0.2f;
-        float leftPadding = spriteSize * 0.5f; // Add some padding from the left edge
+        float spriteSize = Mathf.Min(containerWidth / maxLives * 0.8f, containerHeight * 0.9f);
+        float totalSpacing = containerWidth - (spriteSize * maxLives);
+        float spacing = maxLives > 1 ? totalSpacing / (maxLives - 1) : 0;
+        float heightOffset = (containerHeight - spriteSize) / 2;
 
         for (int i = 0; i < maxLives; i++)
         {
@@ -59,8 +59,8 @@ public class UIManager : MonoBehaviour
 
             newLife.rectTransform.sizeDelta = new Vector2(spriteSize, spriteSize);
 
-            float xPos = (i * spacing) + leftPadding - (containerWidth / 2); // Adjust for RectTransform anchor point
-            float yPos = (i % 2 == 1) ? heightOffset : -heightOffset;
+            float xPos = (i * (spriteSize + spacing)) - (containerWidth / 2) + (spriteSize / 2);
+            float yPos = (i % 2 == 0) ? heightOffset : -heightOffset;
 
             newLife.rectTransform.anchoredPosition = new Vector2(xPos, yPos);
             lifeImages[i] = newLife;

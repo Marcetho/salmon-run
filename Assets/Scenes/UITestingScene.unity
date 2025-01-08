@@ -242,9 +242,9 @@ MonoBehaviour:
   scoreText: {fileID: 740860890}
   lifeContainer: {fileID: 2111809645}
   lifePrefab: {fileID: 5705431150205893305, guid: 961f0a1179362f6449f201058cbd7591, type: 3}
-  fullLifeSprite: {fileID: -618648422, guid: 2cff03a844524074fbeebe2ff161ad18, type: 3}
-  emptyLifeSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
-  maxLives: 30
+  fullLifeSprite: {fileID: -211643807, guid: 93f0a24d49bc0e740a01e2b86f157bf1, type: 3}
+  emptyLifeSprite: {fileID: -746132841, guid: d6de2502a08b7e44cab8c75a6bed2d6b, type: 3}
+  maxLives: 10
 --- !u!1 &443849780
 GameObject:
   m_ObjectHideFlags: 0
