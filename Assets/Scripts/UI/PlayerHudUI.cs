@@ -3,23 +3,23 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerHudUI
 {
-    [SerializeField] private ScoreUI scoreUI;
+    [SerializeField] private EnergyUI energyUI;
     [SerializeField] private HealthUI healthUI;
 
     public void Initialize()
     {
-        scoreUI.Initialize();
+        energyUI.Initialize();
         healthUI.Initialize();
     }
 
     public void Cleanup()
     {
-        scoreUI.Cleanup();
+        energyUI.Cleanup();
         healthUI.Cleanup();
     }
 
     public void OnGameOver()
     {
-        scoreUI.OnGameOver();
+        energyUI.OnGameOver();
     }
 }
