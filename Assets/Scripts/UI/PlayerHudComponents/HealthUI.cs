@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the player's health UI, including life icons and health-related events.
+/// </summary>
 public class HealthUI : UIComponent
 {
     [SerializeField] private Button healthButton;
@@ -8,12 +11,23 @@ public class HealthUI : UIComponent
     [SerializeField] private Image lifePrefab;
     [SerializeField] private Sprite fullLifeSprite;
     [SerializeField] private Sprite emptyLifeSprite;
-    [SerializeField] private int maxLives = 10;
-    [SerializeField] private float lifeSpacingPercent = 1f;
+    [SerializeField] private int maxLives = 10;    // Maximum number of lives player can have
+    [SerializeField] private float lifeSpacingPercent = 1f;   // Spacing between life icons
     [SerializeField] private UIManager uiManager;
 
     private int currentLives;
     private Image[] lifeImages;
+
+    /// <summary>
+    /// Gets the current number of health points remaining.
+    /// </summary>
+    internal int CurrentHealth => currentLives;
+    internal int MaxHealth => maxLives;
+
+    /// <summary>
+    /// Event triggered when health value changes.
+    /// </summary>
+    internal event System.Action<int> OnHealthChanged;
 
     public override void Initialize()
     {
@@ -67,6 +81,30 @@ public class HealthUI : UIComponent
         {
             currentLives--;
             UpdateLives();
+        }
+    }
+
+    /// <summary>
+    /// Decreases player health by one point and updates UI accordingly.
+    /// Triggers game over if health reaches zero.
+    /// </summary>
+    internal void DecreaseHealth()
+    {
+        if (currentLives > 0)
+        {
+            currentLives--;
+            UpdateLives();
+            OnHealthChanged?.Invoke(currentLives);
+        }
+    }
+
+    internal void IncreaseHealth(int amount)
+    {
+        if (currentLives < maxLives)
+        {
+            currentLives = Mathf.Min(currentLives + amount, maxLives);
+            UpdateLives();
+            OnHealthChanged?.Invoke(currentLives);
         }
     }
 

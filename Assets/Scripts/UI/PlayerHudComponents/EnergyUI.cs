@@ -2,14 +2,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Manages the player's energy UI, including energy meter and regeneration.
+/// </summary>
 public class EnergyUI : UIComponent
 {
     [SerializeField] private Button energyButton;
     [SerializeField] private Image energyMeter;
-    [SerializeField] private float energyRegenRate = 0.2f;
+    [SerializeField] private float energyRegenRate = 0.2f;    // Energy regenerated per fixed update
 
     private float energy = 100f;
     private bool isGameOver = false;
+
+    /// <summary>
+    /// Gets the current energy level. Internal access through UIManager.
+    /// </summary>
+    internal float CurrentEnergy => energy;
+
+    /// <summary>
+    /// Event triggered when energy value changes.
+    /// </summary>
+    internal event System.Action<float> OnEnergyChanged;
 
     public override void Initialize()
     {
@@ -25,6 +38,29 @@ public class EnergyUI : UIComponent
         }
     }
 
+    /// <summary>
+    /// Decreases the energy by the specified amount if possible.
+    /// </summary>
+    /// <param name="amount">Amount of energy to decrease</param>
+    internal void DecreaseEnergy(float amount)
+    {
+        if (!isGameOver && energy >= amount)
+        {
+            UpdateEnergy(energy - amount);
+        }
+    }
+
+    /// <summary>
+    /// Adds energy to the player's current energy.
+    /// </summary>
+    internal void AddEnergy(float amount)
+    {
+        if (!isGameOver)
+        {
+            UpdateEnergy(energy + amount);
+        }
+    }
+
     private void UpdateEnergy(float newEnergy)
     {
         energy = newEnergy;
@@ -37,9 +73,10 @@ public class EnergyUI : UIComponent
             energy = 100;
         }
         energyMeter.fillAmount = energy / 100f;
+        OnEnergyChanged?.Invoke(energy);
     }
 
-    public void OnGameOver()
+    internal void OnGameOver()
     {
         isGameOver = true;
     }
@@ -50,7 +87,7 @@ public class EnergyUI : UIComponent
     }
     void FixedUpdate()
     {
-        if (energy < 100)
+        if (!isGameOver && energy < 100 )
         {
             UpdateEnergy(energy + energyRegenRate);
         }
