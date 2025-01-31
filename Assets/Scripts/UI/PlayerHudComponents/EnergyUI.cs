@@ -32,6 +32,7 @@ public class EnergyUI : UIComponent
 
     private void OnEnergyButtonClick()
     {
+        Debug.Log(energy);
         if (!isGameOver && energy >= 10)
         {
             UpdateEnergy(energy - 10);
@@ -53,11 +54,19 @@ public class EnergyUI : UIComponent
     /// <summary>
     /// Adds energy to the player's current energy.
     /// </summary>
-    internal void AddEnergy(float amount)
+    internal void IncreaseEnergy(float amount)
     {
         if (!isGameOver)
         {
             UpdateEnergy(energy + amount);
+        }
+    }
+
+    internal void SetEnergy(float value)
+    {
+        if (!isGameOver)
+        {
+            UpdateEnergy(Mathf.Clamp(value, 0, 100));
         }
     }
 
@@ -87,7 +96,7 @@ public class EnergyUI : UIComponent
     }
     void FixedUpdate()
     {
-        if (!isGameOver && energy < 100 )
+        if (!isGameOver && energy < 100)
         {
             UpdateEnergy(energy + energyRegenRate);
         }
