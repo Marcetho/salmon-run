@@ -17,11 +17,13 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private float baseYPosition;
 
+    private Animator fishAnimator;
     Transform cam;
 
     private void Start()
     {
         cam = Camera.main.transform;
+        fishAnimator = GetComponent<Animator>();
         baseYPosition = transform.position.y;
     }
 
@@ -63,5 +65,10 @@ public class PlayerMovement : MonoBehaviour
         newPosition += transform.up * waveMotion;
         
         transform.position = newPosition;
+
+        if(fishAnimator != null)
+        {
+            fishAnimator.SetFloat("Speed", currentSpeed);
+        }
     }
 }
