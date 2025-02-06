@@ -1,14 +1,25 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
-public enum GameState {Title, Ocean, Freshwater, Won, Lost}
+public enum GameState {Ocean, Freshwater, Won, Lost}
 public class GameController : MonoBehaviour
 {
-    [SerializeField] PlayerData playerData;
-    GameState currentState;
-    void Start()
+    [SerializeField] private PlayerData playerData;
+    [SerializeField] private UIManager gameUI;
+
+    private GameState currentState;
+
+    private void Start()
     {
-        //open title screen
-        currentState = GameState.Title;
+        // Start directly in ocean state since we're in game scene
+        currentState = GameState.Ocean;
+        gameUI.gameObject.SetActive(true);
+        
+        // Initialize game systems
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        // Add initialization logic here
     }
 }

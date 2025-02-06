@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2cff03a844524074fbeebe2ff161ad18
+guid: ad941f59c3f83b34aa06976ecfdd8332
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,23 +110,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TestHealthBar_0
+      name: TempEnergyFish_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 32
+        width: 1024
+        height: 1024
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9a75bb98b91dd524eb6ad52b278ce432
-      internalID: -618648422
+      spriteID: a79d91531a5618841a7d8ebca5d31329
+      internalID: 1902495492
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: f1b4d2dcd664bef47855288aa18d0c6d
+    spriteID: 4a5a40253a12c044796eecc6ce360f17
     internalID: 0
     vertices: []
     indices: 
@@ -145,7 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      TestHealthBar_0: -618648422
+      TempEnergyFish_0: 1902495492
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

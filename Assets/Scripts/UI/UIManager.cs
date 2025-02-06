@@ -1,57 +1,59 @@
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
+/// <summary>
+/// Manages all UI components and provides the public interface for UI interactions.
+/// This is the main entry point for all UI-related operations.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private Button scoreButton;
-    [SerializeField] private Button healthButton;
-    [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private Image healthBar;
+    [Header("UI Components")]
+    [SerializeField] private PlayerHudUI playerHud;
+    [SerializeField] private GameoverTextUI gameOverTextUI;
 
-    private int score = 0;
-    private float health = 100f;
+    #region Internal Methods
 
     private void Start()
     {
-        scoreButton.onClick.AddListener(OnScoreButtonClick);
-        healthButton.onClick.AddListener(OnHealthButtonClick);
-        UpdateScore(0);
-        
-        if (healthBar != null)
-        {
-            healthBar.type = Image.Type.Filled;
-            healthBar.fillMethod = Image.FillMethod.Horizontal;
-            UpdateHealth(health);
-        }
-        else
-        {
-            Debug.LogError("No health bar assigned");
-        }
+        playerHud.Initialize();
+        gameOverTextUI.Initialize();
     }
 
-    private void OnScoreButtonClick()
+    private void OnDestroy()
     {
-        score += 10;
-        UpdateScore(score);
-    }
-    private void OnHealthButtonClick()
-    {
-        health -= 10f;
-        UpdateHealth(health);
+        playerHud.Cleanup();
     }
 
-    private void UpdateScore(int newScore)
+    internal void OnGameOver()
     {
-        scoreText.text = $"Score: {newScore}";
+        gameOverTextUI.ShowGameOver();
+        playerHud.OnGameOver();
     }
 
-    private void UpdateHealth(float newHealth)
-    {
-        health = Mathf.Clamp(newHealth, 0f, 100f);
-        if (healthBar != null)
-        {
-            healthBar.fillAmount = health / 100f;
-        }
-    }
+    #endregion
+
+    #region Public API - Use these methods to interact with the UI
+
+    // Energy Methods
+    public float GetCurrentEnergy() => playerHud.GetCurrentEnergy();
+    public void IncreaseEnergy(float amount) => playerHud.IncreaseEnergy(amount);
+    public void DecreaseEnergy(float amount) => playerHud.DecreaseEnergy(amount);
+
+    // Health Methods
+    public float GetCurrentHealth() => playerHud.GetCurrentHealth();
+    public float GetMaxHealth() => playerHud.GetMaxHealth();
+    public void IncreaseHealth(float amount) => playerHud.IncreaseHealth(amount);
+    public void DecreaseHealth(float amount) => playerHud.DecreaseHealth(amount);
+
+    // Lives Methods
+    public int GetCurrentLives() => playerHud.GetCurrentLives();
+    public int GetMaxLives() => playerHud.GetMaxLives();
+    public void IncreaseLives(int amount) => playerHud.IncreaseLives(amount);
+    public void DecreaseLives() => playerHud.DecreaseLives();
+
+    // Set Methods
+    public void SetLives(int value) => playerHud.SetLives(value);
+    public void SetHealth(float value) => playerHud.SetHealth(value);
+    public void SetEnergy(float value) => playerHud.SetEnergy(value);
+
+    #endregion
 }
