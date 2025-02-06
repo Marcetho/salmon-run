@@ -59,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 newPosition = transform.position + movement;
         
         // Add wave motion relative to current position
-        float waveMotion = Mathf.Sin(Time.time * 2f) * 0.01f;
+        float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
         newPosition += transform.up * waveMotion;
         
         transform.position = newPosition;

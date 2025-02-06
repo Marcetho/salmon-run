@@ -29,13 +29,13 @@ using System.Collections;
 public class CameraMovement : MonoBehaviour
 {
     public Transform target;
-    public float smoothTime = 0.3F;
+    public float smoothTime = 0.1F;
     private Vector3 velocity = Vector3.zero;
 
     //cam movment
     public float offset_x = 0.0f;
-    public float offset_y = 0.7f;
-    public float offset_z = -2.0f;
+    public float offset_y = 0.3f;
+    public float offset_z = -1.0f;
     //cam rotation
     float timeCount = 0.0f;
     float speed = 0.008f;
@@ -49,7 +49,7 @@ public class CameraMovement : MonoBehaviour
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
 
         // move the rotation as well
-        
+
         transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, timeCount * speed);
         timeCount = timeCount + Time.deltaTime;
     }
