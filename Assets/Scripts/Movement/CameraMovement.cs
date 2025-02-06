@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,11 +23,11 @@ public class CameraFollow : MonoBehaviour
         transform.rotation = targetObject.rotation;
     }
 }
-=======
+
 using UnityEngine;
 using System.Collections;
 
-
+*/
 
 
 public class CameraMovement : MonoBehaviour
@@ -61,7 +61,3 @@ public class CameraMovement : MonoBehaviour
 
 }
 
-
-
-
->>>>>>> Stashed changes

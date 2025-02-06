@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+/*
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
 
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
-=======
+*/
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -65,6 +65,6 @@ public class PlayerMovement : MonoBehaviour
         //update the players position using default Unity inputs
         transform.Translate(Vector3.right * horizontalInput * _speed * Time.deltaTime);
         transform.Translate(Vector3.up * verticalInput * _speed * Time.deltaTime);
->>>>>>> Stashed changes
+
     }
 }
