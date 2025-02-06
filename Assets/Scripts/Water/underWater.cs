@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI; // Required for UI elements
 
 public class UnderwaterEffect : MonoBehaviour
 {
@@ -8,6 +9,12 @@ public class UnderwaterEffect : MonoBehaviour
     public float underwaterFogDensity = 0.8f;
     public float underwaterFogStart = 0f;    // Distance where fog begins
     public float underwaterFogEnd = 50f;     // Distance where fog is fully opaque
+
+    public Image underwaterOverlay; // UI Image overlay reference
+    public float overlayFadeSpeed = 2f;  // Speed at which overlay fades
+    public float maxOverlayAlpha = 0.3f; // Maximum opacity of overlay
+    private float targetAlpha;
+
     private bool isUnderwater;
     private Color originalFogColor;
     private Color originalBackgroundColor;
@@ -27,6 +34,14 @@ public class UnderwaterEffect : MonoBehaviour
         originalFogMode = RenderSettings.fogMode;
         originalFogStart = RenderSettings.fogStartDistance;
         originalFogEnd = RenderSettings.fogEndDistance;
+
+        // Ensure the overlay is disabled initially
+        if (underwaterOverlay != null)
+        {
+            Color c = underwaterOverlay.color;
+            c.a = 0f;
+            underwaterOverlay.color = c;
+        }
     }
 
     void Update()
@@ -41,11 +56,21 @@ public class UnderwaterEffect : MonoBehaviour
             if (isUnderwater)
                 SetUnderwater(false);
         }
+
+        // Update overlay alpha
+        if (underwaterOverlay != null)
+        {
+            Color currentColor = underwaterOverlay.color;
+            currentColor.a = Mathf.Lerp(currentColor.a, targetAlpha, Time.deltaTime * overlayFadeSpeed);
+            underwaterOverlay.color = currentColor;
+        }
     }
 
     void SetUnderwater(bool underwater)
     {
         isUnderwater = underwater;
+        targetAlpha = underwater ? maxOverlayAlpha : 0f;
+
         if (underwater)
         {
             RenderSettings.fog = true;
@@ -53,7 +78,10 @@ public class UnderwaterEffect : MonoBehaviour
             RenderSettings.fogColor = underwaterFogColor;
             RenderSettings.fogStartDistance = underwaterFogStart;
             RenderSettings.fogEndDistance = underwaterFogEnd;
-            Camera.main.backgroundColor = underwaterBackgroundColor;
+            if (playerCamera != null)
+            {
+                playerCamera.GetComponent<Camera>().backgroundColor = underwaterBackgroundColor;
+            }
         }
         else
         {
@@ -62,7 +90,10 @@ public class UnderwaterEffect : MonoBehaviour
             RenderSettings.fogColor = originalFogColor;
             RenderSettings.fogStartDistance = originalFogStart;
             RenderSettings.fogEndDistance = originalFogEnd;
-            Camera.main.backgroundColor = originalBackgroundColor;
+            if (playerCamera != null)
+            {
+                playerCamera.GetComponent<Camera>().backgroundColor = originalBackgroundColor;
+            }
         }
     }
 }
