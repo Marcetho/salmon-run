@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,5 +20,37 @@ public class CameraFollow : MonoBehaviour
         transform.position = cameraPosition;
 
         transform.rotation = targetObject.rotation;
+    }
+}
+*/
+using UnityEngine;
+using System.Collections;
+
+public class CameraMovement : MonoBehaviour
+{
+    public Transform target;
+    public float smoothTime = 0.3F;
+    private Vector3 velocity = Vector3.zero;
+
+    //cam movment
+    public float offset_x = 0.0f;
+    public float offset_y = 0.7f;
+    public float offset_z = -2.0f;
+    //cam rotation
+    float timeCount = 0.0f;
+    float speed = 0.008f;
+
+    void Update()
+    {
+        // Define a target position above and behind the target transform
+        Vector3 targetPosition = target.TransformPoint(new Vector3(offset_x, offset_y, offset_z));
+
+        // Smoothly move the camera towards that target position
+        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+
+        // move the rotation as well
+        
+        transform.rotation = Quaternion.Lerp(transform.rotation, target.rotation, timeCount * speed);
+        timeCount = timeCount + Time.deltaTime;
     }
 }
