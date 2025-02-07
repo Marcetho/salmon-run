@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0c8c314846f3e574aa4d2865c54dc5f7
+guid: db0aeae227281b443b1bbdbf58662e5d
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: DarkScales
     second: {fileID: 2100000, guid: e5a8e41d17f932146865eb2cf2d86267, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EyeGleam
+    second: {fileID: 2100000, guid: 8cb0ebed91d08864dad955e310ccb235, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -39,6 +44,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Mouth
     second: {fileID: 2100000, guid: c426d801e384a4248868a540034968ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pupil
+    second: {fileID: 2100000, guid: 9cdcbc9cddd433342b5d6a34a244696f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -192,8 +202,8 @@ ModelImporter:
     importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
