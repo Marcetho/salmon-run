@@ -80,12 +80,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a7f29944b59ad84b97482f290d4befd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxForwardSpeed: 5
-  maxBackwardSpeed: -0.5
-  acceleration: 3
-  deceleration: 3
+  maxForwardSpeed: 7
+  maxBackwardSpeed: -1
+  acceleration: 2
+  deceleration: 2
   rotationSpeed: 100
-  tiltAmount: 15
+  tiltAmount: 5
   verticalTiltAmount: 10
 --- !u!95 &4541544816445233931
 Animator:

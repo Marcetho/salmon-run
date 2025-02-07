@@ -5,11 +5,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float maxForwardSpeed = 5f;
-    public float maxBackwardSpeed = -0.5f; 
+    public float maxBackwardSpeed = -0.5f;
     public float acceleration = 2f;
     public float deceleration = 2f;
     public float rotationSpeed = 100f;
-    public float tiltAmount = 15f;
+    public float tiltAmount = 5f;
     public float verticalTiltAmount = 10f;  // For up/down tilt
 
     private float currentSpeed;
@@ -33,14 +33,14 @@ public class PlayerMovement : MonoBehaviour
         float rotation = 0f;
         if (Input.GetKey(KeyCode.A)) rotation = -1f;
         if (Input.GetKey(KeyCode.D)) rotation = 1f;
-        
+
         float verticalInput = 0f;
         if (Input.GetKey(KeyCode.W)) verticalInput = -1f;
         if (Input.GetKey(KeyCode.S)) verticalInput = 1f;
-        
+
         // Apply rotations
         transform.Rotate(Vector3.up, rotation * rotationSpeed * Time.deltaTime);
-        
+
         // Calculate and apply tilt
         float sideTilt = rotation * tiltAmount;
         float verticalTilt = verticalInput * verticalTiltAmount;
@@ -59,14 +59,14 @@ public class PlayerMovement : MonoBehaviour
         // Apply movement in the direction the fish is facing
         Vector3 movement = transform.forward * currentSpeed * Time.deltaTime;
         Vector3 newPosition = transform.position + movement;
-        
+
         // Add wave motion relative to current position
         float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
         newPosition += transform.up * waveMotion;
-        
+
         transform.position = newPosition;
 
-        if(fishAnimator != null)
+        if (fishAnimator != null)
         {
             fishAnimator.SetFloat("Speed", currentSpeed);
         }

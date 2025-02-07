@@ -29,13 +29,13 @@ using System.Collections;
 public class CameraMovement : MonoBehaviour
 {
     public Transform target;
-    public float smoothTime = 0.1F;
+    public float smoothTime = 0.2F;
     private Vector3 velocity = Vector3.zero;
 
     //cam movment
     public float offset_x = 0.0f;
     public float offset_y = 0.3f;
-    public float offset_z = -1.0f;
+    public float offset_z = -1.5f;
     //cam rotation
     float timeCount = 0.0f;
     float speed = 0.008f;
