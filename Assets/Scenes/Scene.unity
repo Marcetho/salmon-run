@@ -742,10 +742,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1972069813}
-  smoothTime: 0.2
+  smoothTime: 0.1
   offset_x: 0
   offset_y: 0.3
   offset_z: -1.5
+  maxLookAngle: 10
+  lookSpeed: 0.5
 --- !u!45 &1380781421
 Skybox:
   m_ObjectHideFlags: 0

@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour
 
     private float currentSpeed;
     private float targetSpeed;
-    private Vector3 velocity;
     private float baseYPosition;
 
     private Animator fishAnimator;
@@ -31,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Handle rotation and tilt input
         float rotation = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+        if (Mathf.Abs(currentSpeed) < 0.1f) rotation = 0f;  
         float verticalInput = Input.GetKey(KeyCode.S) ? 1f : (Input.GetKey(KeyCode.W) ? -1f : 0f);
 
         // Apply rotations
