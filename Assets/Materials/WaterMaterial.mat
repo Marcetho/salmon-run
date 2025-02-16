@@ -49,6 +49,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _CausticsTex:
+        m_Texture: {fileID: 2800000, guid: 2ea03cf1d91991945ad2e3495afc13cf, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -110,6 +114,8 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _BlendOp: 0
     - _BumpScale: 1
+    - _CausticsScale: 1
+    - _CausticsStrength: 0.358
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 0
@@ -119,6 +125,7 @@ Material:
     - _DstBlend: 10
     - _DstBlendAlpha: 10
     - _EnvironmentReflections: 1
+    - _FoamWidth: 1.42
     - _FresnelPower: 5
     - _GlossMapScale: 0
     - _Glossiness: 0.442
@@ -130,6 +137,9 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _RippleScale: 0.1
+    - _RippleSpeed: 2.18
+    - _RippleStrength: 0.57
     - _SampleGI: 0
     - _SecondaryWaveFreq: 2
     - _Smoothness: 0.188
@@ -139,16 +149,23 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 1
     - _UVSec: 0
+    - _UnderwaterDepthDarkening: 1.22
+    - _UnderwaterSurfaceVisibility: 1
+    - _UnderwaterVisibility: 1
     - _WaveFrequency: 1
     - _WaveHeight: 0.1
-    - _WaveSpeed: 1
+    - _WaveLength: 1
+    - _WaveSpeed: 2
     - _WorkflowMode: 1
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.12726949, g: 0.23848376, b: 0.41509432, a: 0.7647059}
-    - _Color: {r: 0.12726945, g: 0.23848373, b: 0.4150943, a: 0.7647059}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 0.7647059}
+    - _Color: {r: 0.10337308, g: 0.1653411, b: 0.22745098, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ShallowColor: {r: 0.6367924, g: 0.9273584, b: 1, a: 0.4}
+    - _FoamColor: {r: 0.44935924, g: 0.5009076, b: 0.509434, a: 0.8}
+    - _ShallowColor: {r: 0.07609469, g: 0.112981014, b: 0.16981131, a: 0.79607844}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _WaveDirection: {r: 1, g: 0, b: 1, a: 0}
+    - _WindDirection: {r: 1, g: 0, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
