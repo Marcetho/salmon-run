@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; // Required for UI elements
+using UnityEngine.Rendering.PostProcessing;
 
 public class UnderwaterEffect : MonoBehaviour
 {
@@ -24,6 +25,19 @@ public class UnderwaterEffect : MonoBehaviour
     private float originalFogStart;
     private float originalFogEnd;
 
+    [Header("Audio")]
+    public AudioSource underwaterAmbience;
+    public float audioTransitionSpeed = 1f;
+
+    [Header("Effects")]
+    public PostProcessProfile underwaterProfile;
+    public PostProcessProfile normalProfile;
+    public ParticleSystem bubbleEffect;
+    public Renderer underwaterDistortionRenderer; // Change this line - use Renderer instead of Material
+
+    private PostProcessVolume postProcessVolume;
+    private float currentAudioVolume;
+
     void Start()
     {
         // Store original fog and background settings
@@ -42,6 +56,9 @@ public class UnderwaterEffect : MonoBehaviour
             c.a = 0f;
             underwaterOverlay.color = c;
         }
+
+        postProcessVolume = Camera.main.GetComponent<PostProcessVolume>();
+        if (bubbleEffect != null) bubbleEffect.Stop();
     }
 
     void Update()
@@ -64,12 +81,36 @@ public class UnderwaterEffect : MonoBehaviour
             currentColor.a = Mathf.Lerp(currentColor.a, targetAlpha, Time.deltaTime * overlayFadeSpeed);
             underwaterOverlay.color = currentColor;
         }
+
+        // Update audio transition
+        if (underwaterAmbience != null)
+        {
+            float targetVolume = isUnderwater ? 1f : 0f;
+            currentAudioVolume = Mathf.Lerp(currentAudioVolume, targetVolume, Time.deltaTime * audioTransitionSpeed);
+            underwaterAmbience.volume = currentAudioVolume;
+        }
     }
 
     void SetUnderwater(bool underwater)
     {
         isUnderwater = underwater;
         targetAlpha = underwater ? maxOverlayAlpha : 0f;
+
+        // Handle particle effects
+        if (underwater && bubbleEffect != null)
+            bubbleEffect.Play();
+        else if (bubbleEffect != null)
+            bubbleEffect.Stop();
+
+        // Handle post processing
+        if (postProcessVolume != null)
+            postProcessVolume.profile = underwater ? underwaterProfile : normalProfile;
+
+        // Handle distortion effect - replace the material.enabled line with this:
+        if (underwaterDistortionRenderer != null)
+        {
+            underwaterDistortionRenderer.enabled = underwater;
+        }
 
         if (underwater)
         {
@@ -94,6 +135,13 @@ public class UnderwaterEffect : MonoBehaviour
             {
                 playerCamera.GetComponent<Camera>().backgroundColor = originalBackgroundColor;
             }
+        }
+
+        // Start/Stop underwater ambient sound
+        if (underwaterAmbience != null)
+        {
+            if (underwater && !underwaterAmbience.isPlaying)
+                underwaterAmbience.Play();
         }
     }
 }

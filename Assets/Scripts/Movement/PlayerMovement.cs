@@ -30,13 +30,8 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         // Handle rotation and tilt input
-        float rotation = 0f;
-        if (Input.GetKey(KeyCode.A)) rotation = -1f;
-        if (Input.GetKey(KeyCode.D)) rotation = 1f;
-
-        float verticalInput = 0f;
-        if (Input.GetKey(KeyCode.W)) verticalInput = -1f;
-        if (Input.GetKey(KeyCode.S)) verticalInput = 1f;
+        float rotation = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+        float verticalInput = Input.GetKey(KeyCode.S) ? 1f : (Input.GetKey(KeyCode.W) ? -1f : 0f);
 
         // Apply rotations
         transform.Rotate(Vector3.up, rotation * rotationSpeed * Time.deltaTime);
