@@ -53,6 +53,6 @@ public class CameraMovement : MonoBehaviour
         }
 
         // Smoothly interpolate rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, Time.deltaTime * 10f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, Time.deltaTime *5f);
     }
 }
