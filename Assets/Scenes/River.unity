@@ -742,10 +742,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1972069813}
-  smoothTime: 0.2
+  smoothTime: 0.1
   offset_x: 0
   offset_y: 0.3
   offset_z: -1.5
+  maxLookAngle: 10
+  lookSpeed: 0.5
 --- !u!45 &1380781421
 Skybox:
   m_ObjectHideFlags: 0
@@ -760,143 +762,76 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1438817498477858220, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
   m_PrefabInstance: {fileID: 5621226426749150694}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2013140607
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2013140608}
-  - component: {fileID: 2013140611}
-  - component: {fileID: 2013140610}
-  - component: {fileID: 2013140609}
-  - component: {fileID: 2013140612}
-  m_Layer: 1
-  m_Name: River Water
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2013140608
+--- !u!4 &2013140608 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+  m_PrefabInstance: {fileID: 2208881814540503055}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013140607}
+--- !u!1001 &2208881814540503055
+PrefabInstance:
+  m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 390, y: 11.6, z: 217.4}
-  m_LocalScale: {x: 25, y: 10, z: 25}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1100369160}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &2013140609
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013140607}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &2013140610
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013140607}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 2d17fab05b20b4c24bfe3e293c1c1f54, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &2013140611
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013140607}
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2013140612
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013140607}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad8e7614c8f8a6c48aa69d3b27dc2c7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerCamera: {fileID: 1380781418}
-  underwaterFogColor: {r: 0.050980397, g: 0.14901961, b: 0.25882354, a: 1}
-  underwaterBackgroundColor: {r: 0.035294116, g: 0.07903559, b: 0.18431373, a: 1}
-  underwaterFogDensity: 2.85
-  underwaterFogStart: 0
-  underwaterFogEnd: 54.7
-  underwaterOverlay: {fileID: 911404250}
-  overlayFadeSpeed: 2
-  maxOverlayAlpha: 0.3
-  underwaterAmbience: {fileID: 0}
-  audioTransitionSpeed: 1
-  underwaterProfile: {fileID: 0}
-  normalProfile: {fileID: 0}
-  bubbleEffect: {fileID: 0}
-  underwaterDistortionRenderer: {fileID: 0}
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1100369160}
+    m_Modifications:
+    - target: {fileID: 3455663736332191169, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_Name
+      value: Water Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 361.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 11.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 175
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8968907341964439012, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 1380781418}
+    - target: {fileID: 8968907341964439012, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: underwaterOverlay
+      value: 
+      objectReference: {fileID: 911404250}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
 --- !u!1001 &5621226426749150694
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -949,9 +884,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: SockeyeSalmon(Ocean)
       objectReference: {fileID: 0}
-    - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: verticalTiltAmount
-      value: 15
+    - target: {fileID: 8036504716256927064, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+      propertyPath: m_AngularDrag
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8036504716256927064, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
