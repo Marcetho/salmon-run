@@ -590,6 +590,59 @@ Transform:
   - {fileID: 2013140608}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1230086160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1230086161}
+  - component: {fileID: 1230086162}
+  m_Layer: 0
+  m_Name: CameraRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1230086161
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230086160}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -50.269413, y: 16.654736, z: 61.156967}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1380781418}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1230086162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1230086160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b5917f3b0f6144d9233fde76eaea34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1972069813}
+  smoothTime: 0.1
+  offset_x: 0
+  offset_y: 0.3
+  offset_z: 0
+  maxHorizontalLookAngle: 360
+  maxVerticalLookAngle: 15
+  lookSpeed: 2
 --- !u!1 &1380781415
 GameObject:
   m_ObjectHideFlags: 0
@@ -602,7 +655,6 @@ GameObject:
   - component: {fileID: 1380781417}
   - component: {fileID: 1380781416}
   - component: {fileID: 1380781419}
-  - component: {fileID: 1380781420}
   - component: {fileID: 1380781421}
   m_Layer: 3
   m_Name: Main Camera
@@ -678,12 +730,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380781415}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -52.7, y: 18.1, z: 63.3}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1.677}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1230086161}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1380781419
 MonoBehaviour:
@@ -729,25 +781,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &1380781420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1380781415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06b5917f3b0f6144d9233fde76eaea34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 1972069813}
-  smoothTime: 0.1
-  offset_x: 0
-  offset_y: 0.3
-  offset_z: -1.5
-  maxLookAngle: 10
-  lookSpeed: 0.5
 --- !u!45 &1380781421
 Skybox:
   m_ObjectHideFlags: 0
@@ -884,14 +917,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: SockeyeSalmon(Ocean)
       objectReference: {fileID: 0}
-    - target: {fileID: 8036504716256927064, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: m_AngularDrag
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8036504716256927064, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: m_Interpolate
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -901,7 +926,7 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1380781418}
+  - {fileID: 1230086161}
   - {fileID: 248871690}
   - {fileID: 1100369160}
   - {fileID: 5621226426749150694}

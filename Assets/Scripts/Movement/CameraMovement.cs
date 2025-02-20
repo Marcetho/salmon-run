@@ -13,7 +13,8 @@ public class CameraMovement : MonoBehaviour
     public float offset_z = -1.5f;
 
     //look settings
-    public float maxLookAngle = 15f;
+    public float maxHorizontalLookAngle = 360f;
+    public float maxVerticalLookAngle = 15f;
     public float lookSpeed = 1f;
     private Quaternion originalRotation;
     private Quaternion targetLookRotation;
@@ -38,8 +39,8 @@ public class CameraMovement : MonoBehaviour
             lookAngles.y += Input.GetAxis("Mouse X") * lookSpeed;
 
             // Clamp the angles
-            lookAngles.x = Mathf.Clamp(lookAngles.x, -maxLookAngle, maxLookAngle);
-            lookAngles.y = Mathf.Clamp(lookAngles.y, -maxLookAngle, maxLookAngle);
+            lookAngles.x = Mathf.Clamp(lookAngles.x, -maxVerticalLookAngle, maxVerticalLookAngle);
+            lookAngles.y = Mathf.Clamp(lookAngles.y, -maxHorizontalLookAngle, maxHorizontalLookAngle);
 
             // Create rotation offset from base target rotation
             Quaternion xRotation = Quaternion.Euler(lookAngles.x, 0, 0);
