@@ -242,7 +242,7 @@ MonoBehaviour:
   startButton: {fileID: 1084077054}
   titleString: Salmon Run
   subtitleString: 'Fish: The Game'
-  gameSceneName: UITestingScene
+  gameSceneName: River
 --- !u!1 &750737190
 GameObject:
   m_ObjectHideFlags: 0
