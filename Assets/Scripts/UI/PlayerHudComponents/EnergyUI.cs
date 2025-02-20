@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using Unity.VisualScripting;
 
 /// <summary>
 /// Manages the player's energy UI, including energy meter and regeneration.
@@ -9,7 +11,8 @@ public class EnergyUI : UIComponent
 {
     [SerializeField] private Button energyButton;
     [SerializeField] private Image energyMeter;
-    [SerializeField] private float energyRegenRate = 0.2f;    // Energy regenerated per fixed update
+    [SerializeField] private float energyRegenRate = 0.2f;
+    [SerializeField] private UIManager uiManager;
 
     private float energy = 100f;
     private bool isGameOver = false;
@@ -33,7 +36,7 @@ public class EnergyUI : UIComponent
     private void OnEnergyButtonClick()
     {
         Debug.Log(energy);
-        if (!isGameOver && energy >= 10)
+        if (!isGameOver)
         {
             UpdateEnergy(energy - 10);
         }
@@ -45,7 +48,7 @@ public class EnergyUI : UIComponent
     /// <param name="amount">Amount of energy to decrease</param>
     internal void DecreaseEnergy(float amount)
     {
-        if (!isGameOver && energy >= amount)
+        if (!isGameOver)
         {
             UpdateEnergy(energy - amount);
         }
@@ -75,6 +78,8 @@ public class EnergyUI : UIComponent
         energy = newEnergy;
         if (energy < 0)
         {
+            uiManager.DecreaseHealth(Mathf.Abs(energy * 0.5f));
+            Debug.Log("Energy is less than 0");
             energy = 0;
         }
         else if (energy > 100)

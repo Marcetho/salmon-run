@@ -798,6 +798,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2587020391015017064, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5000
+      objectReference: {fileID: 0}
     - target: {fileID: 3646016380857506964, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 0
@@ -1059,10 +1063,10 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 352337880}
+  - {fileID: 1547382367}
   - {fileID: 1230086161}
   - {fileID: 248871690}
   - {fileID: 1100369160}
   - {fileID: 5621226426749150694}
   - {fileID: 996086805}
-  - {fileID: 352337880}
-  - {fileID: 1547382367}

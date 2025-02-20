@@ -4,9 +4,7 @@ public enum GameState { Ocean, Freshwater, Won, Lost }
 public class GameController : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private PlayerData playerData;
     [SerializeField] private GameObject gameUIPrefab;
-    [SerializeField] private PlayerMovement playerMovement;
 
     private UIManager uiManager;
     private GameState currentState;
@@ -21,6 +19,7 @@ public class GameController : MonoBehaviour
 
         // Initialize game systems
         InitializeGame();
+        Debug.Log("Game initialized");
     }
 
     private void InitializeGame()

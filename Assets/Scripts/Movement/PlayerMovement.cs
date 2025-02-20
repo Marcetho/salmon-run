@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private UIManager uiManager;
+
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
     public float maxBackwardSpeed = -0.5f;
-    public float acceleration = 2f;
-    public float deceleration = 2f;
+    public float baseAcceleration = 2f;
+    public float baseDeceleration = 2f;
     public float rotationSpeed = 100f;
     public float yawAmount = 5f;
     public float pitchAmount = 45f;  // For up/down tilt
@@ -21,7 +24,6 @@ public class PlayerMovement : MonoBehaviour
     private bool inWater; // maybe use later for animation purposes
     Transform cam;
     private Rigidbody rb;
-
     private void Start()
     {
         cam = Camera.main.transform;
@@ -32,7 +34,6 @@ public class PlayerMovement : MonoBehaviour
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
     }
-
     void FixedUpdate()
     {
         // Handle rotation and tilt input
@@ -51,10 +52,18 @@ public class PlayerMovement : MonoBehaviour
 
         // Handle speed changes based on shift/ctrl
         float moveInput = 0f;
-        if (Input.GetKey(KeyCode.LeftShift)) moveInput = 1f;
-        else if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+        if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
+        if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+        float speed = maxForwardSpeed;
+        float acceleration = baseAcceleration;
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+        {
+            speed = maxForwardSpeed * 2.5f;
+            acceleration *= 60f;
+            uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
+        }
 
-        targetSpeed = moveInput * maxForwardSpeed;
+        targetSpeed = moveInput * speed;
         currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
         if (currentSpeed < maxBackwardSpeed) currentSpeed = maxBackwardSpeed;
 
@@ -73,21 +82,23 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other) { //in water
+    private void OnTriggerEnter(Collider other)
+    { //in water
         if (other.gameObject.tag == "Water")
             inWater = true;
-            rb.linearDamping = 1f;
-            rotationSpeed = 100f;
-            maxForwardSpeed = 5f;
-            eForceDir = new Vector3(0, 0, 0);
+        rb.linearDamping = 1f;
+        rotationSpeed = 100f;
+        maxForwardSpeed = 5f;
+        eForceDir = new Vector3(0, 0, 0);
     }
 
-    private void OnTriggerExit(Collider other){ //out of water
+    private void OnTriggerExit(Collider other)
+    { //out of water
         if (other.gameObject.tag == "Water")
             inWater = false;
-            rb.linearDamping = 0.1f;
-            rotationSpeed = 0f;
-            maxForwardSpeed = 0.1f;
-            eForceDir = new Vector3(0, -3, 0);
+        rb.linearDamping = 0.1f;
+        rotationSpeed = 0f;
+        maxForwardSpeed = 0.1f;
+        eForceDir = new Vector3(0, -3, 0);
     }
 }
