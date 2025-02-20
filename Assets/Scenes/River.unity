@@ -915,13 +915,34 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
       propertyPath: m_Name
-      value: SockeyeSalmon(Ocean)
+      value: PlayerSalmon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 5621226426749150696}
   m_SourcePrefab: {fileID: 100100000, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+--- !u!1 &5621226426749150695 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+  m_PrefabInstance: {fileID: 5621226426749150694}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5621226426749150696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5621226426749150695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d50e2da029d9bd140a189d6e35ad5757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPlayer: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
