@@ -8,8 +8,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
     public float maxBackwardSpeed = -0.5f;
-    public float baseAcceleration = 2f;
-    public float baseDeceleration = 2f;
+    public float baseAcceleration = 4f;
+    public float baseDeceleration = 16f;
     public float rotationSpeed = 100f;
     public float yawAmount = 5f;
     public float pitchAmount = 45f;  // For up/down tilt
@@ -56,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
         float speed = maxForwardSpeed;
         float acceleration = baseAcceleration;
+        float deceleration = baseDeceleration;
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
         {
             speed = maxForwardSpeed * 2.5f;
@@ -64,7 +65,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         targetSpeed = moveInput * speed;
-        currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
+        if (speed > targetSpeed)
+            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, deceleration * Time.fixedDeltaTime);
+        else
+            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
         if (currentSpeed < maxBackwardSpeed) currentSpeed = maxBackwardSpeed;
 
         // Apply movement in the direction the fish is facing
@@ -86,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
     { //in water
         if (other.gameObject.tag == "Water")
             inWater = true;
-        rb.linearDamping = 1f;
+        rb.linearDamping = 1.5f;
         rotationSpeed = 100f;
         maxForwardSpeed = 5f;
         eForceDir = new Vector3(0, 0, 0);
