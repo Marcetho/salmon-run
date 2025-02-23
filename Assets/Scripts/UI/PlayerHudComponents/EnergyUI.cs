@@ -16,6 +16,9 @@ public class EnergyUI : UIComponent
 
     private float energy = 100f;
     private bool isGameOver = false;
+    private float damageTimer = 0f;
+    private const float DAMAGE_INTERVAL = 0.5f;
+    private const float DAMAGE_AMOUNT = 10f;
 
     /// <summary>
     /// Gets the current energy level. Internal access through UIManager.
@@ -75,17 +78,7 @@ public class EnergyUI : UIComponent
 
     private void UpdateEnergy(float newEnergy)
     {
-        energy = newEnergy;
-        if (energy < 0)
-        {
-            uiManager.DecreaseHealth(Mathf.Abs(energy * 0.5f));
-            Debug.Log("Energy is less than 0");
-            energy = 0;
-        }
-        else if (energy > 100)
-        {
-            energy = 100;
-        }
+        energy = Mathf.Clamp(newEnergy, 0, 100);
         energyMeter.fillAmount = energy / 100f;
         OnEnergyChanged?.Invoke(energy);
     }
@@ -101,9 +94,21 @@ public class EnergyUI : UIComponent
     }
     void FixedUpdate()
     {
-        if (!isGameOver && energy < 100)
+        if (!isGameOver)
         {
-            UpdateEnergy(energy + energyRegenRate);
+            if (energy < 100 && energy > 0)
+            {
+                UpdateEnergy(energy + energyRegenRate);
+            }
+            else if (energy <= 0)
+            {
+                damageTimer += Time.fixedDeltaTime;
+                if (damageTimer >= DAMAGE_INTERVAL)
+                {
+                    uiManager.DecreaseHealth(DAMAGE_AMOUNT);
+                    damageTimer = 0f;
+                }
+            }
         }
     }
 }

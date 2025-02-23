@@ -95,8 +95,11 @@ public class LivesUI : UIComponent
             currentLives--;
             UpdateLives();
             OnLivesChanged?.Invoke(currentLives);
-            uiManager.SetEnergy(100);
-            uiManager.SetHealth(100);
+            if (uiManager != null)
+            {
+                uiManager.SetHealth(100f);
+                uiManager.SetEnergy(100f);
+            }
         }
     }
 
