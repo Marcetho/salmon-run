@@ -70,24 +70,22 @@ Shader "Custom/LowPolyWater"
                 float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 o.worldPos = worldPos;
                 
+                // Calculate multiple waves for more natural ripples
                 float2 windDir = normalize(_WindDirection.xz);
                 
-                // Calculate raw wave values (ranging from -1 to 1)
+                // Main ripples
                 float ripple1 = sin(dot(worldPos.xz * _RippleScale, windDir) + _Time.y * _RippleSpeed);
                 float ripple2 = sin(dot(worldPos.xz * _RippleScale * 1.4, windDir * 0.8) + _Time.y * _RippleSpeed * 0.8);
                 
+                // Cross ripples for more variation
                 float2 crossDir = float2(-windDir.y, windDir.x);
                 float ripple3 = sin(dot(worldPos.xz * _RippleScale * 0.8, crossDir) + _Time.y * _RippleSpeed * 1.2);
                 
-                // Combine ripples
+                // Combine ripples with different weights
                 float wave = (ripple1 * 0.5 + ripple2 * 0.3 + ripple3 * 0.2) * _RippleStrength * _WaveHeight;
                 
-                // Add noise variation
+                // Add small noise variation
                 wave += sin(worldPos.x * 8.0 + worldPos.z * 6.0 + _Time.y * 0.5) * _WaveHeight * 0.1;
-                
-                // Calculate the minimum offset needed (just enough to make the lowest point at y=0)
-                float minOffset = _WaveHeight * _RippleStrength * 0.5;
-                wave += minOffset;
                 
                 // Apply height modification
                 v.vertex.y += wave;
