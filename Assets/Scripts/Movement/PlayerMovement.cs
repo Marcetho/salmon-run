@@ -43,8 +43,13 @@ public class PlayerMovement : MonoBehaviour
     }
     void FixedUpdate()
     {
+        float yawInput = 0f;
         // Handle rotation and tilt input
-        float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+        if (inWater)
+        {
+            yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+        }
+        else
         if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
         float pitchInput = Input.GetKey(KeyCode.S) ? 1f : (Input.GetKey(KeyCode.W) ? -1f : 0f);
 
