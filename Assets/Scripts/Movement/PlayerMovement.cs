@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class NewPlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
