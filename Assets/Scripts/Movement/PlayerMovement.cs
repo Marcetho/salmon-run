@@ -99,7 +99,11 @@ public class PlayerMovement : MonoBehaviour
         // float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
         // movement += transform.up * waveMotion;
 
-        rb.AddForce(movement);
+        if (inWater)
+        {
+            rb.AddForce(movement);
+        }
+
         eForce.force = eForceDir;
 
         if (fishAnimator != null)
