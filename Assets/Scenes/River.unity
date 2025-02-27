@@ -1077,14 +1077,6 @@ PrefabInstance:
       propertyPath: uiManager
       value: 
       objectReference: {fileID: 447776546}
-    - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: baseAcceleration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: baseDeceleration
-      value: 16
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
