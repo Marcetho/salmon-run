@@ -16,8 +16,15 @@ public class PlayerMovement : MonoBehaviour
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
 
-    private float currentSpeed;
-    private float targetSpeed;
+    [Header("Energy Settings")]
+    [SerializeField] private float sprintDamageInterval = 0.5f;
+    [SerializeField] private float sprintDamageAmount = 5f;
+    [SerializeField] private float waterExitEnergyCost = 40f;
+
+    private float lastSprintDamageTime;
+
+    private float movementSpeed;  // renamed from currentSpeed
+    private float targetMovementSpeed;  // renamed from targetSpeed
     private Vector3 velocity;
     private float baseYPosition;
     private Animator fishAnimator;
@@ -38,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Handle rotation and tilt input
         float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-        if (Mathf.Abs(currentSpeed) < 0.1f) yawInput = 0f;
+        if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
         float pitchInput = Input.GetKey(KeyCode.S) ? 1f : (Input.GetKey(KeyCode.W) ? -1f : 0f);
 
         // Apply rotations
@@ -59,20 +66,35 @@ public class PlayerMovement : MonoBehaviour
         float deceleration = baseDeceleration;
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
         {
-            speed = maxForwardSpeed * 2.5f;
-            acceleration *= 60f;
-            uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
+            if (inWater)
+            {
+                speed = maxForwardSpeed * 2.5f;
+                acceleration *= 60f;
+
+                if (!uiManager.HasEnoughEnergy(40f * Time.fixedDeltaTime))
+                {
+                    if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
+                    {
+                        uiManager.DecreaseHealth(sprintDamageAmount);
+                        lastSprintDamageTime = Time.time;
+                    }
+                }
+                else
+                {
+                    uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
+                }
+            }
         }
 
-        targetSpeed = moveInput * speed;
-        if (speed > targetSpeed)
-            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, deceleration * Time.fixedDeltaTime);
+        targetMovementSpeed = moveInput * speed;
+        if (speed > targetMovementSpeed)
+            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
         else
-            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
-        if (currentSpeed < maxBackwardSpeed) currentSpeed = maxBackwardSpeed;
+            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
+        if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
 
         // Apply movement in the direction the fish is facing
-        Vector3 movement = transform.forward * currentSpeed;
+        Vector3 movement = transform.forward * movementSpeed;
 
         // float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
         // movement += transform.up * waveMotion;
@@ -82,7 +104,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (fishAnimator != null)
         {
-            fishAnimator.SetFloat("Speed", currentSpeed);
+            fishAnimator.SetFloat("Speed", movementSpeed);
         }
     }
 
@@ -99,10 +121,25 @@ public class PlayerMovement : MonoBehaviour
     private void OnTriggerExit(Collider other)
     { //out of water
         if (other.gameObject.tag == "Water")
+        {
             inWater = false;
-        rb.linearDamping = 0.1f;
-        rotationSpeed = 0f;
-        maxForwardSpeed = 0.1f;
-        eForceDir = new Vector3(0, -3, 0);
+            rb.linearDamping = 0.1f;
+            rotationSpeed = 0f;
+            maxForwardSpeed = 0.1f;
+            eForceDir = new Vector3(0, -3, 0);
+
+            // Handle energy cost for exiting water
+            float currentEnergy = uiManager.GetCurrentEnergy();
+            if (currentEnergy >= waterExitEnergyCost)
+            {
+                uiManager.DecreaseEnergy(waterExitEnergyCost);
+            }
+            else
+            {
+                uiManager.DecreaseEnergy(currentEnergy); // Use remaining energy
+                float remainingCost = waterExitEnergyCost - currentEnergy;
+                uiManager.DecreaseHealth(remainingCost * 0.5f); // Convert remaining energy cost to health damage
+            }
+        }
     }
 }
