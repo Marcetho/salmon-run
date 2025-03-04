@@ -9,7 +9,6 @@ using Unity.VisualScripting;
 /// </summary>
 public class EnergyUI : UIComponent
 {
-    [SerializeField] private Button energyButton;
     [SerializeField] private Image energyMeter;
     [SerializeField] private float energyRegenRate = 0.2f;
     [SerializeField] private UIManager uiManager;
@@ -29,17 +28,9 @@ public class EnergyUI : UIComponent
 
     public override void Initialize()
     {
-        energyButton.onClick.AddListener(OnEnergyButtonClick);
         UpdateEnergy(energy);
     }
 
-    private void OnEnergyButtonClick()
-    {
-        if (!isGameOver)
-        {
-            UpdateEnergy(energy - 10);
-        }
-    }
 
     /// <summary>
     /// Decreases the energy by the specified amount if possible.
@@ -87,7 +78,6 @@ public class EnergyUI : UIComponent
 
     public override void Cleanup()
     {
-        energyButton.onClick.RemoveListener(OnEnergyButtonClick);
     }
 
     void FixedUpdate()

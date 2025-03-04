@@ -6,7 +6,6 @@ using UnityEngine.UI;
 /// </summary>
 public class LivesUI : UIComponent
 {
-    [SerializeField] private Button healthButton;
     [SerializeField] private GameObject lifeContainer;
     [SerializeField] private Image lifePrefab;
     [SerializeField] private Sprite fullLifeSprite;
@@ -48,12 +47,6 @@ public class LivesUI : UIComponent
         // Remove layout component if exists
         var layout = lifeContainer.GetComponent<HorizontalLayoutGroup>();
         if (layout != null) Destroy(layout);
-
-        // Add button listener if button exists
-        if (healthButton != null)
-        {
-            healthButton.onClick.AddListener(OnHealthButtonClick);
-        }
 
         InitializeLives();
         isInitialized = true;
@@ -120,15 +113,6 @@ public class LivesUI : UIComponent
             {
                 Debug.LogError($"Error creating life icon #{i}: {e.Message}");
             }
-        }
-    }
-
-    private void OnHealthButtonClick()
-    {
-        if (currentLives > 0)
-        {
-            currentLives--;
-            UpdateLives();
         }
     }
 
@@ -223,9 +207,5 @@ public class LivesUI : UIComponent
 
     public override void Cleanup()
     {
-        if (healthButton != null)
-        {
-            healthButton.onClick.RemoveListener(OnHealthButtonClick);
-        }
     }
 }

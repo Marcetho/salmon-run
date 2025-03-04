@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints;
 
     [Header("Game Settings")]
-    [SerializeField] private int initialLivesCount = 3;
+    [SerializeField] private int initialLivesCount = 5;
     private GameState currentState;
     private List<GameObject> spawnedFishes = new List<GameObject>();
     private int currentPlayerIndex = 0;
@@ -57,13 +57,7 @@ public class GameController : MonoBehaviour
             if (spawnedFishes.Count > 0)
             {
                 currentPlayerIndex = 0;
-                PlayerStats stats = spawnedFishes[currentPlayerIndex].GetComponent<PlayerStats>();
-                if (stats != null)
-                {
-                    stats.IsCurrentPlayer = true;
-                }
-                CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
-                camera.target = spawnedFishes[currentPlayerIndex].transform;
+                SetCurrentPlayer(currentPlayerIndex);
             }
             else
             {
@@ -75,7 +69,16 @@ public class GameController : MonoBehaviour
             Debug.LogError($"Error spawning fish: {e.Message}\n{e.StackTrace}");
         }
     }
-
+    private void SetCurrentPlayer(int index)
+    {
+        PlayerStats stats = spawnedFishes[currentPlayerIndex].GetComponent<PlayerStats>();
+        if (stats != null)
+        {
+            stats.IsCurrentPlayer = true;
+        }
+        CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
+        camera.target = spawnedFishes[currentPlayerIndex].transform;
+    }
     private void SpawnFish()
     {
         Vector3 spawnPosition = Vector3.zero;
@@ -125,7 +128,7 @@ public class GameController : MonoBehaviour
     private void OnCurrentPlayerDied()
     {
         remainingLives--;
-        uiManager.SetLives(remainingLives);
+        uiManager.DecreaseLives();
 
         if (remainingLives <= 0)
         {
@@ -143,6 +146,11 @@ public class GameController : MonoBehaviour
                 stats.IsCurrentPlayer = false;
                 stats.OnPlayerDeath -= OnCurrentPlayerDied;
             }
+            Destroy(currentPlayer);
+            spawnedFishes.RemoveAt(currentPlayerIndex);
+            currentPlayerIndex = remainingLives - 1;
+            SetCurrentPlayer(currentPlayerIndex);
+
         }
     }
 

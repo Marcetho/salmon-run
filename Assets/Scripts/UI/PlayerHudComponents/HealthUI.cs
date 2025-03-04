@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class HealthUI : UIComponent
 {
     [SerializeField] private Image healthBar;
-    [SerializeField] private Button healthButton;
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private UIManager uiManager;
 
@@ -19,17 +18,9 @@ public class HealthUI : UIComponent
     public override void Initialize()
     {
         currentHealth = maxHealth;
-        healthButton.onClick.AddListener(OnHealthButtonClick);
         UpdateHealthBar();
     }
 
-    private void OnHealthButtonClick()
-    {
-        if (!isGameOver && currentHealth >= 10)
-        {
-            DecreaseHealth(10);
-        }
-    }
 
     internal void DecreaseHealth(float amount)
     {
@@ -38,11 +29,6 @@ public class HealthUI : UIComponent
             currentHealth = Mathf.Max(0, currentHealth - amount);
             UpdateHealthBar();
             OnHealthChanged?.Invoke(currentHealth);
-            
-            if (currentHealth <= 0)
-            {
-                uiManager.DecreaseLives();
-            }
         }
     }
 
@@ -63,11 +49,6 @@ public class HealthUI : UIComponent
             currentHealth = Mathf.Clamp(value, 0, maxHealth);
             UpdateHealthBar();
             OnHealthChanged?.Invoke(currentHealth);
-            
-            if (currentHealth <= 0)
-            {
-                uiManager.DecreaseLives();
-            }
         }
     }
 
@@ -83,6 +64,5 @@ public class HealthUI : UIComponent
 
     public override void Cleanup()
     {
-        healthButton.onClick.RemoveListener(OnHealthButtonClick);
     }
 }

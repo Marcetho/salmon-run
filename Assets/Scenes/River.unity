@@ -324,7 +324,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7020484979564005909, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
   m_PrefabInstance: {fileID: 1547382367}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1539689325}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5967f63003d93cc4f9fea7eabcf470ea, type: 3}
@@ -801,11 +801,6 @@ Skybox:
   m_GameObject: {fileID: 1380781415}
   m_Enabled: 1
   m_CustomSkybox: {fileID: 2100000, guid: 56113b3b655ab7349bab4d7d405c258a, type: 2}
---- !u!1 &1539689325 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6221307979876474869, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
-  m_PrefabInstance: {fileID: 1547382367}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1547382367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -947,7 +942,10 @@ PrefabInstance:
       value: UICanvas
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8451621223184467252, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+    - {fileID: 4057204875463238958, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+    - {fileID: 1683976197513164006, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
@@ -980,11 +978,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0de61223d4773dd44a01c98311632343, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameUIPrefab: {fileID: 1539689325}
+  uiManager: {fileID: 447776546}
+  cameraMovement: {fileID: 1230086162}
   playerPrefab: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
   spawnPoints:
   - {fileID: 1972069813}
-  initialLivesCount: 3
+  initialLivesCount: 5
 --- !u!4 &1941380930
 Transform:
   m_ObjectHideFlags: 0
@@ -1137,7 +1136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
       propertyPath: m_Name
-      value: SockeyeSalmon(Ocean)
+      value: SockeyeSalmon(Ocean)(ToDelete)
       objectReference: {fileID: 0}
     - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
       propertyPath: uiManager
