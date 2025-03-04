@@ -1,9 +1,10 @@
 using UnityEngine;
-
+using System;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIManager uiManager;
+    private PlayerStats playerStats;
 
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
@@ -23,8 +24,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float lastSprintDamageTime;
 
-    private float movementSpeed;  // renamed from currentSpeed
-    private float targetMovementSpeed;  // renamed from targetSpeed
+    private float movementSpeed;
+    private float targetMovementSpeed;
     private Vector3 velocity;
     private float baseYPosition;
     private Animator fishAnimator;
@@ -42,9 +43,48 @@ public class PlayerMovement : MonoBehaviour
         inWater = true;
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
+
+        // Get the player stats component
+        playerStats = GetComponent<PlayerStats>();
+        if (playerStats == null)
+        {
+            playerStats = gameObject.AddComponent<PlayerStats>();
+        }
+
+        // Subscribe to player death event
+        playerStats.OnPlayerDeath += OnPlayerDeath;
+
+        // Sync UI with initial player stats
+        if (uiManager != null && playerStats.IsCurrentPlayer)
+        {
+            uiManager.SetHealth(playerStats.CurrentHealth);
+            uiManager.SetEnergy(playerStats.CurrentEnergy);
+        }
     }
+
+    private void OnDestroy()
+    {
+        if (playerStats != null)
+        {
+            playerStats.OnPlayerDeath -= OnPlayerDeath;
+        }
+    }
+
+    private void OnPlayerDeath()
+    {
+        // Handle player death logic
+        if (playerStats.IsCurrentPlayer && uiManager != null)
+        {
+            uiManager.DecreaseLives();
+        }
+    }
+
     void FixedUpdate()
     {
+        // Only control if this is the current player
+        if (!playerStats.IsCurrentPlayer)
+            return;
+
         // Handle rotation and tilt input
         float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
         if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
@@ -92,17 +132,21 @@ public class PlayerMovement : MonoBehaviour
                 speed = maxForwardSpeed * 2.5f;
                 acceleration *= 60f;
 
-                if (!uiManager.HasEnoughEnergy(40f * Time.fixedDeltaTime))
+                float energyCost = 40f * Time.fixedDeltaTime;
+                if (!playerStats.TryUseEnergy(energyCost))
                 {
                     if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
                     {
-                        uiManager.DecreaseHealth(sprintDamageAmount);
+                        playerStats.ModifyHealth(-sprintDamageAmount);
                         lastSprintDamageTime = Time.time;
                     }
                 }
-                else
+
+                // Update UI for current player
+                if (uiManager != null)
                 {
-                    uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
+                    uiManager.SetEnergy(playerStats.CurrentEnergy);
+                    uiManager.SetHealth(playerStats.CurrentHealth);
                 }
             }
         }
@@ -116,9 +160,6 @@ public class PlayerMovement : MonoBehaviour
 
         // Apply movement in the direction the fish is facing
         Vector3 movement = transform.forward * movementSpeed;
-
-        // float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
-        // movement += transform.up * waveMotion;
 
         if (inWater)
         {
@@ -157,16 +198,25 @@ public class PlayerMovement : MonoBehaviour
             canPitchUp = false;
 
             // Handle energy cost for exiting water
-            float currentEnergy = uiManager.GetCurrentEnergy();
-            if (currentEnergy >= waterExitEnergyCost)
+            float energyCost = waterExitEnergyCost;
+            if (playerStats.TryUseEnergy(energyCost))
             {
-                uiManager.DecreaseEnergy(waterExitEnergyCost);
+                // Successfully used energy
             }
             else
             {
-                uiManager.DecreaseEnergy(currentEnergy); // Use remaining energy
-                float remainingCost = waterExitEnergyCost - currentEnergy;
-                uiManager.DecreaseHealth(remainingCost * 0.5f); // Convert remaining energy cost to health damage
+                // Not enough energy, consume all remaining energy and damage health
+                float remainingEnergy = playerStats.CurrentEnergy;
+                playerStats.SetEnergy(0);
+                float healthDamage = (energyCost - remainingEnergy) * 0.5f;
+                playerStats.ModifyHealth(-healthDamage);
+            }
+
+            // Update UI for current player
+            if (uiManager != null && playerStats.IsCurrentPlayer)
+            {
+                uiManager.SetEnergy(playerStats.CurrentEnergy);
+                uiManager.SetHealth(playerStats.CurrentHealth);
             }
         }
     }

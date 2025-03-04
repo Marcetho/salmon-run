@@ -1,11 +1,11 @@
 using UnityEngine;
 
 /// <summary>
-/// Internal class to manage UI components for the player HUD.
+/// Class to manage UI components for the player HUD.
 /// This class should only be accessed through UIManager.
 /// </summary>
 [System.Serializable]
-internal class PlayerHudUI
+public class PlayerHudUI
 {
     [SerializeField] private EnergyUI energyUI;
     [SerializeField] private LivesUI livesUI;

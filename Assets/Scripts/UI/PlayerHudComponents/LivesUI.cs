@@ -17,6 +17,7 @@ public class LivesUI : UIComponent
 
     private int currentLives;
     private Image[] lifeImages;
+    private bool isInitialized = false;
 
     /// <summary>
     /// Gets the current number of lives remaining.
@@ -31,15 +32,43 @@ public class LivesUI : UIComponent
 
     public override void Initialize()
     {
+        // Check if components are assigned
+        if (lifeContainer == null)
+        {
+            Debug.LogError("LivesUI: lifeContainer is not assigned!");
+            return;
+        }
+
+        if (lifePrefab == null)
+        {
+            Debug.LogError("LivesUI: lifePrefab is not assigned!");
+            return;
+        }
+
+        // Remove layout component if exists
         var layout = lifeContainer.GetComponent<HorizontalLayoutGroup>();
         if (layout != null) Destroy(layout);
 
-        healthButton.onClick.AddListener(OnHealthButtonClick);
+        // Add button listener if button exists
+        if (healthButton != null)
+        {
+            healthButton.onClick.AddListener(OnHealthButtonClick);
+        }
+
         InitializeLives();
+        isInitialized = true;
     }
 
     private void InitializeLives()
     {
+        // Safety check
+        if (lifeContainer == null || lifePrefab == null)
+        {
+            Debug.LogError("LivesUI: Cannot initialize lives - missing components!");
+            return;
+        }
+
+        // Clean up existing images
         if (lifeImages != null)
         {
             foreach (var image in lifeImages)
@@ -52,6 +81,12 @@ public class LivesUI : UIComponent
         lifeImages = new Image[maxLives];
 
         RectTransform containerRect = lifeContainer.GetComponent<RectTransform>();
+        if (containerRect == null)
+        {
+            Debug.LogError("LivesUI: lifeContainer doesn't have a RectTransform component!");
+            return;
+        }
+
         float containerWidth = containerRect.rect.width;
         float containerHeight = containerRect.rect.height;
 
@@ -62,16 +97,29 @@ public class LivesUI : UIComponent
 
         for (int i = 0; i < maxLives; i++)
         {
-            Image newLife = Instantiate(lifePrefab, lifeContainer.transform);
-            newLife.sprite = fullLifeSprite;
+            try
+            {
+                Image newLife = Instantiate(lifePrefab, lifeContainer.transform);
+                if (newLife != null)
+                {
+                    if (fullLifeSprite != null)
+                    {
+                        newLife.sprite = fullLifeSprite;
+                    }
 
-            newLife.rectTransform.sizeDelta = new Vector2(spriteSize, spriteSize);
+                    newLife.rectTransform.sizeDelta = new Vector2(spriteSize, spriteSize);
 
-            float xPos = (i * (spriteSize + spacing)) - (containerWidth / 2) + (spriteSize / 2);
-            float yPos = (i % 2 == 0) ? heightOffset : -heightOffset;
+                    float xPos = (i * (spriteSize + spacing)) - (containerWidth / 2) + (spriteSize / 2);
+                    float yPos = (i % 2 == 0) ? heightOffset : -heightOffset;
 
-            newLife.rectTransform.anchoredPosition = new Vector2(xPos, yPos);
-            lifeImages[i] = newLife;
+                    newLife.rectTransform.anchoredPosition = new Vector2(xPos, yPos);
+                    lifeImages[i] = newLife;
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error creating life icon #{i}: {e.Message}");
+            }
         }
     }
 
@@ -95,10 +143,16 @@ public class LivesUI : UIComponent
             currentLives--;
             UpdateLives();
             OnLivesChanged?.Invoke(currentLives);
+
             if (uiManager != null)
             {
                 uiManager.SetHealth(100f);
                 uiManager.SetEnergy(100f);
+            }
+
+            if (currentLives <= 0 && uiManager != null)
+            {
+                uiManager.OnGameOver();
             }
         }
     }
@@ -115,25 +169,63 @@ public class LivesUI : UIComponent
 
     internal void SetLives(int value)
     {
+        // Make sure we're initialized before setting lives
+        if (!isInitialized)
+        {
+            currentLives = Mathf.Clamp(value, 0, maxLives);
+            return;
+        }
+
         currentLives = Mathf.Clamp(value, 0, maxLives);
         UpdateLives();
         OnLivesChanged?.Invoke(currentLives);
     }
 
+    internal void SetMaxLives(int value)
+    {
+        maxLives = value;
+        if (!isInitialized)
+        {
+            Initialize();
+        }
+        else
+        {
+            InitializeLives();
+        }
+    }
+
     private void UpdateLives()
     {
+        // Safety check
+        if (lifeImages == null)
+        {
+            Debug.LogWarning("LivesUI: lifeImages array is null in UpdateLives!");
+            return;
+        }
+
         for (int i = 0; i < lifeImages.Length; i++)
         {
             if (lifeImages[i] != null)
             {
-                lifeImages[i].sprite = i < currentLives ? fullLifeSprite : emptyLifeSprite;
+                if (fullLifeSprite != null && emptyLifeSprite != null)
+                {
+                    lifeImages[i].sprite = i < currentLives ? fullLifeSprite : emptyLifeSprite;
+                }
             }
         }
 
-        if (currentLives <= 0)
+        if (currentLives <= 0 && uiManager != null)
         {
             Debug.Log("Game Over");
             uiManager.OnGameOver();
+        }
+    }
+
+    public override void Cleanup()
+    {
+        if (healthButton != null)
+        {
+            healthButton.onClick.RemoveListener(OnHealthButtonClick);
         }
     }
 }

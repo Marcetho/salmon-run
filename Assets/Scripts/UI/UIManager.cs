@@ -10,23 +10,57 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PlayerHudUI playerHud;
     [SerializeField] private GameoverTextUI gameOverTextUI;
 
+    private bool isInitialized = false;
+    private int pendingLivesValue = -1;
+    private float pendingHealthValue = -1f;
+    private float pendingEnergyValue = -1f;
+
     #region Internal Methods
 
     private void Start()
     {
+        if (playerHud == null)
+        {
+            Debug.LogError("UIManager: playerHud is null! Make sure it's assigned in the inspector.");
+            return;
+        }
+
+        if (gameOverTextUI == null)
+        {
+            Debug.LogWarning("UIManager: gameOverTextUI is null! Game over screen won't be shown.");
+        }
+
+        // Initialize UI components
         playerHud.Initialize();
-        gameOverTextUI.Initialize();
+        if (gameOverTextUI != null)
+            gameOverTextUI.Initialize();
+
+        isInitialized = true;
+
+        // Apply any pending values
+        if (pendingLivesValue >= 0)
+            playerHud.SetLives(pendingLivesValue);
+
+        if (pendingHealthValue >= 0)
+            playerHud.SetHealth(pendingHealthValue);
+
+        if (pendingEnergyValue >= 0)
+            playerHud.SetEnergy(pendingEnergyValue);
     }
 
     private void OnDestroy()
     {
-        playerHud.Cleanup();
+        if (playerHud != null)
+            playerHud.Cleanup();
     }
 
     internal void OnGameOver()
     {
-        gameOverTextUI.ShowGameOver();
-        playerHud.OnGameOver();
+        if (gameOverTextUI != null)
+            gameOverTextUI.ShowGameOver();
+
+        if (playerHud != null)
+            playerHud.OnGameOver();
     }
 
     #endregion
@@ -34,27 +68,100 @@ public class UIManager : MonoBehaviour
     #region Public API - Use these methods to interact with the UI
 
     // Energy Methods
-    public bool HasEnoughEnergy(float amount) => playerHud.GetCurrentEnergy() >= amount;
-    public float GetCurrentEnergy() => playerHud.GetCurrentEnergy();
-    public void IncreaseEnergy(float amount) => playerHud.IncreaseEnergy(amount);
-    public void DecreaseEnergy(float amount) => playerHud.DecreaseEnergy(amount);
+    public bool HasEnoughEnergy(float amount) => (playerHud != null) ? playerHud.GetCurrentEnergy() >= amount : false;
+    public float GetCurrentEnergy() => (playerHud != null) ? playerHud.GetCurrentEnergy() : 0f;
+    public void IncreaseEnergy(float amount)
+    {
+        if (playerHud != null)
+            playerHud.IncreaseEnergy(amount);
+    }
+
+    public void DecreaseEnergy(float amount)
+    {
+        if (playerHud != null)
+            playerHud.DecreaseEnergy(amount);
+    }
 
     // Health Methods
-    public float GetCurrentHealth() => playerHud.GetCurrentHealth();
-    public float GetMaxHealth() => playerHud.GetMaxHealth();
-    public void IncreaseHealth(float amount) => playerHud.IncreaseHealth(amount);
-    public void DecreaseHealth(float amount) => playerHud.DecreaseHealth(amount);
+    public float GetCurrentHealth() => (playerHud != null) ? playerHud.GetCurrentHealth() : 0f;
+    public float GetMaxHealth() => (playerHud != null) ? playerHud.GetMaxHealth() : 100f;
+
+    public void IncreaseHealth(float amount)
+    {
+        if (playerHud != null)
+            playerHud.IncreaseHealth(amount);
+    }
+
+    public void DecreaseHealth(float amount)
+    {
+        if (playerHud != null)
+            playerHud.DecreaseHealth(amount);
+    }
 
     // Lives Methods
-    public int GetCurrentLives() => playerHud.GetCurrentLives();
-    public int GetMaxLives() => playerHud.GetMaxLives();
-    public void IncreaseLives(int amount) => playerHud.IncreaseLives(amount);
-    public void DecreaseLives() => playerHud.DecreaseLives();
+    public int GetCurrentLives() => (playerHud != null) ? playerHud.GetCurrentLives() : 0;
+    public int GetMaxLives() => (playerHud != null) ? playerHud.GetMaxLives() : 3;
+
+    public void IncreaseLives(int amount)
+    {
+        if (playerHud != null)
+            playerHud.IncreaseLives(amount);
+    }
+
+    public void DecreaseLives()
+    {
+        if (playerHud != null)
+            playerHud.DecreaseLives();
+    }
 
     // Set Methods
-    public void SetLives(int value) => playerHud.SetLives(value);
-    public void SetHealth(float value) => playerHud.SetHealth(value);
-    public void SetEnergy(float value) => playerHud.SetEnergy(value);
+    public void SetLives(int value)
+    {
+        if (!isInitialized)
+        {
+            pendingLivesValue = value;
+            return;
+        }
+
+        if (playerHud != null)
+            playerHud.SetLives(value);
+    }
+
+    public void SetHealth(float value)
+    {
+        if (!isInitialized)
+        {
+            pendingHealthValue = value;
+            return;
+        }
+
+        if (playerHud != null)
+            playerHud.SetHealth(value);
+    }
+
+    public void SetEnergy(float value)
+    {
+        if (!isInitialized)
+        {
+            pendingEnergyValue = value;
+            return;
+        }
+
+        if (playerHud != null)
+            playerHud.SetEnergy(value);
+    }
+
+    // Player Switching Methods
+    public void SwitchPlayer(PlayerHudUI newPlayerHud)
+    {
+        if (playerHud != null)
+            playerHud.Cleanup();
+
+        playerHud = newPlayerHud;
+
+        if (playerHud != null && isInitialized)
+            playerHud.Initialize();
+    }
 
     #endregion
 }
