@@ -34,6 +34,7 @@ internal class PlayerHudUI
 
     // Energy Methods
     internal float GetCurrentEnergy() => energyUI.CurrentEnergy;
+    internal bool HasEnoughEnergy(float amount) => energyUI.CurrentEnergy >= amount;
     internal void IncreaseEnergy(float amount) => energyUI.IncreaseEnergy(amount);
     internal void DecreaseEnergy(float amount) => energyUI.DecreaseEnergy(amount);
 

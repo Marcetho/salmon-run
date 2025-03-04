@@ -2,25 +2,38 @@ using UnityEngine;
 
 public class NewPlayerMovement : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private UIManager uiManager;
+
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
     public float maxBackwardSpeed = -0.5f;
-    public float acceleration = 2f;
-    public float deceleration = 2f;
+    public float baseAcceleration = 4f;
+    public float baseDeceleration = 16f;
     public float rotationSpeed = 100f;
     public float yawAmount = 5f;
     public float pitchAmount = 45f;  // For up/down tilt
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
 
-    private float currentSpeed;
-    private float targetSpeed;
+    [Header("Energy Settings")]
+    [SerializeField] private float sprintDamageInterval = 0.5f;
+    [SerializeField] private float sprintDamageAmount = 5f;
+    [SerializeField] private float waterExitEnergyCost = 40f;
+
+    private float lastSprintDamageTime;
+
+    private float movementSpeed;  // renamed from currentSpeed
+    private float targetMovementSpeed;  // renamed from targetSpeed
     private Vector3 velocity;
     private float baseYPosition;
     private Animator fishAnimator;
     private bool inWater; // maybe use later for animation purposes
     Transform cam;
     private Rigidbody rb;
+    private bool isJumping = false;
+    private bool isExitingWater = false;
+    private bool canTiltUp = true;
 
     private void Start()
     {
@@ -32,13 +45,35 @@ public class NewPlayerMovement : MonoBehaviour
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
     }
-
     void FixedUpdate()
     {
+        float yawInput = 0f;
         // Handle rotation and tilt input
-        float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-        if (Mathf.Abs(currentSpeed) < 0.1f) yawInput = 0f;
-        float pitchInput = Input.GetKey(KeyCode.S) ? 1f : (Input.GetKey(KeyCode.W) ? -1f : 0f);
+        if (inWater)
+        {
+            yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+        }
+        else
+        if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
+
+        // Modified pitch input logic
+        float pitchInput = 0f;
+        if (Input.GetKey(KeyCode.S))
+        {
+            pitchInput = 1f;
+        }
+        else if (Input.GetKey(KeyCode.W) && inWater && canTiltUp)
+        {
+            pitchInput = -1f;
+        }
+        else if (Input.GetKey(KeyCode.W) && !inWater)
+        {
+            canTiltUp = false;
+        }
+        else if (!Input.GetKeyUp(KeyCode.W) && inWater)
+        {
+            canTiltUp = true;
+        }
 
         // Apply rotations
         transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
@@ -51,43 +86,97 @@ public class NewPlayerMovement : MonoBehaviour
 
         // Handle speed changes based on shift/ctrl
         float moveInput = 0f;
-        if (Input.GetKey(KeyCode.LeftShift)) moveInput = 1f;
-        else if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+        if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
+        if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+        float speed = maxForwardSpeed;
+        Debug.Log("Speed: " + speed + " Max Forward Speed: " + maxForwardSpeed);
+        float acceleration = baseAcceleration;
+        float deceleration = baseDeceleration;
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+        {
+            if (inWater)
+            {
+                speed = maxForwardSpeed * 2.5f;
+                acceleration *= 60f;
 
-        targetSpeed = moveInput * maxForwardSpeed;
-        currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
-        if (currentSpeed < maxBackwardSpeed) currentSpeed = maxBackwardSpeed;
+                if (!uiManager.HasEnoughEnergy(40f * Time.fixedDeltaTime))
+                {
+                    if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
+                    {
+                        uiManager.DecreaseHealth(sprintDamageAmount);
+                        lastSprintDamageTime = Time.time;
+                    }
+                }
+                else
+                {
+                    uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
+                }
+            }
+        }
+
+        targetMovementSpeed = moveInput * speed;
+        if (speed > targetMovementSpeed)
+            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
+        else
+            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
+        if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
 
         // Apply movement in the direction the fish is facing
-        Vector3 movement = transform.forward * currentSpeed;
+        Vector3 movement = transform.forward * movementSpeed;
 
-        // float waveMotion = Mathf.Sin(Time.time * 2f) * 0.002f;
-        // movement += transform.up * waveMotion;
+        if (inWater)
+        {
+            rb.AddForce(movement);
+        }
+        else
+        {
+            // In air, directly set velocity for more precise control
+            Vector3 currentVel = rb.linearVelocity;
+            Vector3 horizontalMovement = movement;
+            horizontalMovement.y = currentVel.y; // Preserve vertical velocity from gravity
+            rb.linearVelocity = horizontalMovement;
+        }
 
-        rb.AddForce(movement);
         eForce.force = eForceDir;
 
         if (fishAnimator != null)
         {
-            fishAnimator.SetFloat("Speed", currentSpeed);
+            fishAnimator.SetFloat("Speed", movementSpeed);
         }
     }
 
-    private void OnTriggerEnter(Collider other) { //in water
+    private void OnTriggerEnter(Collider other)
+    { //in water
         if (other.gameObject.tag == "Water")
             inWater = true;
-            rb.linearDamping = 1f;
-            rotationSpeed = 100f;
-            maxForwardSpeed = 5f;
-            eForceDir = new Vector3(0, 0, 0);
+        rb.linearDamping = 1.5f;
+        rotationSpeed = 100f;
+        maxForwardSpeed = 5f;
+        eForceDir = new Vector3(0, 0, 0);
     }
 
-    private void OnTriggerExit(Collider other){ //out of water
+    private void OnTriggerExit(Collider other)
+    { //out of water
         if (other.gameObject.tag == "Water")
+        {
             inWater = false;
-            rb.linearDamping = 0.1f;
+            rb.linearDamping = 1f;
             rotationSpeed = 0f;
             maxForwardSpeed = 0.1f;
             eForceDir = new Vector3(0, -3, 0);
+
+            // Handle energy cost for exiting water
+            float currentEnergy = uiManager.GetCurrentEnergy();
+            if (currentEnergy >= waterExitEnergyCost)
+            {
+                uiManager.DecreaseEnergy(waterExitEnergyCost);
+            }
+            else
+            {
+                uiManager.DecreaseEnergy(currentEnergy); // Use remaining energy
+                float remainingCost = waterExitEnergyCost - currentEnergy;
+                uiManager.DecreaseHealth(remainingCost * 0.5f); // Convert remaining energy cost to health damage
+            }
+        }
     }
 }

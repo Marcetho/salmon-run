@@ -34,6 +34,7 @@ public class UIManager : MonoBehaviour
     #region Public API - Use these methods to interact with the UI
 
     // Energy Methods
+    public bool HasEnoughEnergy(float amount) => playerHud.GetCurrentEnergy() >= amount;
     public float GetCurrentEnergy() => playerHud.GetCurrentEnergy();
     public void IncreaseEnergy(float amount) => playerHud.IncreaseEnergy(amount);
     public void DecreaseEnergy(float amount) => playerHud.DecreaseEnergy(amount);

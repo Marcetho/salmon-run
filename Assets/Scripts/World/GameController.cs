@@ -1,26 +1,43 @@
 using UnityEngine;
 
-public enum GameState {Ocean, Freshwater, Won, Lost}
+public enum GameState { Ocean, Freshwater, Won, Lost }
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private PlayerData playerData;
-    [SerializeField] private UIManager gameUI;
+    [Header("References")]
+    [SerializeField] private GameObject gameUIPrefab;
 
+    private UIManager uiManager;
     private GameState currentState;
 
     private void Start()
     {
-        // Start directly in ocean state since we're in game scene
         currentState = GameState.Ocean;
-        gameUI.gameObject.SetActive(true);
-        
+
+        // Spawn UI
+        GameObject uiInstance = Instantiate(gameUIPrefab);
+        uiManager = uiInstance.GetComponent<UIManager>();
+
         // Initialize game systems
         InitializeGame();
+        Debug.Log("Game initialized");
     }
 
     private void InitializeGame()
     {
-        // Add initialization logic here
+        // Set initial UI values
+        uiManager.SetLives(3);
+        uiManager.SetHealth(100);
+        uiManager.SetEnergy(100);
+    }
+
+    // Add methods to handle player state changes
+    public void OnPlayerDamaged(float damage)
+    {
+        uiManager.DecreaseHealth(damage);
+    }
+
+    public void OnEnergyUsed(float amount)
+    {
+        uiManager.DecreaseEnergy(amount);
     }
 }
-
