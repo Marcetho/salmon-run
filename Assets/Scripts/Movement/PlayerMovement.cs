@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
@@ -34,6 +35,11 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private bool canPitchUp = true;
 
+    private Vector3 currentRandomOffset;
+    private float currentRandomSpeed;
+    private float randomUpdateInterval = 1f;  // Update random values every second
+    private float lastRandomUpdateTime;
+
     private void Start()
     {
         cam = Camera.main.transform;
@@ -60,6 +66,19 @@ public class PlayerMovement : MonoBehaviour
             uiManager.SetHealth(playerStats.CurrentHealth);
             uiManager.SetEnergy(playerStats.CurrentEnergy);
         }
+
+        UpdateRandomValues();  // Initialize random values
+    }
+
+    private void UpdateRandomValues()
+    {
+        currentRandomOffset = new Vector3(
+            UnityEngine.Random.Range(-1f, 1f),
+            UnityEngine.Random.Range(-1f, 1f),
+            UnityEngine.Random.Range(-1f, 1f)
+        );
+        currentRandomSpeed = maxForwardSpeed * UnityEngine.Random.Range(0.8f, 1.2f);
+        lastRandomUpdateTime = Time.time;
     }
 
     private void OnDestroy()
@@ -81,85 +100,122 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        Vector3 movement;
         // Only control if this is the current player
         if (!playerStats.IsCurrentPlayer)
-            return;
-
-        // Handle rotation and tilt input
-        float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-        if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
-
-        float pitchInput = 0f;
-        if (inWater)
         {
-            if (Input.GetKey(KeyCode.S))
+            // Check if it's time to update random values
+            if (Time.time - lastRandomUpdateTime >= randomUpdateInterval)
             {
-                pitchInput = 1f;
-            }
-            else if (Input.GetKey(KeyCode.W) && canPitchUp)
-            {
-                pitchInput = -1f;
+                UpdateRandomValues();
             }
 
-            if (!Input.GetKey(KeyCode.W))
+            GameObject currentPlayer = GameController.currentPlayer;
+            if (currentPlayer != null)
             {
-                canPitchUp = true;
+                Vector3 directionToPlayer = currentPlayer.transform.position - transform.position;
+                float distanceToPlayer = directionToPlayer.magnitude;
+                float minDistance = 2f; // Minimum distance to maintain from player
+
+                if (distanceToPlayer > minDistance)
+                {
+                    Vector3 normalizedDirection = (directionToPlayer + currentRandomOffset).normalized;
+                    Quaternion targetRotation = Quaternion.LookRotation(normalizedDirection);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, currentRandomSpeed, baseAcceleration * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, 0f, baseDeceleration * Time.fixedDeltaTime);
+                }
+                movement = transform.forward * movementSpeed;
+            }
+            else
+            {
+                movement = Vector3.zero;
             }
         }
 
-        // Force pitch to 0 when out of water
-        float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
 
-        // Apply rotations
-        transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
-
-        // Calculate and apply tilt
-        float yaw = yawInput * yawAmount;
-        Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
-
-        // Handle speed changes based on shift/ctrl
-        float moveInput = 0f;
-        if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
-        if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
-        float speed = maxForwardSpeed;
-        float acceleration = baseAcceleration;
-        float deceleration = baseDeceleration;
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+        else
         {
+            // Handle rotation and tilt input
+            float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
+            if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
+
+            float pitchInput = 0f;
             if (inWater)
             {
-                speed = maxForwardSpeed * 2.5f;
-                acceleration *= 60f;
-
-                float energyCost = 40f * Time.fixedDeltaTime;
-                if (!playerStats.TryUseEnergy(energyCost))
+                if (Input.GetKey(KeyCode.S))
                 {
-                    if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
-                    {
-                        playerStats.ModifyHealth(-sprintDamageAmount);
-                        lastSprintDamageTime = Time.time;
-                    }
+                    pitchInput = 1f;
+                }
+                else if (Input.GetKey(KeyCode.W) && canPitchUp)
+                {
+                    pitchInput = -1f;
                 }
 
-                // Update UI for current player
-                if (uiManager != null)
+                if (!Input.GetKey(KeyCode.W))
                 {
-                    uiManager.SetEnergy(playerStats.CurrentEnergy);
-                    uiManager.SetHealth(playerStats.CurrentHealth);
+                    canPitchUp = true;
                 }
             }
+
+            // Force pitch to 0 when out of water
+            float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
+
+            // Apply rotations
+            transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
+
+            // Calculate and apply tilt
+            float yaw = yawInput * yawAmount;
+            Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+
+            // Handle speed changes based on shift/ctrl
+            float moveInput = 0f;
+            if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
+            if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+            float speed = maxForwardSpeed;
+            float acceleration = baseAcceleration;
+            float deceleration = baseDeceleration;
+            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+            {
+                if (inWater)
+                {
+                    speed = maxForwardSpeed * 2.5f;
+                    acceleration *= 60f;
+
+                    float energyCost = 40f * Time.fixedDeltaTime;
+                    if (!playerStats.TryUseEnergy(energyCost))
+                    {
+                        if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
+                        {
+                            playerStats.ModifyHealth(-sprintDamageAmount);
+                            lastSprintDamageTime = Time.time;
+                        }
+                    }
+
+                    // Update UI for current player
+                    if (uiManager != null)
+                    {
+                        uiManager.SetEnergy(playerStats.CurrentEnergy);
+                        uiManager.SetHealth(playerStats.CurrentHealth);
+                    }
+                }
+            }
+
+            targetMovementSpeed = moveInput * speed;
+            if (speed > targetMovementSpeed)
+                movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
+            else
+                movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
+            if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
+
+            // Apply movement in the direction the fish is facing
+            movement = transform.forward * movementSpeed;
         }
-
-        targetMovementSpeed = moveInput * speed;
-        if (speed > targetMovementSpeed)
-            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
-        else
-            movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
-        if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
-
-        // Apply movement in the direction the fish is facing
-        Vector3 movement = transform.forward * movementSpeed;
 
         if (inWater)
         {

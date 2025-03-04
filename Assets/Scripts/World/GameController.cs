@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     private GameState currentState;
     private List<GameObject> spawnedFishes = new List<GameObject>();
     private int currentPlayerIndex = 0;
+    public static GameObject currentPlayer;
     private int remainingLives;
 
     private void Start()
@@ -71,13 +72,14 @@ public class GameController : MonoBehaviour
     }
     private void SetCurrentPlayer(int index)
     {
-        PlayerStats stats = spawnedFishes[currentPlayerIndex].GetComponent<PlayerStats>();
+        currentPlayer = spawnedFishes[currentPlayerIndex];
+        PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
         if (stats != null)
         {
             stats.IsCurrentPlayer = true;
         }
         CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
-        camera.target = spawnedFishes[currentPlayerIndex].transform;
+        camera.target = currentPlayer.transform;
     }
     private void SpawnFish()
     {
@@ -136,10 +138,9 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        // Get current player and mark as inactive
+        // Get current player and mark as inactive, then move to the next player
         if (currentPlayerIndex >= 0 && currentPlayerIndex < spawnedFishes.Count)
         {
-            GameObject currentPlayer = spawnedFishes[currentPlayerIndex];
             PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
             if (stats != null)
             {
@@ -166,7 +167,6 @@ public class GameController : MonoBehaviour
     {
         if (currentPlayerIndex >= 0 && currentPlayerIndex < spawnedFishes.Count)
         {
-            GameObject currentPlayer = spawnedFishes[currentPlayerIndex];
             PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
             if (stats != null)
             {
@@ -180,7 +180,6 @@ public class GameController : MonoBehaviour
     {
         if (currentPlayerIndex >= 0 && currentPlayerIndex < spawnedFishes.Count)
         {
-            GameObject currentPlayer = spawnedFishes[currentPlayerIndex];
             PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
             if (stats != null)
             {
