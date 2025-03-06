@@ -40,6 +40,11 @@ public class PlayerMovement : MonoBehaviour
     private float randomUpdateInterval = 1f;  // Update random values every second
     private float lastRandomUpdateTime;
 
+    [Header("AI Settings")]
+    private float sprintStartEnergyThreshold = 40f;  // Need this much energy to start sprinting
+    private float sprintStopEnergyThreshold = 10f;   // Stop sprinting when energy drops below this
+    private bool isAISprinting = false;              // Track sprint state
+
     private void Start()
     {
         cam = Camera.main.transform;
@@ -115,16 +120,42 @@ public class PlayerMovement : MonoBehaviour
             {
                 Vector3 directionToPlayer = currentPlayer.transform.position - transform.position;
                 float distanceToPlayer = directionToPlayer.magnitude;
-                float minDistance = 2f; // Minimum distance to maintain from player
+                float minDistance = 5f; // Minimum distance to maintain from player
+                float targetSpeed = maxForwardSpeed;
 
                 if (distanceToPlayer > minDistance)
                 {
+                    // Sprint to catch up if too far behind with energy management
+                    if (distanceToPlayer > 12f)
+                    {
+                        if (!isAISprinting && playerStats.CurrentEnergy >= sprintStartEnergyThreshold)
+                        {
+                            isAISprinting = true;
+                        }
+                        else if (isAISprinting && playerStats.CurrentEnergy <= sprintStopEnergyThreshold)
+                        {
+                            isAISprinting = false;
+                        }
+
+                        if (isAISprinting)
+                        {
+                            targetSpeed = maxForwardSpeed * 2f;
+                            float energyCost = 40f * Time.fixedDeltaTime;
+                            playerStats.TryUseEnergy(energyCost);
+                        }
+                    }
+                    else
+                    {
+                        isAISprinting = false;
+                    }
+
                     Vector3 normalizedDirection = (directionToPlayer + currentRandomOffset).normalized;
                     Quaternion targetRotation = Quaternion.LookRotation(normalizedDirection);
                     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
 
-                    movementSpeed = Mathf.MoveTowards(movementSpeed, currentRandomSpeed, baseAcceleration * Time.fixedDeltaTime);
-                }
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, targetSpeed, baseAcceleration * Time.fixedDeltaTime);
+                } // are we sure we want the fish to be able to die offscren, yeah like e
+                //they can't die from sprinting
                 else
                 {
                     movementSpeed = Mathf.MoveTowards(movementSpeed, 0f, baseDeceleration * Time.fixedDeltaTime);
