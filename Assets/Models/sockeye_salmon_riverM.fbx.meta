@@ -1,9 +1,74 @@
 fileFormatVersion: 2
-guid: 6cc9aca0cb13de947b10e5f1578822a8
+guid: 229eb9550db7b6d49a5c6ea80e09aab4
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BellyScales
+    second: {fileID: 2100000, guid: f1b779639f786e741a5fa98dfef9cdf5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DarkGreen
+    second: {fileID: 2100000, guid: 0ecce444b7e4d08489a3b92320ca4b3a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DarkRed
+    second: {fileID: 2100000, guid: 92bcf9f6d52ff5e4f9dc646f6c18dcea, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EyeGleam
+    second: {fileID: 2100000, guid: 8cb0ebed91d08864dad955e310ccb235, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Eyes
+    second: {fileID: 2100000, guid: 29cffd37f393ebb49bb5d8a19f4bef88, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Fins
+    second: {fileID: 2100000, guid: 0aeb5928a21b5e14786cafe69cf66b28, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GreenHead
+    second: {fileID: 2100000, guid: 4c8014fd8ffccca4e80035102d64771d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Highlight
+    second: {fileID: 2100000, guid: 7df821c4f280fb34ea817d7c12a2e9a3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mouth
+    second: {fileID: 2100000, guid: c426d801e384a4248868a540034968ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pupil
+    second: {fileID: 2100000, guid: 9cdcbc9cddd433342b5d6a34a244696f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RedFins
+    second: {fileID: 2100000, guid: 5f7ce190f966bc740b1384093c27cd7d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RedScales
+    second: {fileID: 2100000, guid: d188ab7ae0f1eed46838765b73b62314, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: WhiteScales
+    second: {fileID: 2100000, guid: 23ac29ba22b97094f833b4bccae5920b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -76,7 +141,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -88,7 +153,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.0015
+    globalScale: 0.15
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
