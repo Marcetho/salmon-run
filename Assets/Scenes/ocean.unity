@@ -287,17 +287,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1230086160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06b5917f3b0f6144d9233fde76eaea34, type: 3}
+  m_Script: {fileID: 11500000, guid: 97a94ec616b396141b634968bba87a27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1972069813}
   smoothTime: 0.1
   offset_x: 0
-  offset_y: 0.3
+  offset_y: 3
   offset_z: 0
-  maxHorizontalLookAngle: 180
-  maxVerticalLookAngle: 15
-  lookSpeed: 5
+  rotationSpeed: 100
 --- !u!1 &1380781415
 GameObject:
   m_ObjectHideFlags: 0

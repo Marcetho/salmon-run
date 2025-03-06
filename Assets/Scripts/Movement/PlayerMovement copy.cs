@@ -53,43 +53,28 @@ public class PlayerMovementCopy : MonoBehaviour
     {
         float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
 
-        // Modified pitch input logic
+        // Remove pitch input logic
         float pitchInput = 0f;
-        if (Input.GetKey(KeyCode.S))
-        {
-            pitchInput = 1f;
-        }
-        else if (Input.GetKey(KeyCode.W) && canTiltUp)
-        {
-            pitchInput = -1f;
-        }
-        else if (Input.GetKey(KeyCode.W))
-        {
-            canTiltUp = false;
-        }
-        else if (!Input.GetKeyUp(KeyCode.W))
-        {
-            canTiltUp = true;
-        }
 
-        // Apply rotations
-        transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
+        // Apply rotations only if forward velocity is not zero
+        if (movementSpeed != 0)
+        {
+            transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
 
-        // Calculate and apply tilt
-        float yaw = yawInput * yawAmount;
-        float pitch = pitchInput * pitchAmount;
-        Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+            // Calculate and apply tilt
+            float yaw = yawInput * yawAmount;
+            float pitch = pitchInput * pitchAmount;
+            Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+        }
 
         // Handle speed changes based on shift/ctrl
-        float moveInput = 0f;
-        if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
-        if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+        float moveInput = Input.GetKey(KeyCode.W) ? 1f : 0f;  // "W" moves forward, "S" does nothing
         float speed = maxForwardSpeed;
         Debug.Log("Speed: " + speed + " Max Forward Speed: " + maxForwardSpeed);
         float acceleration = baseAcceleration;
         float deceleration = baseDeceleration;
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+        if (Input.GetKey(KeyCode.LeftShift) && moveInput > 0) //sprint
         {
             speed = maxForwardSpeed * 2.5f;
             acceleration *= 60f;
