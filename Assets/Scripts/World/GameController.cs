@@ -12,7 +12,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Transform[] spawnPoints;
 
     [Header("Game Settings")]
-    [SerializeField] private int initialLivesCount = 5;
+    [SerializeField] private int initialLivesCount = 10;
     private GameState currentState;
     private List<GameObject> spawnedFishes = new List<GameObject>();
     private int currentPlayerIndex = 0;
