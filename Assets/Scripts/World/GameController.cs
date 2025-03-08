@@ -70,8 +70,26 @@ public class GameController : MonoBehaviour
             Debug.LogError($"Error spawning fish: {e.Message}\n{e.StackTrace}");
         }
     }
+
     private void SetCurrentPlayer(int index)
     {
+        if (index < 0 || index >= spawnedFishes.Count)
+        {
+            Debug.LogError($"GameController: Invalid player index {index}. Valid range is 0-{spawnedFishes.Count - 1}");
+            return;
+        }
+
+        // First, deactivate the current player if there is one
+        if (currentPlayer != null)
+        {
+            PlayerStats prevStats = currentPlayer.GetComponent<PlayerStats>();
+            if (prevStats != null)
+            {
+                prevStats.IsCurrentPlayer = false;
+            }
+        }
+
+        currentPlayerIndex = index;
         currentPlayer = spawnedFishes[currentPlayerIndex];
         PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
         if (stats != null)
@@ -81,6 +99,7 @@ public class GameController : MonoBehaviour
         CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
         camera.target = currentPlayer.transform;
     }
+
     private void SpawnFish()
     {
         Vector3 spawnPosition = Vector3.zero;
@@ -138,7 +157,7 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        // Get current player and mark as inactive, then move to the next player
+        // Get current player and mark as inactive
         if (currentPlayerIndex >= 0 && currentPlayerIndex < spawnedFishes.Count)
         {
             PlayerStats stats = currentPlayer.GetComponent<PlayerStats>();
@@ -147,12 +166,115 @@ public class GameController : MonoBehaviour
                 stats.IsCurrentPlayer = false;
                 stats.OnPlayerDeath -= OnCurrentPlayerDied;
             }
-            Destroy(currentPlayer);
-            spawnedFishes.RemoveAt(currentPlayerIndex);
-            currentPlayerIndex = remainingLives - 1;
-            SetCurrentPlayer(currentPlayerIndex);
 
+            // Store reference before destroying
+            GameObject deadPlayer = currentPlayer;
+
+            // Find a new valid fish to control
+            int newIndex = -1;
+            for (int i = 0; i < spawnedFishes.Count; i++)
+            {
+                if (i != currentPlayerIndex && spawnedFishes[i] != null)
+                {
+                    newIndex = i;
+                    break;
+                }
+            }
+
+            // Remove the dead fish from the list
+            spawnedFishes.RemoveAt(currentPlayerIndex);
+
+            // Now destroy the dead fish
+            Destroy(deadPlayer);
+
+            // Set new current player if we found one
+            if (newIndex != -1)
+            {
+                // Adjust index if needed after removal
+                if (newIndex > currentPlayerIndex)
+                {
+                    newIndex--;
+                }
+
+                SetCurrentPlayer(newIndex);
+            }
+            else if (spawnedFishes.Count > 0)
+            {
+                // Fallback to first fish if available
+                SetCurrentPlayer(0);
+            }
+            else
+            {
+                // No fish left, game over
+                GameOver();
+            }
         }
+    }
+
+    // Add method to handle AI fish death
+    public void OnAIFishDied(GameObject deadFish)
+    {
+        if (deadFish == null) return;
+
+        // Don't decrease lives for AI fish
+
+        // Find and remove the fish from our list
+        int fishIndex = spawnedFishes.IndexOf(deadFish);
+        if (fishIndex >= 0)
+        {
+            // If this is somehow the current player index, we need to fix that
+            if (fishIndex == currentPlayerIndex)
+            {
+                Debug.LogWarning("AI fish died but was marked as current player. This shouldn't happen.");
+
+                // Find another fish to control
+                int newIndex = -1;
+                for (int i = 0; i < spawnedFishes.Count; i++)
+                {
+                    if (i != fishIndex && spawnedFishes[i] != null)
+                    {
+                        newIndex = i;
+                        break;
+                    }
+                }
+
+                spawnedFishes.RemoveAt(fishIndex);
+
+                if (newIndex != -1)
+                {
+                    // Adjust index if needed after removal
+                    if (newIndex > fishIndex)
+                    {
+                        newIndex--;
+                    }
+
+                    SetCurrentPlayer(newIndex);
+                }
+                else if (spawnedFishes.Count > 0)
+                {
+                    SetCurrentPlayer(0);
+                }
+                else
+                {
+                    // No fish left, game over
+                    GameOver();
+                }
+            }
+            else
+            {
+                // Just remove the fish from our list
+                spawnedFishes.RemoveAt(fishIndex);
+
+                // If this affects currentPlayerIndex, adjust it
+                if (fishIndex < currentPlayerIndex)
+                {
+                    currentPlayerIndex--;
+                }
+            }
+        }
+
+        // Now destroy the fish
+        Destroy(deadFish);
     }
 
     private void GameOver()

@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     [SerializeField] private UIManager uiManager;
     private PlayerStats playerStats;
+    private GameController gameController;
 
     [Header("Movement Settings")]
     public float maxForwardSpeed = 5f;
@@ -46,7 +47,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float targetPositionUpdateInterval = 3f;  // Reduced from 5f to be more responsive
     [SerializeField] private float minTargetDistance = 3f;
     [SerializeField] private float maxTargetDistance = 15f;
-    [SerializeField] private float forwardBiasWeight = 4f;  // Increased from 2f to stay more ahead of player
     [SerializeField] private float playerInfluenceFactor = 0.7f; // How much the player influences AI fish movement
     [SerializeField] private float naturalMovementIntensity = 0.2f;  // Reduced from 0.4f for smoother movement
     [SerializeField] private float horizontalSpreadFactor = 8f;      // Controls how wide the school spreads horizontally
@@ -57,7 +57,6 @@ public class PlayerMovement : MonoBehaviour
     private float sprintStartEnergyThreshold = 30f;  // Need this much energy to start sprinting
     private float sprintStopEnergyThreshold = 5f;   // Stop sprinting when energy drops below this
     private bool isAISprinting = false;              // Track sprint state
-    [SerializeField] private float directionMatchSpeed = 2f;  // How quickly to match player direction
 
     // AI target position
     private Vector3 currentAITargetPosition;
@@ -78,6 +77,9 @@ public class PlayerMovement : MonoBehaviour
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
 
+        // Find game controller
+        gameController = FindFirstObjectByType<GameController>();
+
         // Get the player stats component
         playerStats = GetComponent<PlayerStats>();
         if (playerStats == null)
@@ -85,8 +87,11 @@ public class PlayerMovement : MonoBehaviour
             playerStats = gameObject.AddComponent<PlayerStats>();
         }
 
-        // Subscribe to player death event
+        // Subscribe to player death event - only if this is the player-controlled fish
         playerStats.OnPlayerDeath += OnPlayerDeath;
+
+        // Subscribe to AI fish death event
+        playerStats.OnAIFishDeath += OnAIFishDeath;
 
         // Sync UI with initial player stats
         if (uiManager != null && playerStats.IsCurrentPlayer)
@@ -115,15 +120,25 @@ public class PlayerMovement : MonoBehaviour
         if (playerStats != null)
         {
             playerStats.OnPlayerDeath -= OnPlayerDeath;
+            playerStats.OnAIFishDeath -= OnAIFishDeath;
         }
     }
 
     private void OnPlayerDeath()
     {
-        // Handle player death logic
+        // Handle player death logic only for player-controlled fish
         if (playerStats.IsCurrentPlayer && uiManager != null)
         {
             uiManager.DecreaseLives();
+        }
+    }
+
+    private void OnAIFishDeath(GameObject deadFish)
+    {
+        // Notify GameController about AI fish death
+        if (gameController != null)
+        {
+            gameController.OnAIFishDied(deadFish);
         }
     }
 

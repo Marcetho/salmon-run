@@ -11,7 +11,7 @@ public class FishSchoolManager : MonoBehaviour
     [SerializeField] private float verticalAlignmentReduction = 0.3f; // Reduces vertical component (0-1)
     [SerializeField] private float playerSpeedInfluence = 0.7f;       // How much player's speed affects school behavior
     [SerializeField] private float sprintFollowThreshold = 8f;       // Speed threshold to consider player sprinting - lowered to be more responsive
-    [SerializeField] private float sprintDetectionSensitivity = 1.5f; // How quickly to detect sprinting
+    // Removed unused sprintDetectionSensitivity field
     [SerializeField] private float wallDetectionDistance = 5.0f;  // How far to check for walls
     [SerializeField] private float wallAvoidanceStrength = 3.0f;  // Strength of wall avoidance
     [SerializeField] private LayerMask obstacleLayerMask;         // Layers to treat as obstacles
@@ -87,7 +87,7 @@ public class FishSchoolManager : MonoBehaviour
 
     public void RegisterFish(GameObject fish)
     {
-        if (!schoolFishes.Contains(fish))
+        if (fish != null && !schoolFishes.Contains(fish))
         {
             schoolFishes.Add(fish);
         }
@@ -95,10 +95,35 @@ public class FishSchoolManager : MonoBehaviour
 
     public void UnregisterFish(GameObject fish)
     {
-        if (schoolFishes.Contains(fish))
+        if (fish != null && schoolFishes.Contains(fish))
         {
             schoolFishes.Remove(fish);
         }
+    }
+
+    // Add this method to clean up null references in the school list
+    public void CleanupDeadFish()
+    {
+        for (int i = schoolFishes.Count - 1; i >= 0; i--)
+        {
+            if (schoolFishes[i] == null)
+            {
+                schoolFishes.RemoveAt(i);
+            }
+        }
+    }
+
+    // Update this method to handle null fish
+    public Vector3 GetSchoolingInfluence(Vector3 position)
+    {
+        // Clean up any null references first
+        CleanupDeadFish();
+
+        Vector3 cohesion = CalculateCohesion(position, neighborRadius);
+        Vector3 alignment = CalculateAlignment(position, neighborRadius);
+        Vector3 separation = CalculateSeparation(position, separationDistance);
+
+        return cohesion + alignment + separation;
     }
 
     // Calculate cohesion vector (move toward center of neighbors)
@@ -311,16 +336,6 @@ public class FishSchoolManager : MonoBehaviour
             return GameController.currentPlayer.transform.forward;
         }
         return Vector3.forward;
-    }
-
-    // Get schooling influence for a fish at position
-    public Vector3 GetSchoolingInfluence(Vector3 position)
-    {
-        Vector3 cohesion = CalculateCohesion(position, neighborRadius);
-        Vector3 alignment = CalculateAlignment(position, neighborRadius);
-        Vector3 separation = CalculateSeparation(position, separationDistance);
-
-        return cohesion + alignment + separation;
     }
 
     // Get schooling influence for a fish at position
