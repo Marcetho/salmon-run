@@ -89,13 +89,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a7f29944b59ad84b97482f290d4befd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxForwardSpeed: 7
-  maxBackwardSpeed: -1
-  acceleration: 2
-  deceleration: 2
+  uiManager: {fileID: 0}
+  maxForwardSpeed: 5
+  maxBackwardSpeed: -0.5
+  baseAcceleration: 4
+  baseDeceleration: 16
   rotationSpeed: 100
   yawAmount: 5
   pitchAmount: 15
+  sprintDamageInterval: 0.5
+  sprintDamageAmount: 5
+  waterExitEnergyCost: 20
+  minDistanceToPlayer: 2
+  maxDistanceToPlayer: 10
+  targetPositionUpdateInterval: 3
+  minTargetDistance: 3
+  maxTargetDistance: 10
+  playerInfluenceFactor: 1
+  naturalMovementIntensity: 0.01
+  horizontalSpreadFactor: 8
+  verticalSpreadFactor: 1.5
+  preferredHeightOffset: 0
+  rotationSmoothTime: 0.5
+  sprintCatchupMultiplier: 1.2
+  waterSurfaceYPosition: 0
+  minDepthBeforeJumping: 0.5
+  jumpAvoidanceDistance: 1.5
 --- !u!95 &4541544816445233931
 Animator:
   serializedVersion: 7
