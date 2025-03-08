@@ -51,8 +51,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float naturalMovementIntensity = 0.2f;  // Reduced from 0.4f for smoother movement
     [SerializeField] private float horizontalSpreadFactor = 8f;      // Controls how wide the school spreads horizontally
     [SerializeField] private float verticalSpreadFactor = 1.5f;      // Reduced from 3f to limit vertical movement
-    [SerializeField] private float preferredHeightOffset = 0.5f;     // Prefer to swim slightly above player height
-    [SerializeField] private float rotationSmoothTime = 0.3f;        // Time to smooth rotations
+    [SerializeField] private float preferredHeightOffset = 0f;     // Prefer to swim slightly above player height
+    [SerializeField] private float rotationSmoothTime = 0.5f;        // Time to smooth rotations
     [SerializeField] private float sprintCatchupMultiplier = 1.3f;   // How much faster AI fish can go when catching up
     private float sprintStartEnergyThreshold = 30f;  // Need this much energy to start sprinting
     private float sprintStopEnergyThreshold = 5f;   // Stop sprinting when energy drops below this
