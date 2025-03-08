@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Energy Settings")]
     [SerializeField] private float sprintDamageInterval = 0.5f;
     [SerializeField] private float sprintDamageAmount = 5f;
-    [SerializeField] private float waterExitEnergyCost = 40f;
+    [SerializeField] private float waterExitEnergyCost = 20f;
 
     private float lastSprintDamageTime;
 
@@ -41,9 +41,32 @@ public class PlayerMovement : MonoBehaviour
     private float lastRandomUpdateTime;
 
     [Header("AI Settings")]
-    private float sprintStartEnergyThreshold = 40f;  // Need this much energy to start sprinting
-    private float sprintStopEnergyThreshold = 10f;   // Stop sprinting when energy drops below this
+    [SerializeField] private float minDistanceToPlayer = 5f;
+    [SerializeField] private float maxDistanceToPlayer = 20f;
+    [SerializeField] private float targetPositionUpdateInterval = 3f;  // Reduced from 5f to be more responsive
+    [SerializeField] private float minTargetDistance = 3f;
+    [SerializeField] private float maxTargetDistance = 15f;
+    [SerializeField] private float forwardBiasWeight = 4f;  // Increased from 2f to stay more ahead of player
+    [SerializeField] private float playerInfluenceFactor = 0.7f; // How much the player influences AI fish movement
+    [SerializeField] private float naturalMovementIntensity = 0.2f;  // Reduced from 0.4f for smoother movement
+    [SerializeField] private float horizontalSpreadFactor = 8f;      // Controls how wide the school spreads horizontally
+    [SerializeField] private float verticalSpreadFactor = 1.5f;      // Reduced from 3f to limit vertical movement
+    [SerializeField] private float preferredHeightOffset = 0.5f;     // Prefer to swim slightly above player height
+    [SerializeField] private float rotationSmoothTime = 0.3f;        // Time to smooth rotations
+    [SerializeField] private float sprintCatchupMultiplier = 1.3f;   // How much faster AI fish can go when catching up
+    private float sprintStartEnergyThreshold = 30f;  // Need this much energy to start sprinting
+    private float sprintStopEnergyThreshold = 5f;   // Stop sprinting when energy drops below this
     private bool isAISprinting = false;              // Track sprint state
+    [SerializeField] private float directionMatchSpeed = 2f;  // How quickly to match player direction
+
+    // AI target position
+    private Vector3 currentAITargetPosition;
+    private float lastTargetUpdateTime;
+    private bool hasValidTarget = false;
+
+    // For rotation smoothing
+    private Vector3 currentRotationVelocity;
+    private Quaternion targetRotation;
 
     private void Start()
     {
@@ -73,6 +96,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         UpdateRandomValues();  // Initialize random values
+        UpdateAITargetPosition(); // Initialize AI target position
     }
 
     private void UpdateRandomValues()
@@ -103,6 +127,131 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void UpdateAITargetPosition()
+    {
+        if (!playerStats.IsCurrentPlayer && GameController.currentPlayer != null)
+        {
+            Vector3 playerPos = GameController.currentPlayer.transform.position;
+            Transform playerTransform = GameController.currentPlayer.transform;
+
+            // Generate a position biased toward the front of the player
+            Vector3 forwardDir = playerTransform.forward;
+
+            // Use instanceID for consistent behavior per fish
+            int fishID = gameObject.GetInstanceID();
+            UnityEngine.Random.InitState(fishID + Mathf.FloorToInt(Time.time));
+
+            // Get player speed from FishSchoolManager to adjust position
+            float playerSpeed = 5f; // Default
+            bool playerIsSprinting = false;
+            if (FishSchoolManager.Instance != null)
+            {
+                playerSpeed = FishSchoolManager.Instance.GetPlayerSpeed();
+                playerIsSprinting = FishSchoolManager.Instance.IsPlayerSprinting();
+            }
+
+            // Adjust target distances based on player speed
+            float speedFactor = Mathf.Clamp01(playerSpeed / 8f);
+            float minTargetDistanceAdjusted = Mathf.Lerp(minTargetDistance * 0.5f, minTargetDistance, speedFactor);
+            float maxTargetDistanceAdjusted = Mathf.Lerp(maxTargetDistance * 0.5f, maxTargetDistance, speedFactor);
+
+            // When sprinting, keep fish closer to the front
+            if (playerIsSprinting)
+            {
+                minTargetDistanceAdjusted *= 0.8f;
+                maxTargetDistanceAdjusted *= 0.8f;
+            }
+
+            // Much wider horizontal spread
+            Vector3 rightOffset = playerTransform.right * UnityEngine.Random.Range(-horizontalSpreadFactor, horizontalSpreadFactor);
+
+            // More constrained vertical variation
+            float verticalMin = -verticalSpreadFactor * 0.2f;  // Further reduced downward offset
+            float verticalMax = verticalSpreadFactor;
+            Vector3 upOffset = Vector3.up * (UnityEngine.Random.Range(verticalMin, verticalMax) + preferredHeightOffset);
+
+            // Forward distance based on adjusted ranges
+            float forwardDistance = UnityEngine.Random.Range(minTargetDistanceAdjusted, maxTargetDistanceAdjusted);
+
+            // Add slight offset based on fish instanceID for varied positions
+            float uniqueAngle = (fishID % 360) * Mathf.Deg2Rad;
+            Vector3 uniqueOffset = new Vector3(
+                Mathf.Sin(uniqueAngle) * 2f,
+                Mathf.Cos(uniqueAngle) * 0.8f,
+                0
+            );
+
+            // Calculate base position with spread
+            currentAITargetPosition = playerPos +
+                                    forwardDir * forwardDistance +
+                                    rightOffset +
+                                    upOffset +
+                                    uniqueOffset;
+
+            // Make sure the target is not too far below the player
+            float maxDepthDifference = 1.2f;  // Further reduced
+            if (currentAITargetPosition.y < playerPos.y - maxDepthDifference)
+            {
+                currentAITargetPosition.y = playerPos.y - maxDepthDifference;
+            }
+
+            // Favor positions above player
+            if (currentAITargetPosition.y < playerPos.y)
+            {
+                // Apply stronger lifting force to targets below player
+                currentAITargetPosition.y = Mathf.Lerp(currentAITargetPosition.y, playerPos.y + preferredHeightOffset, 0.4f);
+            }
+
+            // Check for obstacles between player and target position
+            RaycastHit hit;
+            Vector3 dirToTarget = currentAITargetPosition - playerPos;
+            if (Physics.Raycast(playerPos, dirToTarget.normalized, out hit, dirToTarget.magnitude,
+                              LayerMask.GetMask("Default", "Environment", "Obstacle")))
+            {
+                // If obstacle detected, adjust target position to be on player's side of obstacle
+                float safeDistance = hit.distance * 0.8f; // 80% of distance to obstacle
+                currentAITargetPosition = playerPos + dirToTarget.normalized * safeDistance;
+            }
+
+            hasValidTarget = true;
+            lastTargetUpdateTime = Time.time;
+        }
+    }
+
+    private bool ShouldUpdateTargetPosition()
+    {
+        // Update if we don't have a valid target or it's time for an update
+        if (!hasValidTarget || Time.time - lastTargetUpdateTime >= targetPositionUpdateInterval)
+            return true;
+
+        // Update if current target is too close or too far from player
+        if (GameController.currentPlayer != null)
+        {
+            float distanceToPlayer = Vector3.Distance(currentAITargetPosition, GameController.currentPlayer.transform.position);
+            if (distanceToPlayer < minDistanceToPlayer || distanceToPlayer > maxDistanceToPlayer)
+                return true;
+
+            // Also update target if player has significantly changed direction
+            if (Vector3.Dot(transform.forward, GameController.currentPlayer.transform.forward) < 0.7f)
+                return true;
+        }
+
+        return false;
+    }
+
+    private Vector3 GetNaturalMovement()
+    {
+        // Create a subtle wave-like motion
+        float time = Time.time;
+        Vector3 naturalMotion = new Vector3(
+            Mathf.Sin(time * 1.0f) * 0.3f,
+            Mathf.Sin(time * 0.8f) * 0.2f,
+            Mathf.Sin(time * 1.2f) * 0.3f
+        );
+
+        return naturalMotion * naturalMovementIntensity;
+    }
+
     void FixedUpdate()
     {
         Vector3 movement;
@@ -115,51 +264,207 @@ public class PlayerMovement : MonoBehaviour
                 UpdateRandomValues();
             }
 
+            // Check if we need to update the target position
+            if (ShouldUpdateTargetPosition())
+            {
+                UpdateAITargetPosition();
+            }
+
             GameObject currentPlayer = GameController.currentPlayer;
             if (currentPlayer != null)
             {
+                // Calculate distance to player for basic tracking
                 Vector3 directionToPlayer = currentPlayer.transform.position - transform.position;
                 float distanceToPlayer = directionToPlayer.magnitude;
-                float minDistance = 5f; // Minimum distance to maintain from player
+
+                // Calculate direction to target position
+                Vector3 directionToTarget = currentAITargetPosition - transform.position;
+                float distanceToTarget = directionToTarget.magnitude;
+
+                // Default target speed
                 float targetSpeed = maxForwardSpeed;
 
-                if (distanceToPlayer > minDistance)
-                {
-                    // Sprint to catch up if too far behind with energy management
-                    if (distanceToPlayer > 12f)
-                    {
-                        if (!isAISprinting && playerStats.CurrentEnergy >= sprintStartEnergyThreshold)
-                        {
-                            isAISprinting = true;
-                        }
-                        else if (isAISprinting && playerStats.CurrentEnergy <= sprintStopEnergyThreshold)
-                        {
-                            isAISprinting = false;
-                        }
+                // Check if player is sprinting using FishSchoolManager
+                bool playerSprinting = FishSchoolManager.Instance != null && FishSchoolManager.Instance.IsPlayerSprinting();
+                float playerCurrentSpeed = FishSchoolManager.Instance != null ? FishSchoolManager.Instance.GetPlayerSpeed() : 0f;
 
-                        if (isAISprinting)
-                        {
-                            targetSpeed = maxForwardSpeed * 2f;
-                            float energyCost = 40f * Time.fixedDeltaTime;
-                            playerStats.TryUseEnergy(energyCost);
-                        }
+                // Get obstacle avoidance influence
+                Vector3 obstacleInfluence = Vector3.zero;
+                if (FishSchoolManager.Instance != null)
+                {
+                    // Use the schooling influence with forward direction for obstacle detection
+                    obstacleInfluence = FishSchoolManager.Instance.GetSchoolingInfluence(transform.position, inWater, transform.forward);
+                }
+
+                // Sprint logic - improved to keep up with player
+                if (playerSprinting || distanceToPlayer > 10f) // Reduced from 12f to react sooner
+                {
+                    if (!isAISprinting && playerStats.CurrentEnergy >= sprintStartEnergyThreshold)
+                    {
+                        isAISprinting = true;
                     }
-                    else
+                    else if (isAISprinting && playerStats.CurrentEnergy <= sprintStopEnergyThreshold)
                     {
                         isAISprinting = false;
                     }
 
-                    Vector3 normalizedDirection = (directionToPlayer + currentRandomOffset).normalized;
-                    Quaternion targetRotation = Quaternion.LookRotation(normalizedDirection);
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+                    if (isAISprinting)
+                    {
+                        // Base sprint multiplier - increased lower bound
+                        float sprintMultiplier = UnityEngine.Random.Range(2.2f, 2.6f);
 
-                    movementSpeed = Mathf.MoveTowards(movementSpeed, targetSpeed, baseAcceleration * Time.fixedDeltaTime);
-                } // are we sure we want the fish to be able to die offscren, yeah like e
-                //they can't die from sprinting
+                        // Extra boost when falling behind player
+                        if (distanceToPlayer > 15f && Vector3.Dot(transform.forward, directionToPlayer.normalized) > 0.5f)
+                        {
+                            sprintMultiplier *= sprintCatchupMultiplier * 1.2f;  // Increased catchup multiplier
+                        }
+
+                        // Match player's speed more closely when they're sprinting
+                        if (playerSprinting && playerCurrentSpeed > 0)
+                        {
+                            float matchFactor = Mathf.Clamp01(playerCurrentSpeed / 12f);
+                            sprintMultiplier = Mathf.Lerp(sprintMultiplier, playerCurrentSpeed / maxForwardSpeed, matchFactor);
+                        }
+
+                        targetSpeed = maxForwardSpeed * sprintMultiplier;
+
+                        // Energy cost - reduced to allow longer sprinting
+                        float energyFactor = sprintMultiplier / 3.0f;  // Reduced from 2.0f
+                        float energyCost = 15f * Time.fixedDeltaTime * energyFactor; // Reduced from 20f
+                        playerStats.TryUseEnergy(energyCost);
+                    }
+                }
                 else
                 {
+                    isAISprinting = false;
+                }
+
+                // Add natural movement to make fish motion more realistic
+                Vector3 naturalMovement = GetNaturalMovement();
+
+                // Get player direction from FishSchoolManager
+                Vector3 playerDirection = FishSchoolManager.Instance != null ?
+                    FishSchoolManager.Instance.GetPlayerDirection() : currentPlayer.transform.forward;
+
+                // Blend direction to target with player direction and obstacle avoidance
+                float blendFactor = playerInfluenceFactor;
+
+                // Increase player direction influence when sprinting
+                if (playerSprinting && isAISprinting) blendFactor = 0.85f;
+
+                // Create a weighted direction that considers:
+                // 1. Direction to target position
+                // 2. Player's forward direction
+                // 3. Obstacle avoidance influence
+                Vector3 blendedDirection;
+
+                // If obstacles are detected (magnitude > 0), prioritize avoiding them
+                if (obstacleInfluence.magnitude > 0.1f)
+                {
+                    // Weighted blend of all influences
+                    blendedDirection = Vector3.Normalize(
+                        directionToTarget.normalized * 0.3f +  // Reduced target weight
+                        playerDirection * 0.3f +              // Reduced player direction weight
+                        obstacleInfluence.normalized * 0.4f   // Higher obstacle avoidance weight
+                    );
+                }
+                else
+                {
+                    // Normal blend with target position and player direction
+                    blendedDirection = Vector3.Slerp(
+                        directionToTarget.normalized,
+                        playerDirection,
+                        blendFactor
+                    );
+                }
+
+                // Combine target direction with natural movement
+                Vector3 finalDirection = (blendedDirection.normalized + naturalMovement).normalized;
+
+                // If too close to target, slow down
+                if (distanceToTarget < 2f)
+                {
+                    targetSpeed *= 0.5f;
+                }
+
+                // IMPROVED ROTATION SMOOTHING: Using SmoothDamp for rotation
+                if (finalDirection != Vector3.zero)
+                {
+                    // Create target rotation
+                    targetRotation = Quaternion.LookRotation(finalDirection);
+
+                    // Different rotation speeds based on situation
+                    float rotateSpeed = rotationSpeed;
+                    float smoothTime = rotationSmoothTime;
+
+                    // Faster rotation when player direction differs greatly from fish direction
+                    if (Vector3.Dot(transform.forward, playerDirection) < 0.7f)
+                    {
+                        smoothTime *= 0.5f;  // Halve smooth time for faster turning
+                    }
+
+                    // Even faster turns when falling behind during sprinting
+                    if (playerSprinting && distanceToPlayer > 15f)
+                    {
+                        smoothTime *= 0.7f;
+                    }
+
+                    // Apply smoothed rotation
+                    Vector3 currentEuler = transform.rotation.eulerAngles;
+                    Vector3 targetEuler = targetRotation.eulerAngles;
+
+                    // Handle the 0-360 wraparound for smooth rotation
+                    if (targetEuler.y - currentEuler.y > 180) targetEuler.y -= 360;
+                    if (targetEuler.y - currentEuler.y < -180) targetEuler.y += 360;
+
+                    // Similar handling for pitch (x) axis
+                    if (targetEuler.x - currentEuler.x > 180) targetEuler.x -= 360;
+                    if (targetEuler.x - currentEuler.x < -180) targetEuler.x += 360;
+
+                    // Limit extreme downward pitch to prevent diving behavior
+                    if (targetEuler.x > 30 && targetEuler.x < 180)
+                    {
+                        targetEuler.x = 30;
+                    }
+
+                    // Apply smoothing to each axis separately
+                    Vector3 smoothedEuler = Vector3.SmoothDamp(
+                        currentEuler,
+                        targetEuler,
+                        ref currentRotationVelocity,
+                        smoothTime
+                    );
+
+                    transform.rotation = Quaternion.Euler(smoothedEuler);
+                }
+
+                // Apply movement
+                if (distanceToTarget > 1f)
+                {
+                    // Accelerate or decelerate to target speed
+                    float accel = isAISprinting ? baseAcceleration * 4f : baseAcceleration * 1.5f; // Increased base accel
+
+                    // Additional acceleration when falling behind during sprint
+                    if (isAISprinting && distanceToPlayer > 15f)
+                    {
+                        accel *= 2.0f; // Significantly increased from 1.5f
+                    }
+
+                    // Even more acceleration for extreme catch-up
+                    if (distanceToPlayer > 25f)
+                    {
+                        accel *= 1.5f;
+                        targetSpeed *= 1.2f; // Allow faster than normal speeds when far behind
+                    }
+
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, targetSpeed, accel * Time.fixedDeltaTime);
+                }
+                else
+                {
+                    // Slow down when close to target
                     movementSpeed = Mathf.MoveTowards(movementSpeed, 0f, baseDeceleration * Time.fixedDeltaTime);
                 }
+
                 movement = transform.forward * movementSpeed;
             }
             else
@@ -167,8 +472,6 @@ public class PlayerMovement : MonoBehaviour
                 movement = Vector3.zero;
             }
         }
-
-
         else
         {
             // Handle rotation and tilt input
@@ -218,7 +521,7 @@ public class PlayerMovement : MonoBehaviour
                     speed = maxForwardSpeed * 2.5f;
                     acceleration *= 60f;
 
-                    float energyCost = 40f * Time.fixedDeltaTime;
+                    float energyCost = 20f * Time.fixedDeltaTime;
                     if (!playerStats.TryUseEnergy(energyCost))
                     {
                         if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
@@ -284,26 +587,38 @@ public class PlayerMovement : MonoBehaviour
             eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
 
-            // Handle energy cost for exiting water
-            float energyCost = waterExitEnergyCost;
-            if (playerStats.TryUseEnergy(energyCost))
+            // Only apply energy cost/damage to player-controlled fish
+            if (playerStats.IsCurrentPlayer)
             {
-                // Successfully used energy
+                // Handle energy cost for exiting water
+                float energyCost = waterExitEnergyCost;
+                if (!playerStats.TryUseEnergy(energyCost))
+                {
+                    // Not enough energy, consume all remaining energy and damage health
+                    float remainingEnergy = playerStats.CurrentEnergy;
+                    playerStats.SetEnergy(0);
+                    float healthDamage = (energyCost - remainingEnergy) * 0.5f;
+                    playerStats.ModifyHealth(-healthDamage);
+                }
+
+                // Update UI for current player
+                if (uiManager != null)
+                {
+                    uiManager.SetEnergy(playerStats.CurrentEnergy);
+                    uiManager.SetHealth(playerStats.CurrentHealth);
+                }
             }
             else
             {
-                // Not enough energy, consume all remaining energy and damage health
-                float remainingEnergy = playerStats.CurrentEnergy;
-                playerStats.SetEnergy(0);
-                float healthDamage = (energyCost - remainingEnergy) * 0.5f;
-                playerStats.ModifyHealth(-healthDamage);
-            }
+                // For AI fish, reduce energy but don't let them die from jumping
+                float aiEnergyCost = waterExitEnergyCost * 0.5f; // Reduced energy cost
 
-            // Update UI for current player
-            if (uiManager != null && playerStats.IsCurrentPlayer)
-            {
-                uiManager.SetEnergy(playerStats.CurrentEnergy);
-                uiManager.SetHealth(playerStats.CurrentHealth);
+                // Make sure AI fish don't drain energy below minimum threshold
+                float minEnergyThreshold = 15f;
+                float newEnergy = Mathf.Max(minEnergyThreshold, playerStats.CurrentEnergy - aiEnergyCost);
+                playerStats.SetEnergy(newEnergy);
+
+                // AI fish will never take health damage from jumping
             }
         }
     }
