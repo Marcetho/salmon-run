@@ -6,6 +6,8 @@ public class FishSchoolManager : MonoBehaviour
     [SerializeField] private float wallDetectionDistance = 5.0f;
     [SerializeField] private float wallAvoidanceStrength = 3.0f;
     [SerializeField] private LayerMask obstacleLayerMask;
+    [SerializeField] private float sprintThreshold = 8.0f;
+
     private Vector3 lastPlayerPosition;
     private float playerSpeed;
     private bool playerIsSprinting = false;
@@ -32,10 +34,13 @@ public class FishSchoolManager : MonoBehaviour
 
     public void Start()
     {
-        if (schoolFishes.Count > 0)
+        if (GameController.currentPlayer != null)
         {
-            lastPlayerPosition = GameController.currentPlayer != null ?
-                GameController.currentPlayer.transform.position : Vector3.zero;
+            lastPlayerPosition = GameController.currentPlayer.transform.position;
+        }
+        else
+        {
+            lastPlayerPosition = Vector3.zero;
         }
 
         StartCoroutine(UpdatePlayerVelocity());
@@ -58,8 +63,8 @@ public class FishSchoolManager : MonoBehaviour
                 smoothedSpeed = Mathf.Lerp(smoothedSpeed, instantSpeed, smoothFactor);
                 playerSpeed = smoothedSpeed;
 
-                // Simple sprint detection
-                playerIsSprinting = smoothedSpeed > 8f ||
+                // Sprint detection - either based on speed or input keys
+                playerIsSprinting = smoothedSpeed > sprintThreshold ||
                     (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space));
 
                 // When player makes significant speed/direction changes, trigger natural movement updates
@@ -73,7 +78,7 @@ public class FishSchoolManager : MonoBehaviour
         }
     }
 
-    // New method to trigger natural movement updates on all fish
+    // Trigger natural movement updates on all fish
     private void TriggerFishMovementUpdates()
     {
         // Clean up list first
@@ -129,13 +134,13 @@ public class FishSchoolManager : MonoBehaviour
         }
     }
 
-    // Basic obstacle avoidance - simplify but keep for safety
+    // Basic obstacle avoidance
     public Vector3 CalculateObstacleAvoidance(Vector3 position, Vector3 forward)
     {
         Vector3 avoidanceVector = Vector3.zero;
         int hitCount = 0;
 
-        // Check only forward direction for simplicity
+        // Check forward direction
         RaycastHit hit;
         if (Physics.Raycast(position, forward, out hit, wallDetectionDistance, obstacleLayerMask))
         {
@@ -148,7 +153,7 @@ public class FishSchoolManager : MonoBehaviour
         return hitCount > 0 ? avoidanceVector : Vector3.zero;
     }
 
-    // Public getter for player sprint status
+    // Getters for player information
     public bool IsPlayerSprinting()
     {
         return playerIsSprinting;
@@ -168,9 +173,29 @@ public class FishSchoolManager : MonoBehaviour
         return Vector3.forward;
     }
 
-    // Simplified version for minimal obstacle avoidance only
+    // Get schooling influence - currently just obstacle avoidance
     public Vector3 GetSchoolingInfluence(Vector3 position, bool isInWater, Vector3 forward)
     {
         return CalculateObstacleAvoidance(position, forward);
+    }
+
+    // Get player's facing direction with a small variation
+    public Quaternion GetPlayerFacingRotation(float uniqueValue, float maxVariationDegrees = 15f)
+    {
+        if (GameController.currentPlayer != null)
+        {
+            // Get the player's current rotation
+            Quaternion playerRotation = GameController.currentPlayer.transform.rotation;
+
+            // Add slight variation for natural fish school appearance
+            float timeOffset = Time.time * 0.5f;
+            float yawVariation = Mathf.Sin(timeOffset + uniqueValue * 10f) * maxVariationDegrees;
+            float pitchVariation = Mathf.Sin(timeOffset * 0.7f + uniqueValue * 5f) * (maxVariationDegrees * 0.5f);
+            float rollVariation = Mathf.Sin(timeOffset * 0.3f + uniqueValue * 7f) * (maxVariationDegrees * 0.3f);
+
+            return playerRotation * Quaternion.Euler(pitchVariation, yawVariation, rollVariation);
+        }
+
+        return Quaternion.identity;
     }
 }

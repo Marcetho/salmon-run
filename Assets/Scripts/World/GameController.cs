@@ -95,6 +95,21 @@ public class GameController : MonoBehaviour
         if (stats != null)
         {
             stats.IsCurrentPlayer = true;
+
+            // Ensure newly controlled fish have minimum energy
+            float minSwitchEnergy = stats.MaxEnergy * 0.3f; // 30% of max energy
+            if (stats.CurrentEnergy < minSwitchEnergy)
+            {
+                stats.SetEnergy(minSwitchEnergy);
+            }
+
+            // Update UI with the new fish's stats
+            if (uiManager != null)
+            {
+                uiManager.SetHealth(stats.CurrentHealth);
+                uiManager.SetEnergy(stats.CurrentEnergy);
+                uiManager.SetLives(remainingLives);
+            }
         }
         CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
         camera.target = currentPlayer.transform;

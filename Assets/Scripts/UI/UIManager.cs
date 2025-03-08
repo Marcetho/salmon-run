@@ -163,5 +163,16 @@ public class UIManager : MonoBehaviour
             playerHud.Initialize();
     }
 
+    // New method to refresh all stats at once (useful when switching players)
+    public void RefreshAllStats(float health, float energy, int lives)
+    {
+        if (playerHud != null)
+        {
+            playerHud.SetHealth(health);
+            playerHud.SetEnergy(energy);
+            playerHud.SetLives(lives);
+        }
+    }
+
     #endregion
 }
