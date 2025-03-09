@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using Unity.VisualScripting;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
@@ -100,6 +101,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        fishAnimator.SetBool("InWater", inWater);
         Vector3 movement;
         // Only control if this is the current player
         if (!playerStats.IsCurrentPlayer)
@@ -142,7 +144,12 @@ public class PlayerMovement : MonoBehaviour
         {
             // Handle rotation and tilt input
             float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-            if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
+            if (Mathf.Abs(movementSpeed) < 0.1f){
+                if (yawInput > 0)
+                    fishAnimator.SetTrigger("TurnRight");
+                else if (yawInput < 0)
+                    fishAnimator.SetTrigger("TurnLeft");
+            } 
 
             float pitchInput = 0f;
             if (inWater)
@@ -275,5 +282,13 @@ public class PlayerMovement : MonoBehaviour
                 uiManager.SetHealth(playerStats.CurrentHealth);
             }
         }
+    }
+
+    private void OnTriggerStay(Collider other) //on land (DOES NOT WORK)
+    {
+        if (other.gameObject.CompareTag("Terrain"))
+            fishAnimator.SetBool("OnLand", true);
+        else
+            fishAnimator.SetBool("OnLand", false);
     }
 }
