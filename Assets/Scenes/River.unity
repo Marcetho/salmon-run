@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 1100369158}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -646,7 +646,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06b5917f3b0f6144d9233fde76eaea34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1972069813}
+  target: {fileID: 0}
   smoothTime: 0.1
   offset_x: 0
   offset_y: 0.3
@@ -1134,7 +1134,7 @@ MonoBehaviour:
   cameraMovement: {fileID: 1230086162}
   playerPrefab: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
   spawnPoints:
-  - {fileID: 1972069813}
+  - {fileID: 0}
   initialLivesCount: 5
   selectionTimeScale: 0.1
   selectionModeText: {fileID: 1730306006}
@@ -1153,11 +1153,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1972069813 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1438817498477858220, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-  m_PrefabInstance: {fileID: 5621226426749150694}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2013140608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
@@ -1296,14 +1291,6 @@ PrefabInstance:
       propertyPath: uiManager
       value: 
       objectReference: {fileID: 447776546}
-    - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: baseAcceleration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5667260735697428456, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
-      propertyPath: baseDeceleration
-      value: 16
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

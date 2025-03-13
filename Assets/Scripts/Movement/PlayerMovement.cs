@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using Unity.VisualScripting;
+using UnityEngine.Rendering.Universal;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
@@ -32,7 +34,9 @@ public class PlayerMovement : MonoBehaviour
     private float targetMovementSpeed;
     private float baseYPosition;
     private Animator fishAnimator;
-    private bool inWater; // maybe use later for animation purposes
+    private bool inWater;
+    private bool isBeached;
+    Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
 
@@ -182,6 +186,8 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        fishAnimator.SetBool("InWater", inWater);
+        fishAnimator.SetBool("OnLand", isBeached);
         Vector3 movement;
 
         // Only control if this is the current player
@@ -333,6 +339,12 @@ public class PlayerMovement : MonoBehaviour
 
                 // Apply movement in the direction the fish is facing
                 movement = transform.forward * movementSpeed;
+                
+                if (isBeached)
+                {
+                    rb.AddForce(10*movement + 20*Vector3.up);
+                }
+                
             }
             else
             {
@@ -341,9 +353,29 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
+            float moveInput = 0f;
+            // Handle rotation and tilt input
             // ... existing code for player-controlled fish ...
             float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-            if (Mathf.Abs(movementSpeed) < 0.1f) yawInput = 0f;
+            if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0){
+                if (yawInput == 1f)
+                {
+                    fishAnimator.SetBool("TurnRight", true);
+                    fishAnimator.SetBool("TurnLeft", false);
+                    moveInput = 0.3f;
+                }
+                else if (yawInput == -1f)
+                {
+                    fishAnimator.SetBool("TurnLeft", true);
+                    fishAnimator.SetBool("TurnRight", false);
+                    moveInput = 0.3f;
+                }
+            }
+            else
+            {
+                fishAnimator.SetBool("TurnLeft", false);
+                fishAnimator.SetBool("TurnRight", false);
+            }
 
             float pitchInput = 0f;
             if (inWater)
@@ -375,7 +407,6 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
 
             // Handle speed changes based on shift/ctrl
-            float moveInput = 0f;
             if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
             if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
             float speed = maxForwardSpeed;
@@ -416,11 +447,20 @@ public class PlayerMovement : MonoBehaviour
 
             // Apply movement in the direction the fish is facing
             movement = transform.forward * movementSpeed;
+            if (isBeached && moveInput > 0)
+            {
+                rb.AddForce(10*movement + 20*Vector3.up);
+            }
         }
 
         if (inWater)
         {
             rb.AddForce(movement);
+            isBeached = false;
+        }
+        else
+        {
+            isBeached = Mathf.Abs(rb.linearVelocity.y) < 0.001f; //grounded
         }
 
         eForce.force = eForceDir;
