@@ -8,16 +8,26 @@ public class boats : MonoBehaviour
     [SerializeField] private int maxBoats = 10;
     [SerializeField] private float spawnInterval = 2f;
     [SerializeField] private BoxCollider spawnVolume;
+    [SerializeField] private FoodSpawner foodSpawner;
+    [SerializeField] private string collisionTargetTag = "Player";
+    private int pointsLostOnHit = 5;
 
     private List<GameObject> activeBoats = new List<GameObject>();
     private float nextSpawnTime;
     private bool spawnHorizontal = true;
+
+    public FoodSpawner FoodSpawnerReference => foodSpawner;
+    public int PointsLostOnHit => pointsLostOnHit;
 
     void Start()
     {
         if (spawnVolume == null)
         {
             spawnVolume = GetComponent<BoxCollider>();
+        }
+        if (foodSpawner == null)
+        {
+            foodSpawner = FindObjectOfType<FoodSpawner>();
         }
         nextSpawnTime = Time.time;
     }
@@ -57,8 +67,19 @@ public class boats : MonoBehaviour
         GameObject boat = Instantiate(boatPrefab, spawnPoint, Quaternion.identity);
         boat.transform.LookAt(targetPoint);
         activeBoats.Add(boat);
+        spawnHorizontal = !spawnHorizontal;
+    }
 
-        spawnHorizontal = !spawnHorizontal; // Alternate between horizontal and vertical
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag(collisionTargetTag) && foodSpawner != null)
+        {
+            for (int i = 0; i < pointsLostOnHit; i++)
+            {
+                foodSpawner.DecrementFoodCollected();
+            }
+            Debug.Log($"Hit by boat! Lost {pointsLostOnHit} points!");
+        }
     }
 
     private Vector3 GetPerpendicularEdgePosition()

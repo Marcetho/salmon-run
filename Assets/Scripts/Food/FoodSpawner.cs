@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro; // Add this for TextMeshPro support
 
 public class FoodSpawner : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
+    [SerializeField] private TextMeshProUGUI scoreText; // Add this field
 
     [Header("Spawn Settings")]
     public GameObject foodPrefab;
@@ -120,6 +122,22 @@ public class FoodSpawner : MonoBehaviour
     public void IncrementFoodCollected()
     {
         totalFoodCollected++;
+        UpdateScoreDisplay();
+    }
+
+    public void DecrementFoodCollected()
+    {
+        totalFoodCollected = Mathf.Max(0, totalFoodCollected - 1);
+        UpdateScoreDisplay();
+        Debug.Log($"Lost food! Total points: {totalFoodCollected}");
+    }
+
+    private void UpdateScoreDisplay()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = $"Score: {totalFoodCollected}";
+        }
     }
 
     private void OnDrawGizmos()
