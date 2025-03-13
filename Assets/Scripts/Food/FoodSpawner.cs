@@ -1,12 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
-using TMPro; // Add this for TextMeshPro support
+using TMPro; // Replace UnityEngine.UI with TMPro
 
 public class FoodSpawner : MonoBehaviour
 {
     [Header("References")]
     public Transform player;
-    [SerializeField] private TextMeshProUGUI scoreText; // Add this field
+    public TextMeshProUGUI scoreText; // Change from Text to TextMeshProUGUI
 
     [Header("Spawn Settings")]
     public GameObject foodPrefab;
@@ -31,6 +31,11 @@ public class FoodSpawner : MonoBehaviour
             Debug.LogError("FoodSpawner requires a player reference!");
             enabled = false;
             return;
+        }
+
+        if (scoreText == null)
+        {
+            Debug.LogWarning("ScoreText reference is missing!");
         }
 
         if (spawnVolume == null)
@@ -114,6 +119,14 @@ public class FoodSpawner : MonoBehaviour
         SetNextSpawnTime(minSpawnInterval, maxSpawnInterval);
     }
 
+    private void UpdateScoreDisplay()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = $"Food: {totalFoodCollected}";
+        }
+    }
+
     public int GetTotalFoodCollected()
     {
         return totalFoodCollected;
@@ -130,14 +143,6 @@ public class FoodSpawner : MonoBehaviour
         totalFoodCollected = Mathf.Max(0, totalFoodCollected - 1);
         UpdateScoreDisplay();
         Debug.Log($"Lost food! Total points: {totalFoodCollected}");
-    }
-
-    private void UpdateScoreDisplay()
-    {
-        if (scoreText != null)
-        {
-            scoreText.text = $"Score: {totalFoodCollected}";
-        }
     }
 
     private void OnDrawGizmos()

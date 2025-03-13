@@ -66,20 +66,12 @@ public class boats : MonoBehaviour
 
         GameObject boat = Instantiate(boatPrefab, spawnPoint, Quaternion.identity);
         boat.transform.LookAt(targetPoint);
+        if (!boat.GetComponent<BoatCollision>())
+        {
+            boat.AddComponent<BoatCollision>();
+        }
         activeBoats.Add(boat);
         spawnHorizontal = !spawnHorizontal;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag(collisionTargetTag) && foodSpawner != null)
-        {
-            for (int i = 0; i < pointsLostOnHit; i++)
-            {
-                foodSpawner.DecrementFoodCollected();
-            }
-            Debug.Log($"Hit by boat! Lost {pointsLostOnHit} points!");
-        }
     }
 
     private Vector3 GetPerpendicularEdgePosition()
