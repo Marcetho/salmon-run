@@ -90,8 +90,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiManager: {fileID: 0}
-  maxForwardSpeed: 7
-  maxBackwardSpeed: -1
+  maxForwardSpeed: 5
+  maxBackwardSpeed: -0.5
   baseAcceleration: 4
   baseDeceleration: 16
   rotationSpeed: 100
@@ -99,7 +99,16 @@ MonoBehaviour:
   pitchAmount: 15
   sprintDamageInterval: 0.5
   sprintDamageAmount: 5
-  waterExitEnergyCost: 40
+  waterExitEnergyCost: 20
+  aiEnergyCostMultiplier: 0.5
+  aiSprintEnergyCostPerSecond: 10
+  rotationSmoothTime: 0.5
+  waterSurfaceYPosition: 0
+  independentMovementStrength: 0.5
+  forwardBiasStrength: 0.7
+  naturalMovementSpeed: 0.8
+  positionUpdateInterval: 3
+  aiFishSprintEnergyUse: 5
 --- !u!95 &4541544816445233931
 Animator:
   serializedVersion: 7
