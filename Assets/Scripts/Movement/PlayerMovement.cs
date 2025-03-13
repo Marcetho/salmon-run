@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Unity.VisualScripting;
+using UnityEngine.Rendering.Universal;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
@@ -142,14 +143,28 @@ public class PlayerMovement : MonoBehaviour
 
         else
         {
+            float moveInput = 0f;
             // Handle rotation and tilt input
             float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-            if (Mathf.Abs(movementSpeed) < 0.1f){
-                if (yawInput > 0)
-                    fishAnimator.SetTrigger("TurnRight");
-                else if (yawInput < 0)
-                    fishAnimator.SetTrigger("TurnLeft");
-            } 
+            if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0){
+                if (yawInput == 1f)
+                {
+                    fishAnimator.SetBool("TurnRight", true);
+                    fishAnimator.SetBool("TurnLeft", false);
+                    moveInput = 0.3f;
+                }
+                else if (yawInput == -1f)
+                {
+                    fishAnimator.SetBool("TurnLeft", true);
+                    fishAnimator.SetBool("TurnRight", false);
+                    moveInput = 0.3f;
+                }
+            }
+            else
+            {
+                fishAnimator.SetBool("TurnLeft", false);
+                fishAnimator.SetBool("TurnRight", false);
+            }
 
             float pitchInput = 0f;
             if (inWater)
@@ -181,7 +196,6 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
 
             // Handle speed changes based on shift/ctrl
-            float moveInput = 0f;
             if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
             if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
             float speed = maxForwardSpeed;
@@ -227,8 +241,16 @@ public class PlayerMovement : MonoBehaviour
         if (inWater)
         {
             rb.AddForce(movement);
+            fishAnimator.SetBool("OnLand", false);
         }
-
+        else 
+        {
+            if (Mathf.Abs(rb.linearVelocity.y) < 0.001f) //grounded
+                fishAnimator.SetBool("OnLand", true);
+            else
+                fishAnimator.SetBool("OnLand", false);
+        }
+        
         eForce.force = eForceDir;
 
         if (fishAnimator != null)
@@ -282,13 +304,5 @@ public class PlayerMovement : MonoBehaviour
                 uiManager.SetHealth(playerStats.CurrentHealth);
             }
         }
-    }
-
-    private void OnTriggerStay(Collider other) //on land (DOES NOT WORK)
-    {
-        if (other.gameObject.CompareTag("Terrain"))
-            fishAnimator.SetBool("OnLand", true);
-        else
-            fishAnimator.SetBool("OnLand", false);
     }
 }
