@@ -32,7 +32,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private float baseYPosition;
     private Animator fishAnimator;
-    private bool inWater; // maybe use later for animation purposes
+    private bool inWater;
+    private bool isBeached;
     Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
@@ -103,6 +104,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         fishAnimator.SetBool("InWater", inWater);
+        fishAnimator.SetBool("OnLand", isBeached);
         Vector3 movement;
         // Only control if this is the current player
         if (!playerStats.IsCurrentPlayer)
@@ -133,6 +135,12 @@ public class PlayerMovement : MonoBehaviour
                     movementSpeed = Mathf.MoveTowards(movementSpeed, 0f, baseDeceleration * Time.fixedDeltaTime);
                 }
                 movement = transform.forward * movementSpeed;
+                
+                if (isBeached)
+                {
+                    rb.AddForce(10*movement + 20*Vector3.up);
+                }
+                
             }
             else
             {
@@ -236,21 +244,22 @@ public class PlayerMovement : MonoBehaviour
 
             // Apply movement in the direction the fish is facing
             movement = transform.forward * movementSpeed;
+            if (isBeached && moveInput > 0)
+            {
+                rb.AddForce(10*movement + 20*Vector3.up);
+            }
         }
 
         if (inWater)
         {
             rb.AddForce(movement);
-            fishAnimator.SetBool("OnLand", false);
+            isBeached = false;
         }
-        else 
+        else
         {
-            if (Mathf.Abs(rb.linearVelocity.y) < 0.001f) //grounded
-                fishAnimator.SetBool("OnLand", true);
-            else
-                fishAnimator.SetBool("OnLand", false);
+            isBeached = Mathf.Abs(rb.linearVelocity.y) < 0.001f; //grounded
         }
-        
+
         eForce.force = eForceDir;
 
         if (fishAnimator != null)
