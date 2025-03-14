@@ -19,6 +19,8 @@ public class PlayerStats : MonoBehaviour
     public event Action<float> OnHealthChanged;
     public event Action<float> OnEnergyChanged;
     public event Action OnPlayerDeath;
+    // New event for AI fish death
+    public event Action<GameObject> OnAIFishDeath;
 
     // Properties
     public float MaxHealth => maxHealth;
@@ -51,7 +53,16 @@ public class PlayerStats : MonoBehaviour
 
             if (currentHealth <= 0)
             {
-                OnPlayerDeath?.Invoke();
+                if (isCurrentPlayer)
+                {
+                    // Only invoke player death for the current player
+                    OnPlayerDeath?.Invoke();
+                }
+                else
+                {
+                    // For AI fish, invoke AI death event
+                    OnAIFishDeath?.Invoke(this.gameObject);
+                }
             }
         }
     }
