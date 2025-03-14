@@ -43,6 +43,10 @@ public class GameController : MonoBehaviour
             Debug.LogError("GameController: Cannot initialize game. uiManager is null!");
             return;
         }
+        if (selectionModeText)
+        {
+            selectionModeText.gameObject.SetActive(false);
+        }
 
         // Set initial UI values
         LivesUI livesUI = uiManager.GetComponentInChildren<LivesUI>();

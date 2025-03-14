@@ -355,7 +355,7 @@ public class PlayerMovement : MonoBehaviour
         {
             float moveInput = 0f;
             // Handle rotation and tilt input
-            // ... existing code for player-controlled fish ...
+
             float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
             if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0){
                 if (yawInput == 1f)

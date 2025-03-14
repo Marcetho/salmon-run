@@ -1157,7 +1157,7 @@ MonoBehaviour:
   - {fileID: 0}
   initialLivesCount: 5
   selectionTimeScale: 0.1
-  selectionModeText: {fileID: 1730306006}
+  selectionModeText: {fileID: 0}
 --- !u!4 &1941380930
 Transform:
   m_ObjectHideFlags: 0
