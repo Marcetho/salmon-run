@@ -941,6 +941,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 6786879661281376383, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -2115374316, guid: cdb5170718e03b447be339352c5d9053, type: 3}
     - target: {fileID: 7020484979564005909, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
       propertyPath: fishStatsText
       value: 
@@ -949,6 +953,22 @@ PrefabInstance:
       propertyPath: fishSelectionPanel
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7478296874631169512, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7478296874631169512, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -2.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7903076873155020632, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: fullLifeSprite
+      value: 
+      objectReference: {fileID: 549978353, guid: 159fdff81ba46874188620aaf77f34dd, type: 3}
+    - target: {fileID: 7903076873155020632, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: emptyLifeSprite
+      value: 
+      objectReference: {fileID: 2082785772, guid: bb3101dd953724344b2b850aa9362159, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 8451621223184467252, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
@@ -998,7 +1018,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
