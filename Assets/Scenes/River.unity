@@ -405,6 +405,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911404248}
   m_CullTransparentMesh: 1
+--- !u!4 &931906235 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1438817498477858220, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+  m_PrefabInstance: {fileID: 5621226426749150694}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &996086801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1018,7 +1023,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: Fish selection instructions
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1052,8 +1057,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -1113,8 +1118,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 140, y: 183}
+  m_SizeDelta: {x: 400, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &1889496478 stripped
 RectTransform:
@@ -1152,12 +1157,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiManager: {fileID: 447776546}
   cameraMovement: {fileID: 1230086162}
-  playerPrefab: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+  playerPrefabOcean: {fileID: 1782409816687499030, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
+  playerPrefabM: {fileID: 6746072350167704681, guid: e6b5fb2fba7910544bc3b6d1137f71f4, type: 3}
+  playerPrefabF: {fileID: 5203965940252221843, guid: b68bbf19243650542ad9e09022d26b20, type: 3}
   spawnPoints:
-  - {fileID: 0}
+  - {fileID: 931906235}
   initialLivesCount: 5
   selectionTimeScale: 0.1
-  selectionModeText: {fileID: 0}
+  selectionModeText: {fileID: 1730306006}
 --- !u!4 &1941380930
 Transform:
   m_ObjectHideFlags: 0
@@ -1269,7 +1276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438817498477858220, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.2
+      value: 8.39
       objectReference: {fileID: 0}
     - target: {fileID: 1438817498477858220, guid: 7555f1960595173478ae8b2a7005e8df, type: 3}
       propertyPath: m_LocalPosition.z
