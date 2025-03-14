@@ -8,7 +8,9 @@ public class GameController : MonoBehaviour
     [Header("References")]
     [SerializeField] private UIManager uiManager;
     [SerializeField] private CameraMovement cameraMovement;
-    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject playerPrefabOcean;
+    [SerializeField] private GameObject playerPrefabM;
+    [SerializeField] private GameObject playerPrefabF;
     [SerializeField] private Transform[] spawnPoints;
 
     [Header("Game Settings")]
@@ -24,6 +26,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI selectionModeText; // Optional text to show during selection
     private bool inSelectionMode = false;
     private int selectionIndex = 0;
+    private int level = 1;
+    private bool wasSpaceAlreadyPressed = false; // Track if space was already pressed when entering selection mode
 
     private void Start()
     {
@@ -148,6 +152,8 @@ public class GameController : MonoBehaviour
             }
         }
 
+        GameObject playerPrefab = level != 1 ? UnityEngine.Random.value > 0.5f ? playerPrefabM : playerPrefabF : playerPrefabOcean;
+
         GameObject player = Instantiate(playerPrefab, spawnPosition, spawnRotation);
         spawnedFishes.Add(player);
 
@@ -237,17 +243,23 @@ public class GameController : MonoBehaviour
     private void HandleFishSelection()
     {
         // Navigate between fish
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.A))
         {
             CycleSelectionFish(-1);
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.D))
         {
             CycleSelectionFish(1);
         }
 
-        // Confirm selection
-        if (Input.GetKeyDown(KeyCode.Return))
+        // Check for space key release before allowing selection
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            wasSpaceAlreadyPressed = false;
+        }
+
+        // Confirm selection only if space wasn't already pressed when entering selection mode
+        if (Input.GetKeyDown(KeyCode.Space) && !wasSpaceAlreadyPressed)
         {
             ConfirmFishSelection();
         }
@@ -308,11 +320,14 @@ public class GameController : MonoBehaviour
         Time.timeScale = selectionTimeScale;
         currentState = GameState.FishSelection;
 
+        // Check if space is already pressed when entering selection mode
+        wasSpaceAlreadyPressed = Input.GetKey(KeyCode.Space);
+
         // Display selection mode text if available
         if (selectionModeText != null)
         {
             selectionModeText.gameObject.SetActive(true);
-            selectionModeText.text = "CHOOSE NEXT FISH\nUse A/D or Arrow Keys\nPress Space/Enter to select";
+            selectionModeText.text = "CHOOSE NEXT FISH\nUse A/D to navigate\nPress Space to select";
         }
 
         // Make sure selectionIndex is valid
