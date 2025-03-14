@@ -478,9 +478,10 @@ MonoBehaviour:
   scoreText: {fileID: 498585526}
   foodPrefab: {fileID: 1963570314}
   spawnVolume: {fileID: 148432670}
-  foodDensity: 30
-  maxFoodCount: 100
-  minFoodCount: 20
+  foodDensity: 80
+  maxFoodCount: 150
+  minFoodCount: 30
+  pointsPerFood: 3
   minSpawnInterval: 0.1
   maxSpawnInterval: 2
   foodLifetime: 20

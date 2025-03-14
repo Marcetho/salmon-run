@@ -14,6 +14,7 @@ public class FoodSpawner : MonoBehaviour
     public float foodDensity = 1f; // Food items per cubic unit
     public float maxFoodCount = 50f;
     public float minFoodCount = 20f; // Minimum food count to maintain
+    public int pointsPerFood = 1;  // New variable for points per food item
 
     [Header("Timing")]
     public float minSpawnInterval = 0.1f;
@@ -134,7 +135,7 @@ public class FoodSpawner : MonoBehaviour
 
     public void IncrementFoodCollected()
     {
-        totalFoodCollected++;
+        totalFoodCollected += pointsPerFood;
         UpdateScoreDisplay();
     }
 
