@@ -339,12 +339,12 @@ public class PlayerMovement : MonoBehaviour
 
                 // Apply movement in the direction the fish is facing
                 movement = transform.forward * movementSpeed;
-                
+
                 if (isBeached)
                 {
-                    rb.AddForce(10*movement + 20*Vector3.up);
+                    rb.AddForce(10 * movement + 20 * Vector3.up);
                 }
-                
+
             }
             else
             {
@@ -356,8 +356,9 @@ public class PlayerMovement : MonoBehaviour
             float moveInput = 0f;
             // Handle rotation and tilt input
 
-            float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-            if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0){
+            float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
+            if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
+            {
                 if (yawInput == 1f)
                 {
                     fishAnimator.SetBool("TurnRight", true);
@@ -449,7 +450,7 @@ public class PlayerMovement : MonoBehaviour
             movement = transform.forward * movementSpeed;
             if (isBeached && moveInput > 0)
             {
-                rb.AddForce(10*movement + 20*Vector3.up);
+                rb.AddForce(10 * movement + 20 * Vector3.up);
             }
         }
 

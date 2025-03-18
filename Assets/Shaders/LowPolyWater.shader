@@ -21,7 +21,7 @@ Shader "Custom/LowPolyWater"
         Tags {"Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True"}
         LOD 100
         
-        ZWrite On
+        ZWrite Off  // Changed from ZWrite On
         Cull Off
         Blend SrcAlpha OneMinusSrcAlpha
 
@@ -121,34 +121,22 @@ Shader "Custom/LowPolyWater"
                 float foam = saturate(1 - (depthDifference / _FoamWidth));
                 float ndot1 = max(0, dot(i.worldNormal, float3(0, 1, 0)));
                 
-                // Consistent fresnel for both above and below
                 float fresnel = pow(1.0 - saturate(dot(normalize(i.worldNormal), i.viewDir)), _FresnelPower);
                 
-                // Base color calculation - same for both above and below
                 fixed4 finalColor = lerp(_Color, _ShallowColor, i.waveHeight * 0.5 + 0.5);
                 finalColor = lerp(finalColor, _FoamColor, foam);
                 
                 if (isUnderwater)
                 {
-                    if (isBackFace)
-                    {
-                        // Use same color calculation as above water for consistency
-                        finalColor = lerp(_Color, _ShallowColor, i.waveHeight * 0.5 + 0.5);
-                        finalColor.rgb *= 0.9; // Slightly darker underwater
-                        
-                        // Consistent lighting
-                        finalColor.rgb *= (ndot1 * 0.3 + 0.7);
-                        finalColor.rgb += fresnel * _ShallowColor.rgb * 0.1; // Reduced fresnel effect underwater
-                        
-                        // Transparency based on view angle only
-                        float viewAngleAlpha = saturate(1 - abs(dot(i.worldNormal, i.viewDir)) + 0.2);
-                        finalColor.a = viewAngleAlpha * _UnderwaterVisibility;
-                    }
-                    else
-                    {
-                        // Non-backface underwater surfaces should be nearly invisible
-                        finalColor.a *= _UnderwaterVisibility * 0.3;
-                    }
+                    // Underwater behavior - maintain transparency for ghost fish
+                    finalColor = lerp(_Color, _ShallowColor, i.waveHeight * 0.5 + 0.5);
+                    finalColor.rgb *= 0.9;
+                    finalColor.rgb *= (ndot1 * 0.3 + 0.7);
+                    finalColor.rgb += fresnel * _ShallowColor.rgb * 0.1;
+                    
+                    // Preserve original alpha for ghost fish visibility
+                    float viewAngleAlpha = saturate(1 - abs(dot(i.worldNormal, i.viewDir)) + 0.2);
+                    finalColor.a = viewAngleAlpha * finalColor.a;
                 }
                 else
                 {

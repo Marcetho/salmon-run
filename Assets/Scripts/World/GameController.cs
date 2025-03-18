@@ -29,6 +29,18 @@ public class GameController : MonoBehaviour
     private int level = 1;
     private bool wasSpaceAlreadyPressed = false; // Track if space was already pressed when entering selection mode
 
+    // Ghost fish properties
+    [Header("Ghost Fish")]
+    [SerializeField] private Color ghostColor = new Color(0.5f, 0.5f, 1.0f, 0.2f); // Blue-ish translucent color
+    [SerializeField] private float ghostMoveSpeed = 2.0f; // Moderate speed for smooth transitions
+    [SerializeField] private Material ghostMaterial; // Optional: base material for ghost (can be null)
+    private GameObject ghostFish; // Reference to the ghost fish object
+
+    // Camera adjustments during selection
+    private Transform originalCameraTarget;
+    private float originalCameraSmoothTime;
+    private bool hasOriginalCameraSettings = false;
+
     private void Start()
     {
         currentState = GameState.Ocean;
@@ -211,6 +223,9 @@ public class GameController : MonoBehaviour
                     stats.IsCurrentPlayer = false;
                     stats.OnPlayerDeath -= OnCurrentPlayerDied;
                 }
+
+                // Create the ghost fish before destroying the dead fish
+                CreateGhostFish(deadPlayer);
             }
 
             // Remove the dead fish from the list
@@ -235,8 +250,59 @@ public class GameController : MonoBehaviour
             else
             {
                 // No fish left, game over
+                DestroyGhostFish(); // Clean up ghost if no fish left
                 GameOver();
             }
+        }
+    }
+
+    private void CreateGhostFish(GameObject deadFish)
+    {
+        DestroyGhostFish();
+
+        ghostFish = Instantiate(deadFish, deadFish.transform.position, deadFish.transform.rotation);
+        ghostFish.name = "GhostFish";
+
+        if (cameraMovement != null)
+        {
+            ghostFish.transform.position = cameraMovement.transform.position +
+                                          cameraMovement.transform.forward * 2f;
+        }
+
+        // Disable scripts and colliders
+        var scripts = ghostFish.GetComponents<MonoBehaviour>();
+        foreach (var script in scripts)
+        {
+            if (script != null && script.GetType() != typeof(Transform))
+            {
+                Destroy(script);
+            }
+        }
+
+        Collider[] colliders = ghostFish.GetComponentsInChildren<Collider>();
+        foreach (Collider c in colliders)
+        {
+            c.enabled = false;
+        }
+
+        // Add the ghost behavior component
+        GhostBehavior ghostBehavior = ghostFish.AddComponent<GhostBehavior>();
+        ghostBehavior.useUnscaledTime = true;
+        ghostBehavior.ghostColor = ghostColor; // Pass the ghost color to the behavior
+
+        // Setup the target fish if available
+        if (spawnedFishes.Count > 0 && selectionIndex >= 0 && selectionIndex < spawnedFishes.Count)
+        {
+            ghostBehavior.SetTargetFish(spawnedFishes[selectionIndex].transform);
+        }
+    }
+
+    private void DestroyGhostFish()
+    {
+        if (ghostFish != null)
+        {
+            Destroy(ghostFish);
+            ghostFish = null;
         }
     }
 
@@ -263,26 +329,52 @@ public class GameController : MonoBehaviour
         {
             ConfirmFishSelection();
         }
+
+        // Move ghost toward the currently selected fish if it exists
+        MoveGhostToSelectedFish();
+
+        // Update ghost's target fish
+        if (ghostFish != null && selectionIndex >= 0 && selectionIndex < spawnedFishes.Count)
+        {
+            GhostBehavior ghostBehavior = ghostFish.GetComponent<GhostBehavior>();
+            if (ghostBehavior != null)
+            {
+                ghostBehavior.SetTargetFish(spawnedFishes[selectionIndex].transform);
+            }
+        }
     }
 
-    private void CycleSelectionFish(int direction)
+    private void MoveGhostToSelectedFish(bool immediate = false)
     {
-        if (spawnedFishes.Count == 0) return;
-
-        selectionIndex = (selectionIndex + direction + spawnedFishes.Count) % spawnedFishes.Count;
-
-        // Move camera to the selected fish
-        if (cameraMovement != null && spawnedFishes[selectionIndex] != null)
+        if (ghostFish != null && spawnedFishes.Count > 0 && selectionIndex >= 0 && selectionIndex < spawnedFishes.Count)
         {
-            cameraMovement.target = spawnedFishes[selectionIndex].transform;
-
-            // Update UI to show this fish's stats using the existing player HUD
-            if (uiManager != null)
+            GameObject targetFish = spawnedFishes[selectionIndex];
+            if (targetFish != null)
             {
-                PlayerStats stats = spawnedFishes[selectionIndex].GetComponent<PlayerStats>();
-                if (stats != null)
+                if (immediate)
                 {
-                    uiManager.RefreshAllStats(stats.CurrentHealth, stats.CurrentEnergy, remainingLives);
+                    // Immediately position near the target fish 
+                    ghostFish.transform.position = targetFish.transform.position;
+                    ghostFish.transform.rotation = targetFish.transform.rotation;
+                }
+                else
+                {
+                    // Move ghost toward the selected fish with smooth lerp
+                    float moveStep = Time.unscaledDeltaTime * ghostMoveSpeed;
+
+                    // Position
+                    ghostFish.transform.position = Vector3.Lerp(
+                        ghostFish.transform.position,
+                        targetFish.transform.position,
+                        moveStep
+                    );
+
+                    // Rotation
+                    ghostFish.transform.rotation = Quaternion.Slerp(
+                        ghostFish.transform.rotation,
+                        targetFish.transform.rotation,
+                        moveStep
+                    );
                 }
             }
         }
@@ -292,7 +384,19 @@ public class GameController : MonoBehaviour
     {
         if (spawnedFishes.Count > 0 && selectionIndex >= 0 && selectionIndex < spawnedFishes.Count)
         {
+            // Set the camera to follow the selected fish before destroying the ghost
+            if (cameraMovement != null && hasOriginalCameraSettings)
+            {
+                cameraMovement.target = spawnedFishes[selectionIndex].transform;
+            }
+
+            // Set current player
             SetCurrentPlayer(selectionIndex);
+
+            // Destroy the ghost fish after selection is confirmed
+            DestroyGhostFish();
+
+            // Exit selection mode
             ExitSelectionMode();
         }
         else
@@ -303,12 +407,40 @@ public class GameController : MonoBehaviour
             if (spawnedFishes.Count > 0)
             {
                 selectionIndex = 0;
+
+                // Set the camera to follow the selected fish
+                if (cameraMovement != null && hasOriginalCameraSettings)
+                {
+                    cameraMovement.target = spawnedFishes[selectionIndex].transform;
+                }
+
                 SetCurrentPlayer(selectionIndex);
+
+                // Destroy the ghost fish
+                DestroyGhostFish();
+
                 ExitSelectionMode();
             }
             else
             {
                 GameOver();
+            }
+        }
+    }
+
+    private void CycleSelectionFish(int direction)
+    {
+        if (spawnedFishes.Count == 0) return;
+
+        selectionIndex = (selectionIndex + direction + spawnedFishes.Count) % spawnedFishes.Count;
+
+        // Update UI to show this fish's stats using the existing player HUD
+        if (uiManager != null)
+        {
+            PlayerStats stats = spawnedFishes[selectionIndex].GetComponent<PlayerStats>();
+            if (stats != null)
+            {
+                uiManager.RefreshAllStats(stats.CurrentHealth, stats.CurrentEnergy, remainingLives);
             }
         }
     }
@@ -336,24 +468,38 @@ public class GameController : MonoBehaviour
             selectionIndex = 0;
         }
 
-        // Make sure we have a valid fish
-        if (spawnedFishes.Count > 0 && selectionIndex < spawnedFishes.Count && spawnedFishes[selectionIndex] != null)
+        // Store original camera target
+        if (cameraMovement != null)
         {
-            Debug.Log($"Initial selection fish: {spawnedFishes[selectionIndex].name}");
-            // Set camera to follow this fish
-            if (cameraMovement != null)
+            originalCameraTarget = cameraMovement.target;
+            originalCameraSmoothTime = cameraMovement.smoothTime;
+            hasOriginalCameraSettings = true;
+
+            // Set camera to follow ghost fish
+            if (ghostFish != null)
             {
-                cameraMovement.target = spawnedFishes[selectionIndex].transform;
+                cameraMovement.target = ghostFish.transform;
+                cameraMovement.smoothTime = 0.3f;
+                cameraMovement.useUnscaledTime = true;
+            }
+        }
+
+        // Make sure we have a valid fish
+        if (spawnedFishes.Count > 0 && selectionIndex >= 0 && selectionIndex < spawnedFishes.Count)
+        {
+            // If we have a ghost fish, move it to the first selectable fish right away
+            if (ghostFish != null)
+            {
+                // Start the ghost moving toward the first selectable fish
+                MoveGhostToSelectedFish(true); // true = immediate positioning
             }
 
-            // Immediately update the UI with this fish's stats
+            // Update UI with this fish's stats
             if (uiManager != null)
             {
                 PlayerStats stats = spawnedFishes[selectionIndex].GetComponent<PlayerStats>();
-                Debug.Log($"Initial selection stats: {stats}");
                 if (stats != null)
                 {
-                    // Replace the individual stat updates with a full refresh
                     uiManager.RefreshAllStats(stats.CurrentHealth, stats.CurrentEnergy, remainingLives);
                 }
             }
@@ -374,6 +520,14 @@ public class GameController : MonoBehaviour
         if (selectionModeText != null)
         {
             selectionModeText.gameObject.SetActive(false);
+        }
+
+        // Restore original camera settings
+        if (cameraMovement != null && hasOriginalCameraSettings)
+        {
+            // Target should be the newly selected fish from ConfirmFishSelection
+            cameraMovement.smoothTime = originalCameraSmoothTime;
+            cameraMovement.useUnscaledTime = false;
         }
     }
 
@@ -475,5 +629,159 @@ public class GameController : MonoBehaviour
                 uiManager.SetEnergy(stats.CurrentEnergy);
             }
         }
+    }
+}
+
+// Replace the GhostBehavior class at the bottom of the file
+public class GhostBehavior : MonoBehaviour
+{
+    public bool useUnscaledTime = true;
+    private Transform targetFish;
+    public float initialAlpha = 0.8f;
+    private float maxDistance = 1f;
+    private float minDistance = 0.2f;
+    public Color ghostColor = new Color(0.5f, 0.5f, 1.0f, 0.2f); // Ghostly blue color
+
+    // Added debug field to visualize alpha values in inspector
+    [SerializeField] private float currentAlpha;
+
+    // Track material instances
+    private List<Material> materialInstances = new List<Material>();
+    private bool materialsSetup = false;
+
+    private void Start()
+    {
+        SetupMaterialInstances();
+    }
+
+    private void SetupMaterialInstances()
+    {
+        // Create unique material instances to modify
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
+        {
+            // Create unique instances of the materials
+            Material[] sharedMaterials = r.sharedMaterials;
+            Material[] uniqueMaterials = new Material[sharedMaterials.Length];
+
+            for (int i = 0; i < sharedMaterials.Length; i++)
+            {
+                // Create instance that we can modify
+                uniqueMaterials[i] = new Material(sharedMaterials[i]);
+
+                // Make sure rendering mode is set for transparency
+                uniqueMaterials[i].SetFloat("_Surface", 1); // 0=Opaque, 1=Transparent
+                uniqueMaterials[i].SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                uniqueMaterials[i].SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                uniqueMaterials[i].SetInt("_ZWrite", 0); // Turn off ZWrite for transparent objects
+                uniqueMaterials[i].EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                uniqueMaterials[i].EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                uniqueMaterials[i].renderQueue = 3000; // Transparent render queue
+
+                // Apply ghost color (keep alpha for later manipulation)
+                if (uniqueMaterials[i].HasProperty("_BaseColor"))
+                {
+                    Color baseColor = new Color(ghostColor.r, ghostColor.g, ghostColor.b, 1f);
+                    uniqueMaterials[i].SetColor("_BaseColor", baseColor);
+                }
+                else if (uniqueMaterials[i].HasProperty("_Color"))
+                {
+                    Color baseColor = new Color(ghostColor.r, ghostColor.g, ghostColor.b, 1f);
+                    uniqueMaterials[i].SetColor("_Color", baseColor);
+                }
+
+                // Reduce emission to avoid overly bright ghost
+                if (uniqueMaterials[i].HasProperty("_EmissionColor"))
+                {
+                    Color emissionColor = uniqueMaterials[i].GetColor("_EmissionColor") * 0.5f;
+                    uniqueMaterials[i].SetColor("_EmissionColor", emissionColor);
+                }
+
+                materialInstances.Add(uniqueMaterials[i]);
+            }
+
+            // Assign unique materials
+            r.materials = uniqueMaterials;
+        }
+
+        materialsSetup = true;
+        Debug.Log($"Ghost material setup complete. Created {materialInstances.Count} material instances with ghost color.");
+    }
+
+    private void Update()
+    {
+        if (targetFish == null) return;
+        if (!materialsSetup) SetupMaterialInstances();
+
+        float distance = Vector3.Distance(transform.position, targetFish.position);
+
+        // Calculate alpha with improved formula and wider range
+        float newAlpha = initialAlpha;
+        if (distance < maxDistance)
+        {
+            // Normalize distance between minDistance and maxDistance
+            float normalizedDistance = Mathf.Clamp01((distance - minDistance) / (maxDistance - minDistance));
+            // Create a smoother fade out curve
+            newAlpha = initialAlpha * normalizedDistance;
+        }
+
+        currentAlpha = newAlpha; // For debugging
+
+        // Apply alpha to all materials
+        foreach (Material mat in materialInstances)
+        {
+            if (mat != null)
+            {
+                // Apply alpha to all common color properties to ensure compatibility
+                if (mat.HasProperty("_BaseColor"))
+                {
+                    Color color = mat.GetColor("_BaseColor");
+                    mat.SetColor("_BaseColor", new Color(color.r, color.g, color.b, newAlpha));
+                }
+
+                if (mat.HasProperty("_Color"))
+                {
+                    Color color = mat.GetColor("_Color");
+                    mat.SetColor("_Color", new Color(color.r, color.g, color.b, newAlpha));
+                }
+
+                // Adjust emission intensity with alpha too
+                if (mat.HasProperty("_EmissionColor"))
+                {
+                    Color emission = mat.GetColor("_EmissionColor");
+                    mat.SetColor("_EmissionColor", emission * newAlpha);
+                }
+
+                // Explicitly set alpha value for shaders that use it separately
+                if (mat.HasProperty("_Alpha"))
+                {
+                    mat.SetFloat("_Alpha", newAlpha);
+                }
+            }
+        }
+    }
+
+    public void SetTargetFish(Transform target)
+    {
+        targetFish = target;
+
+        // Force update material setup if target changes
+        if (!materialsSetup)
+        {
+            SetupMaterialInstances();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Clean up material instances to prevent memory leaks
+        foreach (Material mat in materialInstances)
+        {
+            if (mat != null)
+            {
+                Destroy(mat);
+            }
+        }
+        materialInstances.Clear();
     }
 }

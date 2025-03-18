@@ -20,6 +20,9 @@ public class CameraMovement : MonoBehaviour
     private Quaternion targetLookRotation;
     private Vector2 lookAngles = Vector2.zero;  // Store x,y look angles separately
 
+    // Selection mode adjustments
+    public bool useUnscaledTime = false;
+
     void Start()
     {
         originalRotation = transform.rotation;
@@ -28,11 +31,31 @@ public class CameraMovement : MonoBehaviour
 
     void Update()
     {
-        // Position handling
-        Vector3 targetPosition = target.TransformPoint(new Vector3(offset_x, offset_y, offset_z));
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        // Exit if no target
+        if (target == null) return;
 
-        // Rotation handling
+        // Calculate target position 
+        Vector3 targetPosition = target.TransformPoint(new Vector3(offset_x, offset_y, offset_z));
+
+        // Choose appropriate time delta based on settings
+        float deltaTime = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+
+        // Use smooth follow regardless of timeScale
+        if (useUnscaledTime || Time.timeScale < 0.1f)
+        {
+            // For slow-motion scenes, use a custom lerp implementation
+            float moveSpeed = deltaTime / smoothTime * 3f;
+            moveSpeed = Mathf.Clamp01(moveSpeed); // Ensure value is between 0-1
+
+            transform.position = Vector3.Lerp(transform.position, targetPosition, moveSpeed);
+        }
+        else
+        {
+            // Normal smoothing for regular gameplay
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        }
+
+        // Rotation handling - simplified to avoid abrupt changes
         if (Input.GetMouseButton(1))
         {
             lookAngles.x -= Input.GetAxis("Mouse Y") * lookSpeed;
@@ -49,13 +72,14 @@ public class CameraMovement : MonoBehaviour
         }
         else
         {
-            lookAngles = Vector2.Lerp(lookAngles, Vector2.zero, Time.deltaTime * 5f);
+            // Smooth rotation lerp based on time settings
+            lookAngles = Vector2.Lerp(lookAngles, Vector2.zero, deltaTime * 3f);
             targetLookRotation = target.rotation * Quaternion.Euler(lookAngles.x, lookAngles.y, 0);
         }
 
-        // Smoothly interpolate rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, Time.deltaTime * 5f);
-
+        // Apply rotation with appropriate timing
+        float rotationSpeed = deltaTime * (useUnscaledTime ? 7f : 5f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, rotationSpeed);
     }
 
     public void ForceUpdatePosition()
