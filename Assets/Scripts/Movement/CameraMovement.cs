@@ -54,6 +54,23 @@ public class CameraMovement : MonoBehaviour
         }
 
         // Smoothly interpolate rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, Time.deltaTime *5f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetLookRotation, Time.deltaTime * 5f);
+
+    }
+
+    public void ForceUpdatePosition()
+    {
+        if (target != null)
+        {
+            // Immediately position camera without smoothing
+            Vector3 targetPosition = target.TransformPoint(new Vector3(offset_x, offset_y, offset_z));
+            transform.position = targetPosition;
+
+            // Also update rotation
+            transform.rotation = target.rotation;
+
+            // Reset velocity to avoid unwanted drift
+            velocity = Vector3.zero;
+        }
     }
 }
