@@ -120,6 +120,7 @@ public class GameController : MonoBehaviour
             if (prevStats != null)
             {
                 prevStats.IsCurrentPlayer = false;
+                
             }
         }
 
@@ -147,6 +148,8 @@ public class GameController : MonoBehaviour
         }
         CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
         camera.target = currentPlayer.transform;
+        //set current tag to player
+        currentPlayer.tag = "Player";
     }
 
     private void SpawnFish()
