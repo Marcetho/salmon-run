@@ -11,6 +11,7 @@ public class predatorTemplate : MonoBehaviour
     public LayerMask obstacleLayer;
     public GameObject player;
     public Animator animator;
+    public GameController gameController;
     private NavMeshAgent agent;
     private bool canAttack = true;
 
@@ -29,19 +30,14 @@ public class predatorTemplate : MonoBehaviour
         {
             if (CanSeePlayer())
             {
+                Debug.Log("Player detected!");
                 agent.SetDestination(player.transform.position);
 
                 if (distanceToPlayer <= attackRange && canAttack)
                 {
-                    
-                    if (GameController == null) {
-                        Debug.Log("ruhroh");
+        
+                    gameController.OnPlayerDamaged(25);
 
-                    }else {
-                        GameController.OnPlayerDamaged(25);
-
-
-                    } 
                     
                     StartCoroutine(GrabAttack());
                 }
