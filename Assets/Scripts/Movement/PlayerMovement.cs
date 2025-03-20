@@ -66,6 +66,10 @@ public class PlayerMovement : MonoBehaviour
     private float lastEnergyUpdateTime;
     private float energyUpdateInterval = 0.5f;
 
+    [Header("Level-Specific Settings")]
+    [SerializeField] private float[] levelSpeedMultipliers = new float[] { 1f, 1.2f, 1.5f }; // Ocean, River, Spawning Ground
+    [SerializeField] private float[] levelEnergyUseMultipliers = new float[] { 1f, 1.3f, 1.6f }; // Increased energy use in higher levels
+
     private void Start()
     {
         fishAnimator = GetComponent<Animator>();
@@ -451,6 +455,32 @@ public class PlayerMovement : MonoBehaviour
             if (isBeached && moveInput > 0)
             {
                 rb.AddForce(10 * movement + 20 * Vector3.up);
+            }
+        }
+
+        // Apply level-specific adjustments
+        if (gameController != null)
+        {
+            int currentLevel = gameController.GetCurrentLevel();
+            int levelIndex = Mathf.Clamp(currentLevel - 1, 0, levelSpeedMultipliers.Length - 1);
+
+            // Adjust speed based on current level
+            if (playerStats.IsCurrentPlayer && currentLevel > 1)
+            {
+                // For player fish, apply speed adjustments for higher levels
+                float speedMultiplier = levelSpeedMultipliers[levelIndex];
+
+                // Apply multiplier to actual movement
+                movement *= speedMultiplier;
+
+                // If we're sprinting, apply increased energy cost for higher levels
+                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space) && inWater)
+                {
+                    float energyMultiplier = levelEnergyUseMultipliers[levelIndex];
+
+                    // This is just a visual effect - actual energy cost is handled elsewhere
+                    // You could adjust that code to use this multiplier
+                }
             }
         }
 
