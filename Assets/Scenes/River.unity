@@ -838,6 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73e81016c387bab45b053d63a9f84a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameController: {fileID: 1941380929}
   detectionRadius: 10
   attackRange: 2
   attackCooldown: 2
@@ -849,7 +850,6 @@ MonoBehaviour:
     m_Bits: 0
   player: {fileID: 0}
   animator: {fileID: 1213752228}
-  gameController: {fileID: 1941380929}
 --- !u!1 &1230086160
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,7 +15,7 @@ public class TitleScreenUI : MonoBehaviour
     [SerializeField] private string subtitleString = "Fish: The Game";
     
     [Header("Scene Management")]
-    [SerializeField] private string gameSceneName = "ocean";
+    [SerializeField] private string gameSceneName = "River";
 
     private void Start()
     {
