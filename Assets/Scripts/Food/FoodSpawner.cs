@@ -171,8 +171,7 @@ public class FoodItem : MonoBehaviour
         destroyTime = Time.time + lifetime;
         StartCoroutine(DestroyAfterDelay());
     }
-
-    private void OnTriggerEnter(Collider other)
+     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
