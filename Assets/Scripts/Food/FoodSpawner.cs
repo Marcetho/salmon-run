@@ -7,15 +7,14 @@ public class FoodSpawner : MonoBehaviour
     [Header("References")]
     public Transform player;
     public TextMeshProUGUI scoreText; // Change from Text to TextMeshProUGUI
-    private TimedSceneController sceneController;
 
     [Header("Spawn Settings")]
     public GameObject foodPrefab;
     public BoxCollider spawnVolume;
     public float foodDensity = 1f; // Food items per cubic unit
-    public float maxFoodCount = 15f;
+    public float maxFoodCount = 50f;
     public float minFoodCount = 20f; // Minimum food count to maintain
-    public int pointsPerFood = 3;  // New variable for points per food item
+    public int pointsPerFood = 1;  // New variable for points per food item
 
     [Header("Timing")]
     public float minSpawnInterval = 0.1f;
@@ -51,11 +50,6 @@ public class FoodSpawner : MonoBehaviour
             }
         }
 
-        sceneController = FindObjectOfType<TimedSceneController>();
-        if (sceneController == null)
-        {
-            Debug.LogWarning("TimedSceneController reference not found!");
-        }
         SetNextSpawnTime();
     }
 
@@ -142,25 +136,14 @@ public class FoodSpawner : MonoBehaviour
     public void IncrementFoodCollected()
     {
         totalFoodCollected += pointsPerFood;
-        if (sceneController != null)
-        {
-            sceneController.IncrementScore(pointsPerFood);
-        }
         UpdateScoreDisplay();
     }
 
     public void DecrementFoodCollected()
     {
-        if (totalFoodCollected > 0)
-        {
-            totalFoodCollected--;
-            if (sceneController != null)
-            {
-                sceneController.IncrementScore(-1);
-            }
-            UpdateScoreDisplay();
-            Debug.Log($"Lost food! Total points: {totalFoodCollected}");
-        }
+        totalFoodCollected = Mathf.Max(0, totalFoodCollected - 1);
+        UpdateScoreDisplay();
+        Debug.Log($"Lost food! Total points: {totalFoodCollected}");
     }
 
     private void OnDrawGizmos()
