@@ -148,6 +148,7 @@ public class GameController : MonoBehaviour
             {
                 prevStats.IsCurrentPlayer = false;
 
+
             }
         }
 
