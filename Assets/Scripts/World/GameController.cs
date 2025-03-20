@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour
             if (prevStats != null)
             {
                 prevStats.IsCurrentPlayer = false;
-                
+
             }
         }
 
@@ -631,6 +631,23 @@ public class GameController : MonoBehaviour
                 stats.ModifyEnergy(-amount);
                 uiManager.SetEnergy(stats.CurrentEnergy);
             }
+        }
+    }
+
+    public void SetInitialLives(int lives)
+    {
+        initialLivesCount = lives;
+        remainingLives = lives;
+
+        // Update UI if it's already initialized
+        if (uiManager != null)
+        {
+            LivesUI livesUI = uiManager.GetComponentInChildren<LivesUI>();
+            if (livesUI != null)
+            {
+                livesUI.SetMaxLives(initialLivesCount);
+            }
+            uiManager.SetLives(remainingLives);
         }
     }
 }
