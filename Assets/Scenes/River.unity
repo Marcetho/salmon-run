@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &48289019
 Transform:
   m_ObjectHideFlags: 0
@@ -838,7 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73e81016c387bab45b053d63a9f84a09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameController: {fileID: 1941380929}
   detectionRadius: 10
   attackRange: 2
   attackCooldown: 2
@@ -850,6 +849,7 @@ MonoBehaviour:
     m_Bits: 0
   player: {fileID: 0}
   animator: {fileID: 1213752228}
+  gameController: {fileID: 1941380929}
 --- !u!1 &1230086160
 GameObject:
   m_ObjectHideFlags: 0
@@ -1456,6 +1456,10 @@ PrefabInstance:
     - target: {fileID: 3455663736332191169, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
       propertyPath: m_Name
       value: Water Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 3455663736332191169, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
       propertyPath: m_LocalScale.x
