@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour
             if (prevStats != null)
             {
                 prevStats.IsCurrentPlayer = false;
-                
+
             }
         }
 
@@ -148,8 +148,6 @@ public class GameController : MonoBehaviour
         }
         CameraMovement camera = cameraMovement.GetComponent<CameraMovement>();
         camera.target = currentPlayer.transform;
-        //set current tag to player
-        currentPlayer.tag = "Player";
     }
 
     private void SpawnFish()
@@ -170,6 +168,7 @@ public class GameController : MonoBehaviour
         GameObject playerPrefab = level != 1 ? UnityEngine.Random.value > 0.5f ? playerPrefabM : playerPrefabF : playerPrefabOcean;
 
         GameObject player = Instantiate(playerPrefab, spawnPosition, spawnRotation);
+        player.tag = "Player"; // Set the Player tag for all spawned fish
         spawnedFishes.Add(player);
 
         // Get player components
