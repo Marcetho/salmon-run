@@ -20,7 +20,7 @@ public class SealAI : MonoBehaviour
     [SerializeField] private float breathGainPerSecond = 50f; // breath gain per second when seal out of water
 
     [Header("Movement Settings")]
-    public float maxForwardSpeed = 12f;
+    public float maxForwardSpeed = 10f;
     public float baseAcceleration = 7f;
     public float baseDeceleration = 16f;
     public float rotationSpeed = 100f;
@@ -171,7 +171,7 @@ public class SealAI : MonoBehaviour
             inWater = true;
             rb.linearDamping = 1.5f;
             rotationSpeed = 100f;
-            maxForwardSpeed = 5f;
+            maxForwardSpeed = 10f;
             eForceDir = new Vector3(0, 0, 0);
         }
     }
