@@ -1,17 +1,11 @@
 using UnityEngine;
 using System;
-using System.Net.NetworkInformation;
 
-public class SealAI : MonoBehaviour
+public class SealAI : PredatorAI
 {
     enum ActivityState {Surfacing, Floating, Hunting, Feeding}
-    private GameController gameController;
 
-    [Header("Predator Stats")]
-    public Collider bodyCollider;
-    public float detectionRadius = 20f;
-    public float attackRange = 2f;
-    public float attackCooldown = 2f;
+    [Header("Breath Settings")]
     public float maxBreathTime = 120f;
     public float maxSurfaceTime = 10f;
     private float surfaceTime;
@@ -27,9 +21,7 @@ public class SealAI : MonoBehaviour
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
-    private GameObject player;
     private float movementSpeed;
-    private Animator sealAnimator;
     private bool inWater;
     private bool canBreathe;
     private bool isBeached;
@@ -43,7 +35,7 @@ public class SealAI : MonoBehaviour
     private void Start()
     {
         gameController = FindFirstObjectByType<GameController>();
-        sealAnimator = GetComponent<Animator>();
+        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         inWater = true;
         actState = ActivityState.Surfacing;
@@ -116,6 +108,14 @@ public class SealAI : MonoBehaviour
                 break;
             case ActivityState.Feeding:
                 movement = Vector3.up;
+                targetRotation = Quaternion.Euler(Vector3.zero);
+                // Apply smoothed rotation
+                float rFactor = 10f / rotationSmoothTime;
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    Time.fixedDeltaTime * rFactor
+                );
                 break;
         }
         // Recover breath if breached or surfacing
@@ -139,29 +139,11 @@ public class SealAI : MonoBehaviour
 
         eForce.force = eForceDir;
 
-        if (sealAnimator != null)
+        if (anim != null)
         {
             HandleSealAnims(actState);
-            sealAnimator.SetFloat("Speed", movementSpeed);
+            anim.SetFloat("Speed", movementSpeed);
         }
-    }
-
-    bool CanSeePlayer()
-    {
-        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-        RaycastHit hit;
-
-        // Define a layer mask that ignores the water layer
-        int layerMask = ~(1 << LayerMask.NameToLayer("TransparentFX")); // Exclude Water layer
-
-        if (Physics.Raycast(transform.position, directionToPlayer, out hit, detectionRadius, layerMask))
-        {
-            if (hit.collider.CompareTag("Player"))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -198,30 +180,42 @@ public class SealAI : MonoBehaviour
         }
     }
 
+     public override void StartStruggle()
+    {
+        anim.SetBool("Feeding", true);
+        actState = ActivityState.Feeding;
+    }
+
+    public override void EndStruggle()
+    {
+        anim.SetBool("Feeding", false);
+        actState = ActivityState.Surfacing;
+    }
+
     private void HandleSealAnims(ActivityState action)
     {
-        sealAnimator.SetBool("InWater", inWater);
+        anim.SetBool("InWater", inWater);
         switch (action) //handle activity based anims
         {
             case ActivityState.Surfacing:
-                sealAnimator.SetBool("Feeding", false);
-                sealAnimator.SetBool("Surfacing", true);
-                sealAnimator.SetBool("Floating", false);
+                anim.SetBool("Feeding", false);
+                anim.SetBool("Surfacing", true);
+                anim.SetBool("Floating", false);
                 break;
             case ActivityState.Floating:
-                sealAnimator.SetBool("Feeding", false);
-                sealAnimator.SetBool("Surfacing", false);
-                sealAnimator.SetBool("Floating", true);
+                anim.SetBool("Feeding", false);
+                anim.SetBool("Surfacing", false);
+                anim.SetBool("Floating", true);
                 break;
             case ActivityState.Feeding:
-                sealAnimator.SetBool("Feeding", true);
-                sealAnimator.SetBool("Surfacing", false);
-                sealAnimator.SetBool("Floating", false);
+                anim.SetBool("Feeding", true);
+                anim.SetBool("Surfacing", false);
+                anim.SetBool("Floating", false);
                 break;
             default:
-                sealAnimator.SetBool("Feeding", false);
-                sealAnimator.SetBool("Surfacing", false);
-                sealAnimator.SetBool("Floating", false);
+                anim.SetBool("Feeding", false);
+                anim.SetBool("Surfacing", false);
+                anim.SetBool("Floating", false);
                 break;
         }
     }
