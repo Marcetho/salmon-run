@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using Unity.Mathematics;
 
 public class SealAI : PredatorAI
 {
@@ -42,15 +43,16 @@ public class SealAI : PredatorAI
         surfaceTime = 0;
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
+        canAttack = false;
     }
 
     void FixedUpdate()
     {
         player = GameController.currentPlayer;
         float distanceToPlayer;
-        if (player == null) // if no active player, float
+        if (player == null) // if no active player, surface
         {
-            actState = ActivityState.Floating;
+            actState = ActivityState.Surfacing;
             distanceToPlayer = Mathf.Infinity;
         }
         else
@@ -62,6 +64,7 @@ public class SealAI : PredatorAI
             actState = ActivityState.Surfacing;
         }
         Vector3 targetPosition;
+        canAttack = actState == ActivityState.Hunting;
 
         switch (actState) //determine seal behaviour based on activity state
         {
@@ -70,8 +73,7 @@ public class SealAI : PredatorAI
                 if (canBreathe && surfaceTime == 0) // once at surface, set for surface time
                     surfaceTime = maxSurfaceTime;
                 else
-                    surfaceTime = Mathf.Clamp(surfaceTime - Time.fixedDeltaTime, 0, maxSurfaceTime);
-                
+                    surfaceTime = Mathf.Clamp(surfaceTime - Time.fixedDeltaTime, 0, Mathf.Infinity);
                 if (currentBreath == maxBreathTime && surfaceTime <= 0) // proceed to float (look for prey) once surface time over
                 {
                     actState = ActivityState.Floating;
@@ -185,9 +187,13 @@ public class SealAI : PredatorAI
         actState = ActivityState.Feeding;
     }
 
-    public override void EndStruggle()
+    public override void EndStruggle(bool success)
     {
         anim.SetBool("Feeding", false);
+        if (success)
+            surfaceTime = maxSurfaceTime*2; //double surface time if successful catch
+        else
+            surfaceTime = maxSurfaceTime;
         actState = ActivityState.Surfacing;
     }
 

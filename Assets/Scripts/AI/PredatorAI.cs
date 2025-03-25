@@ -10,8 +10,9 @@ public class PredatorAI : MonoBehaviour
     [Header("Stats")]
     public Collider bodyCollider;
     public float detectionRadius = 20f;
-    public float attackCooldown = 1f;
-    public int attackDmg = 25;
+    public float attackCooldown = 1f; //dmg interval (in seconds) during struggle
+    public int attackDmg = 25; //dmg per interval
+    public bool canAttack = true; // if can currently attack
     [Header("Visual")]
     public Vector3 feedingOffset; //relative position of player when being fed on
     public Vector3 feedingRotationOffset; //relative position of player when being fed on
@@ -39,7 +40,7 @@ public class PredatorAI : MonoBehaviour
         anim.SetBool("Feeding", true);
     }
 
-    public virtual void EndStruggle()
+    public virtual void EndStruggle(bool success)
     {
         anim.SetBool("Feeding", false);
     }

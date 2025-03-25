@@ -1432,26 +1432,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HarborSeal
       objectReference: {fileID: 0}
-    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
-      propertyPath: attackDmg
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
-      propertyPath: feedingOffset.x
-      value: -0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
-      propertyPath: feedingOffset.y
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
-      propertyPath: feedingOffset.z
-      value: 0.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
-      propertyPath: feedingRotationOffset.x
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

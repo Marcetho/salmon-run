@@ -1,5 +1,5 @@
 using UnityEngine;
-using System;
+using System.Collections;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Unity.VisualScripting;
 using UnityEngine.Rendering.Universal;
@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Energy Settings")]
     [SerializeField] private float sprintDamageInterval = 0.5f;
     [SerializeField] private float sprintDamageAmount = 5f;
+    [SerializeField] private float struggleCost = 20f;
     [SerializeField] private float waterExitEnergyCost = 20f;
     [SerializeField] private float aiEnergyCostMultiplier = 0.5f; // How much energy AI fish use compared to player
     [SerializeField] private float aiSprintEnergyCostPerSecond = 10f; // Energy cost per second when AI fish sprints
@@ -460,14 +461,28 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (isStruggling && currentPredator != null) // if struggling
             {
-                movement = Vector3.zero;
+                //check struggle input
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    if (playerStats.TryUseEnergy(struggleCost))//check if enough energy to struggle, use stamina
+                    {
+                        uiManager.SetEnergy(playerStats.CurrentEnergy);
+                        int escape = Random.Range(1, 6);
+                        if (escape == 1) // 1 in 5 chance to escape per attempt
+                        {
+                            currentPredator.EndStruggle(false);
+                            isStruggling = false;
+                        }
+                    }
+                }
+                movement = Vector3.zero; //fix fish position, rotation to predator mouth
                 transform.rotation = Quaternion.Euler(currentPredator.transform.eulerAngles + currentPredator.feedingRotationOffset);
                 transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.feedingOffset);
                 if (Time.time - lastHurtTime >= currentPredator.attackCooldown)
                 {
                     //if player dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
-                        currentPredator.EndStruggle();
+                        currentPredator.EndStruggle(true);
                     gameController.OnPlayerDamaged(currentPredator.attackDmg);
                     lastHurtTime = Time.time;
                 }
@@ -556,21 +571,25 @@ public class PlayerMovement : MonoBehaviour
             currentPredator = other.gameObject.GetComponent<PredatorAI>();
             if (currentPredator)
             {
-                isStruggling = true;
-                currentPredator.StartStruggle();
+                if (currentPredator.canAttack)
+                {
+                    isStruggling = true;
+                    currentPredator.StartStruggle();
+                }
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     { //out of water
-        if (other.gameObject.CompareTag("Water") && !isStruggling)
+        if (other.gameObject.CompareTag("Water"))
         {
             inWater = false;
             rb.linearDamping = 0.1f;
             rotationSpeed = 0f;
             maxForwardSpeed = 0.5f;
-            eForceDir = new Vector3(0, -3, 0);
+            if (!isStruggling)
+                eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
 
             // Only apply energy cost/damage to player-controlled fish
@@ -603,6 +622,10 @@ public class PlayerMovement : MonoBehaviour
                 float speedFactor = 1.0f;
                 ApplyEnergyAndDamageForAI(aiEnergyCost, speedFactor);
             }
+        }
+        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer && !inWater)
+        {
+            eForceDir = new Vector3(0, -3, 0);
         }
     }
 }
