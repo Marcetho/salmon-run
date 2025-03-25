@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private bool canPitchUp = true;
     private bool isInputBlocked = false;
+    public bool IsStruggling => isStruggling;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
@@ -637,7 +638,7 @@ public class PlayerMovement : MonoBehaviour
             currentPredator = other.gameObject.GetComponent<PredatorAI>();
             if (currentPredator)
             {
-                if (currentPredator.canAttack)
+                if (currentPredator.canAttack && !isStruggling)
                 {
                     isStruggling = true;
                     currentPredator.StartStruggle();
