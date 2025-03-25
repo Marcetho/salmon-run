@@ -896,6 +896,23 @@ public class GameController : MonoBehaviour
     {
         return currentLevel;
     }
+
+    public void SetInitialLives(int lives)
+    {
+        initialLivesCount = lives;
+        remainingLives = lives;
+
+        // Update UI if it's already initialized
+        if (uiManager != null)
+        {
+            LivesUI livesUI = uiManager.GetComponentInChildren<LivesUI>();
+            if (livesUI != null)
+            {
+                livesUI.SetMaxLives(initialLivesCount);
+            }
+            uiManager.SetLives(remainingLives);
+        }
+    }
 }
 
 // Replace the GhostBehavior class at the bottom of the file
