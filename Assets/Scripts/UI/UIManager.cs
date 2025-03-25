@@ -10,7 +10,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PlayerHudUI playerHud;
     [SerializeField] private GameoverTextUI gameOverTextUI;
 
+    [Header("Level Transition UI")]
+    [SerializeField] private GameObject levelTransitionPanel;
+    [SerializeField] private TMPro.TextMeshProUGUI levelTransitionText;
+    [SerializeField] private float transitionDisplayTime = 3f;
+
     private bool isInitialized = false;
+    private float transitionTimer = 0f;
+    private bool isShowingTransition = false;
     private int pendingLivesValue = -1;
     private float pendingHealthValue = -1f;
     private float pendingEnergyValue = -1f;
@@ -52,6 +59,19 @@ public class UIManager : MonoBehaviour
     {
         if (playerHud != null)
             playerHud.Cleanup();
+    }
+
+    private void Update()
+    {
+        // Handle level transition display timer
+        if (isShowingTransition)
+        {
+            transitionTimer -= Time.unscaledDeltaTime;
+            if (transitionTimer <= 0)
+            {
+                HideLevelTransition();
+            }
+        }
     }
 
     internal void OnGameOver()
@@ -171,6 +191,58 @@ public class UIManager : MonoBehaviour
             playerHud.SetHealth(health);
             playerHud.SetEnergy(energy);
             playerHud.SetLives(lives);
+        }
+    }
+
+    #endregion
+
+    #region Level Transition
+
+    /// <summary>
+    /// Shows a level transition UI with information about moving from one level to another
+    /// </summary>
+    /// <param name="previousLevel">Level the player is coming from</param>
+    /// <param name="nextLevel">Level the player is going to</param>
+    public void ShowLevelTransition(int previousLevel, int nextLevel)
+    {
+        if (levelTransitionPanel == null)
+        {
+            Debug.LogWarning("UIManager: Level transition panel not assigned, can't show level transition.");
+            return;
+        }
+
+        // Show the transition panel
+        levelTransitionPanel.SetActive(true);
+        isShowingTransition = true;
+        transitionTimer = transitionDisplayTime;
+
+        // Set the transition text if available
+        if (levelTransitionText != null)
+        {
+            string environmentFrom = GetEnvironmentName(previousLevel);
+            string environmentTo = GetEnvironmentName(nextLevel);
+
+            levelTransitionText.text = $"LEVEL {previousLevel} COMPLETE\n" +
+                                       $"Moving from {environmentFrom} to {environmentTo}\n" +
+                                       $"Get ready for Level {nextLevel}!";
+        }
+    }
+
+    private void HideLevelTransition()
+    {
+        if (levelTransitionPanel != null)
+        {
+            levelTransitionPanel.SetActive(false);
+        }
+        isShowingTransition = false;
+    }
+
+    private string GetEnvironmentName(int level)
+    {
+        switch (level)
+        {
+            default:
+                return $"Level {level}";
         }
     }
 

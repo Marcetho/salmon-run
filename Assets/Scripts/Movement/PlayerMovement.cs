@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
+    private bool isInputBlocked = false;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
@@ -68,6 +69,10 @@ public class PlayerMovement : MonoBehaviour
     // For AI fish energy management
     private float lastEnergyUpdateTime;
     private float energyUpdateInterval = 0.5f;
+
+    [Header("Level-Specific Settings")]
+    [SerializeField] private float[] levelSpeedMultipliers = new float[] { 1f, 1.2f, 1.5f }; // Ocean, River, Spawning Ground
+    [SerializeField] private float[] levelEnergyUseMultipliers = new float[] { 1f, 1.3f, 1.6f }; // Increased energy use in higher levels
 
     private void Start()
     {
@@ -357,7 +362,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            if (!isStruggling) // if not struggling control normally
+            if (!isStruggling && !isInputBlocked) // Check for input blocking
             {
                 float moveInput = 0f;
                 // Handle rotation and tilt input
@@ -472,6 +477,12 @@ public class PlayerMovement : MonoBehaviour
                         {
                             currentPredator.EndStruggle(false);
                             isStruggling = false;
+
+                            // Hide struggle instructions when player escapes
+                            if (gameController != null)
+                            {
+                                gameController.HideInstructionPanel();
+                            }
                         }
                     }
                 }
@@ -482,7 +493,15 @@ public class PlayerMovement : MonoBehaviour
                 {
                     //if player dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                    {
                         currentPredator.EndStruggle(true);
+
+                        // Hide struggle instructions when player dies
+                        if (gameController != null)
+                        {
+                            gameController.HideInstructionPanel();
+                        }
+                    }
                     gameController.OnPlayerDamaged(currentPredator.attackDmg);
                     lastHurtTime = Time.time;
                 }
@@ -491,6 +510,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 movement = Vector3.zero;
                 isStruggling = false;
+
+                // Hide struggle instructions when player is released
+                if (gameController != null)
+                {
+                    gameController.HideInstructionPanel();
+                }
             }
         }
 
@@ -556,6 +581,47 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void SetInputBlocked(bool blocked)
+    {
+        isInputBlocked = blocked;
+
+        // If blocking input, also reset movement speed
+        if (blocked)
+        {
+            movementSpeed = 0f;
+            targetMovementSpeed = 0f;
+
+            // Also reset any rigidbody velocity
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+    }
+
+    public void ResetMovementState()
+    {
+        // Reset all movement and physics-related values
+        movementSpeed = 0f;
+        targetMovementSpeed = 0f;
+
+        // Reset animation parameters if necessary
+        if (fishAnimator != null)
+        {
+            fishAnimator.SetFloat("Speed", 0f);
+            fishAnimator.SetBool("TurnRight", false);
+            fishAnimator.SetBool("TurnLeft", false);
+        }
+
+        // Reset any pending forces or states
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     { //in water
         if (other.gameObject.CompareTag("Water"))
@@ -575,6 +641,12 @@ public class PlayerMovement : MonoBehaviour
                 {
                     isStruggling = true;
                     currentPredator.StartStruggle();
+
+                    // Show struggle instructions when player is grabbed by predator
+                    if (gameController != null)
+                    {
+                        gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
+                    }
                 }
             }
         }
