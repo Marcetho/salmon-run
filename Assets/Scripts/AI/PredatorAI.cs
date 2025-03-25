@@ -5,6 +5,7 @@ public class PredatorAI : MonoBehaviour
 {
     [Header("References")]
     public GameObject player;
+    public PlayerMovement playerMove;
     public Animator anim;
 
     [Header("Stats")]
