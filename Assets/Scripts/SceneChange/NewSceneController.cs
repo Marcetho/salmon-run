@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NextSceneController : MonoBehaviour
+public class NewSceneController : MonoBehaviour
 {
     // The new variable that will be set based on the previous score
     public int derivedValue;
@@ -15,10 +15,14 @@ public class NextSceneController : MonoBehaviour
         derivedValue = 1 + (previousScore * 2);
 
         // Get the GameController and set its initial lives
-        GameController gameController = FindObjectOfType<GameController>();
+        GameController gameController = FindFirstObjectByType<GameController>();
         if (gameController != null)
         {
             gameController.SetInitialLives(derivedValue);
+        }
+        else
+        {
+            Debug.Log("LALALALALALA");
         }
 
         Debug.Log("Previous score: " + previousScore);
