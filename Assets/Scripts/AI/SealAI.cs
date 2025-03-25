@@ -34,7 +34,6 @@ public class SealAI : PredatorAI
 
     private void Start()
     {
-        gameController = FindFirstObjectByType<GameController>();
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         inWater = true;
@@ -108,7 +107,7 @@ public class SealAI : PredatorAI
                 break;
             case ActivityState.Feeding:
                 movement = Vector3.up;
-                targetRotation = Quaternion.Euler(Vector3.zero);
+                targetRotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
                 // Apply smoothed rotation
                 float rFactor = 10f / rotationSmoothTime;
                 transform.rotation = Quaternion.Slerp(

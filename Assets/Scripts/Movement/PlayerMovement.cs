@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float aiSprintEnergyCostPerSecond = 10f; // Energy cost per second when AI fish sprints
 
     private float lastSprintDamageTime;
+    private float lastHurtTime;
     private float movementSpeed;
     private float targetMovementSpeed;
     private float baseYPosition;
@@ -460,15 +461,22 @@ public class PlayerMovement : MonoBehaviour
             else if (isStruggling && currentPredator != null) // if struggling
             {
                 movement = Vector3.zero;
-                transform.rotation = Quaternion.Euler(currentPredator.jawBone.rotation.eulerAngles + currentPredator.feedingRotationOffset);
-                transform.position = currentPredator.jawBone.position + currentPredator.feedingOffset;
+                transform.rotation = Quaternion.Euler(currentPredator.transform.eulerAngles + currentPredator.feedingRotationOffset);
+                transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.feedingOffset);
+                if (Time.time - lastHurtTime >= currentPredator.attackCooldown)
+                {
+                    //if player dies from this bite, release predator
+                    if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                        currentPredator.EndStruggle();
+                    gameController.OnPlayerDamaged(currentPredator.attackDmg);
+                    lastHurtTime = Time.time;
+                }
             }
             else //if struggling but no predator, release
             {
                 movement = Vector3.zero;
                 isStruggling = false;
             }
-            
         }
 
         if (inWater && !isStruggling)
@@ -543,7 +551,7 @@ public class PlayerMovement : MonoBehaviour
             maxForwardSpeed = 5f;
             eForceDir = new Vector3(0, 0, 0);
         }
-        if (other.gameObject.CompareTag("Predator"))
+        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer)
         {
             currentPredator = other.gameObject.GetComponent<PredatorAI>();
             if (currentPredator)

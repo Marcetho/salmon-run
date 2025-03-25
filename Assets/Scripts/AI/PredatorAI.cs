@@ -4,17 +4,15 @@ using System;
 public class PredatorAI : MonoBehaviour
 {
     [Header("References")]
-    public GameController gameController;
     public GameObject player;
     public Animator anim;
 
     [Header("Stats")]
     public Collider bodyCollider;
     public float detectionRadius = 20f;
-    public float attackRange = 2f;
-    public float attackCooldown = 2f;
+    public float attackCooldown = 1f;
+    public int attackDmg = 25;
     [Header("Visual")]
-    public Transform jawBone;
     public Vector3 feedingOffset; //relative position of player when being fed on
     public Vector3 feedingRotationOffset; //relative position of player when being fed on
 
