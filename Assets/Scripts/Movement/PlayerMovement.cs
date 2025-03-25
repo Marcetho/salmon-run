@@ -477,6 +477,12 @@ public class PlayerMovement : MonoBehaviour
                         {
                             currentPredator.EndStruggle(false);
                             isStruggling = false;
+
+                            // Hide struggle instructions when player escapes
+                            if (gameController != null)
+                            {
+                                gameController.HideInstructionPanel();
+                            }
                         }
                     }
                 }
@@ -487,7 +493,15 @@ public class PlayerMovement : MonoBehaviour
                 {
                     //if player dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                    {
                         currentPredator.EndStruggle(true);
+
+                        // Hide struggle instructions when player dies
+                        if (gameController != null)
+                        {
+                            gameController.HideInstructionPanel();
+                        }
+                    }
                     gameController.OnPlayerDamaged(currentPredator.attackDmg);
                     lastHurtTime = Time.time;
                 }
@@ -496,6 +510,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 movement = Vector3.zero;
                 isStruggling = false;
+
+                // Hide struggle instructions when player is released
+                if (gameController != null)
+                {
+                    gameController.HideInstructionPanel();
+                }
             }
         }
 
@@ -621,6 +641,12 @@ public class PlayerMovement : MonoBehaviour
                 {
                     isStruggling = true;
                     currentPredator.StartStruggle();
+
+                    // Show struggle instructions when player is grabbed by predator
+                    if (gameController != null)
+                    {
+                        gameController.ShowInstructionPanel("STRUGGLE!", "Press SPACE to try to escape\nEach attempt costs energy");
+                    }
                 }
             }
         }

@@ -30,7 +30,8 @@ public class GameController : MonoBehaviour
 
     [Header("Fish Selection")]
     [SerializeField] private float selectionTimeScale = 0.01f; // Slows time during selection
-    [SerializeField] private TMPro.TextMeshProUGUI selectionModeText; // Optional text to show during selection
+    [SerializeField] private GameObject instructionBox; // Simple instruction box in top right
+    [SerializeField] private TMPro.TextMeshProUGUI instructionText; // Text inside the instruction box
     private bool inSelectionMode = false;
     private int selectionIndex = 0;
     private int level = 1;
@@ -86,9 +87,9 @@ public class GameController : MonoBehaviour
             Debug.LogError("GameController: Cannot initialize game. uiManager is null!");
             return;
         }
-        if (selectionModeText)
+        if (instructionBox)
         {
-            selectionModeText.gameObject.SetActive(false);
+            instructionBox.SetActive(false);
         }
 
         // Set initial UI values
@@ -484,12 +485,8 @@ public class GameController : MonoBehaviour
         // Check if space is already pressed when entering selection mode
         wasSpaceAlreadyPressed = Input.GetKey(KeyCode.Space);
 
-        // Display selection mode text if available
-        if (selectionModeText != null)
-        {
-            selectionModeText.gameObject.SetActive(true);
-            selectionModeText.text = "CHOOSE NEXT FISH\nUse A/D to navigate\nPress Space to select";
-        }
+        // Display selection mode instructions
+        ShowInstructionPanel("CHOOSE NEXT FISH", "Use A/D to navigate\nPress Space to select");
 
         // Make sure selectionIndex is valid
         if (selectionIndex < 0 || selectionIndex >= spawnedFishes.Count)
@@ -545,11 +542,8 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1.0f;
         currentState = GameState.Ocean; // or whatever the previous state was
 
-        // Hide selection mode text
-        if (selectionModeText != null)
-        {
-            selectionModeText.gameObject.SetActive(false);
-        }
+        // Hide instruction panel
+        HideInstructionPanel();
 
         // Restore original camera settings
         if (cameraMovement != null && hasOriginalCameraSettings)
@@ -965,6 +959,24 @@ public class GameController : MonoBehaviour
                 livesUI.SetMaxLives(initialLivesCount);
             }
             uiManager.SetLives(remainingLives);
+        }
+    }
+
+    // New methods to handle the instruction panel
+    public void ShowInstructionPanel(string title, string bodyText)
+    {
+        if (instructionBox != null && instructionText != null)
+        {
+            instructionBox.SetActive(true);
+            instructionText.text = $"<b>{title}</b>\n{bodyText}";
+        }
+    }
+
+    public void HideInstructionPanel()
+    {
+        if (instructionBox != null)
+        {
+            instructionBox.SetActive(false);
         }
     }
 }
