@@ -69,6 +69,10 @@ public class PlayerMovement : MonoBehaviour
     private float lastEnergyUpdateTime;
     private float energyUpdateInterval = 0.5f;
 
+    [Header("Level-Specific Settings")]
+    [SerializeField] private float[] levelSpeedMultipliers = new float[] { 1f, 1.2f, 1.5f }; // Ocean, River, Spawning Ground
+    [SerializeField] private float[] levelEnergyUseMultipliers = new float[] { 1f, 1.3f, 1.6f }; // Increased energy use in higher levels
+
     private void Start()
     {
         fishAnimator = GetComponent<Animator>();

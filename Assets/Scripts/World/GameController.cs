@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection }
+public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition }
 public class GameController : MonoBehaviour
 {
     [Header("References")]
@@ -20,6 +20,13 @@ public class GameController : MonoBehaviour
     private int currentPlayerIndex = 0;
     public static GameObject currentPlayer;
     private int remainingLives;
+    private int currentLevel = 1;
+
+    [Header("Level Transition")]
+    [SerializeField] private float transitionDuration = 2.0f;
+    [SerializeField] private bool autoFindTransitionPoints = true;
+    private bool isTransitioning = false;
+    private List<LevelTransition> levelTransitionPoints = new List<LevelTransition>();
 
     [Header("Fish Selection")]
     [SerializeField] private float selectionTimeScale = 0.01f; // Slows time during selection
@@ -45,10 +52,30 @@ public class GameController : MonoBehaviour
     {
         currentState = GameState.Ocean;
         remainingLives = initialLivesCount;
+        currentLevel = 1;
+
+        // Find all level transition points in the scene if auto-find is enabled
+        if (autoFindTransitionPoints)
+        {
+            FindAllLevelTransitionPoints();
+        }
 
         // Initialize game systems
         InitializeGame();
         Debug.Log("Game initialized");
+    }
+
+    private void FindAllLevelTransitionPoints()
+    {
+        LevelTransition[] points = FindObjectsOfType<LevelTransition>();
+        levelTransitionPoints.Clear();
+
+        foreach (LevelTransition point in points)
+        {
+            levelTransitionPoints.Add(point);
+        }
+
+        Debug.Log($"Found {levelTransitionPoints.Count} level transition points in the scene.");
     }
 
     private void InitializeGame()
@@ -631,6 +658,243 @@ public class GameController : MonoBehaviour
                 uiManager.SetEnergy(stats.CurrentEnergy);
             }
         }
+    }
+
+    // New method to handle transitioning to the next level
+    public void TransitionToNextLevel(int nextLevel)
+    {
+        if (isTransitioning) return;
+
+        Debug.Log($"Transitioning from level {currentLevel} to level {nextLevel}");
+
+        // Update level state
+        int previousLevel = currentLevel;
+        currentLevel = nextLevel;
+        level = nextLevel;  // Make sure to update the level variable used for prefab selection
+
+        // Find the start point for the next level
+        Transform nextLevelStartPoint = FindLevelStartPoint(nextLevel);
+
+        if (nextLevelStartPoint == null)
+        {
+            Debug.LogError($"No start point found for level {nextLevel}. Cannot transition!");
+            return;
+        }
+
+        // Change game state
+        GameState previousState = currentState;
+        currentState = GameState.LevelTransition;
+        isTransitioning = true;
+
+        // If level is changing to 2, change to Freshwater state
+        if (nextLevel == 2 && previousLevel == 1)
+        {
+            currentState = GameState.Freshwater;
+        }
+
+        // Update the UI or other game systems as needed based on level change
+        if (uiManager != null)
+        {
+            uiManager.ShowLevelTransition(previousLevel, nextLevel);
+        }
+
+        // Relocate all fish to the new starting point
+        StartCoroutine(RelocateAllFish(nextLevelStartPoint, transitionDuration));
+    }
+
+    private System.Collections.IEnumerator RelocateAllFish(Transform destination, float duration)
+    {
+        // Make fish inactive during transition
+        foreach (GameObject fish in spawnedFishes)
+        {
+            if (fish != null)
+            {
+                // Disable player movement scripts
+                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.enabled = false;
+                }
+            }
+        }
+
+        // Wait for a short delay
+        yield return new WaitForSeconds(duration * 0.5f);
+
+        // Replace all fish with appropriate prefabs for the new level
+        List<GameObject> newFishList = new List<GameObject>();
+        bool isCurrentPlayerReplaced = false;
+        int newCurrentPlayerIndex = 0;
+
+        for (int i = 0; i < spawnedFishes.Count; i++)
+        {
+            if (spawnedFishes[i] != null)
+            {
+                // Get information from the current fish
+                Vector3 position = destination.position + UnityEngine.Random.insideUnitSphere * 3f;
+                Quaternion rotation = destination.rotation;
+                bool isCurrentPlayerFish = (i == currentPlayerIndex);
+                PlayerStats oldStats = spawnedFishes[i].GetComponent<PlayerStats>();
+                
+                // Create new fish with appropriate prefab
+                GameObject newFish = CreateNewFishForLevel(position, rotation, oldStats);
+                newFishList.Add(newFish);
+
+                // Track current player
+                if (isCurrentPlayerFish)
+                {
+                    newCurrentPlayerIndex = newFishList.Count - 1;
+                    isCurrentPlayerReplaced = true;
+                }
+
+                // Destroy the old fish
+                Destroy(spawnedFishes[i]);
+            }
+        }
+
+        // Update the fish list
+        spawnedFishes = newFishList;
+
+        // Set current player if it was replaced
+        if (isCurrentPlayerReplaced && spawnedFishes.Count > 0)
+        {
+            currentPlayerIndex = newCurrentPlayerIndex;
+            currentPlayer = spawnedFishes[currentPlayerIndex];
+            
+            // Update camera target
+            if (cameraMovement != null)
+            {
+                cameraMovement.target = currentPlayer.transform;
+                cameraMovement.ForceUpdatePosition();
+            }
+        }
+
+        // Wait for a short delay to let everything settle
+        yield return new WaitForSeconds(duration * 0.5f);
+
+        // Re-enable fish movement
+        foreach (GameObject fish in spawnedFishes)
+        {
+            if (fish != null)
+            {
+                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.enabled = true;
+                }
+            }
+        }
+
+        // Transition complete
+        isTransitioning = false;
+    }
+
+    // Helper method to create a new fish with the appropriate prefab for the current level
+    private GameObject CreateNewFishForLevel(Vector3 position, Quaternion rotation, PlayerStats oldStats)
+    {
+        // Select the appropriate prefab based on level
+        GameObject prefab;
+        
+        if (level == 1)
+        {
+            prefab = playerPrefabOcean;
+            Debug.Log("Using ocean salmon prefab");
+        }
+        else
+        {
+            // For levels 2+, randomly choose male/female prefabs
+            prefab = UnityEngine.Random.value > 0.5f ? playerPrefabM : playerPrefabF;
+            Debug.Log($"Using {(prefab == playerPrefabM ? "male" : "female")} salmon prefab for level {level}");
+        }
+
+        // Create the new fish
+        GameObject newFish = Instantiate(prefab, position, rotation);
+        newFish.tag = "Player";
+
+        // Transfer stats if available
+        if (oldStats != null)
+        {
+            PlayerStats newStats = newFish.GetComponent<PlayerStats>();
+            if (newStats == null)
+            {
+                newStats = newFish.AddComponent<PlayerStats>();
+            }
+
+            // Copy essential stats
+            newStats.IsCurrentPlayer = oldStats.IsCurrentPlayer;
+            newStats.SetHealth(oldStats.CurrentHealth);
+            newStats.SetEnergy(oldStats.CurrentEnergy);
+            newStats.OnPlayerDeath += OnCurrentPlayerDied;
+        }
+
+        // Set up player movement
+        PlayerMovement playerMovement = newFish.GetComponent<PlayerMovement>();
+        if (playerMovement != null && uiManager != null)
+        {
+            // Set reference to UI manager via reflection or serialized field
+            var uiField = playerMovement.GetType().GetField("uiManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            if (uiField != null)
+            {
+                uiField.SetValue(playerMovement, uiManager);
+            }
+        }
+
+        return newFish;
+    }
+
+    // Update environment names for the UI
+    private string GetEnvironmentName(int level)
+    {
+        switch (level)
+        {
+            case 1:
+                return "Ocean";
+            case 2:
+                return "Lower River";
+            case 3:
+                return "Upper River";
+            case 4:
+                return "Spawning Grounds";
+            default:
+                return $"Level {level}";
+        }
+    }
+
+    private Transform FindLevelStartPoint(int level)
+    {
+        foreach (LevelTransition point in levelTransitionPoints)
+        {
+            if (point.LevelNumber == level && point.GetPointType == LevelTransition.PointType.Start)
+            {
+                return point.transform;
+            }
+        }
+
+        Debug.LogWarning($"No start point found for level {level}");
+        return null;
+    }
+
+    private void UpdatePlayerPrefabsForLevel(int level)
+    {
+        // Update the player prefabs based on the current level
+        // This allows for different fish types in different environments
+        if (level >= 2)
+        {
+            // For level 2+ (freshwater), use male/female salmon prefabs
+            // This code assumes these prefabs are already set in the inspector
+            Debug.Log($"Updated player prefabs for level {level} (Freshwater)");
+        }
+        else
+        {
+            // For level 1 (ocean), use ocean salmon prefab
+            Debug.Log($"Updated player prefabs for level {level} (Ocean)");
+        }
+    }
+
+    // Helper function to get the current level
+    public int GetCurrentLevel()
+    {
+        return currentLevel;
     }
 }
 
