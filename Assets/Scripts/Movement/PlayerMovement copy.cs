@@ -80,7 +80,7 @@ public class PlayerMovementCopy : MonoBehaviour
 
 
         // Handle speed changes based on shift/ctrl
-        float moveInput = Input.GetKey(KeyCode.W) ? 1f : 0f;  // "W" moves forward, "S" does nothing
+        float moveInput = Input.GetKey(KeyCode.Space) ? 1f : 0f;  // "W" moves forward, "S" does nothing
         float speed = maxForwardSpeed;
         // Debug.Log("Speed: " + speed + " Max Forward Speed: " + maxForwardSpeed);
         float acceleration = baseAcceleration;
