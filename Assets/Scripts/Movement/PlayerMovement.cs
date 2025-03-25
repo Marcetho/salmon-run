@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
+    private bool isInputBlocked = false;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
@@ -361,7 +362,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            if (!isStruggling) // if not struggling control normally
+            if (!isStruggling && !isInputBlocked) // Check for input blocking
             {
                 float moveInput = 0f;
                 // Handle rotation and tilt input
@@ -557,6 +558,47 @@ public class PlayerMovement : MonoBehaviour
                 float newHealth = Mathf.Max(minHealth, playerStats.CurrentHealth - healthDamage);
                 playerStats.SetHealth(newHealth);
             }
+        }
+    }
+
+    public void SetInputBlocked(bool blocked)
+    {
+        isInputBlocked = blocked;
+
+        // If blocking input, also reset movement speed
+        if (blocked)
+        {
+            movementSpeed = 0f;
+            targetMovementSpeed = 0f;
+
+            // Also reset any rigidbody velocity
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+    }
+
+    public void ResetMovementState()
+    {
+        // Reset all movement and physics-related values
+        movementSpeed = 0f;
+        targetMovementSpeed = 0f;
+
+        // Reset animation parameters if necessary
+        if (fishAnimator != null)
+        {
+            fishAnimator.SetFloat("Speed", 0f);
+            fishAnimator.SetBool("TurnRight", false);
+            fishAnimator.SetBool("TurnLeft", false);
+        }
+
+        // Reset any pending forces or states
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
     }
 

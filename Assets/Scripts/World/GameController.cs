@@ -67,7 +67,7 @@ public class GameController : MonoBehaviour
 
     private void FindAllLevelTransitionPoints()
     {
-        LevelTransition[] points = FindObjectsOfType<LevelTransition>();
+        LevelTransition[] points = FindObjectsByType<LevelTransition>(FindObjectsSortMode.None);
         levelTransitionPoints.Clear();
 
         foreach (LevelTransition point in points)
@@ -715,6 +715,14 @@ public class GameController : MonoBehaviour
                 {
                     movement.enabled = false;
                 }
+
+                // Reset physics state
+                Rigidbody rb = fish.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
             }
         }
 
@@ -732,10 +740,12 @@ public class GameController : MonoBehaviour
             {
                 // Get information from the current fish
                 Vector3 position = destination.position + UnityEngine.Random.insideUnitSphere * 3f;
+                // Ensure fish are placed at correct water level
+                position.y = destination.position.y;
                 Quaternion rotation = destination.rotation;
                 bool isCurrentPlayerFish = (i == currentPlayerIndex);
                 PlayerStats oldStats = spawnedFishes[i].GetComponent<PlayerStats>();
-                
+
                 // Create new fish with appropriate prefab
                 GameObject newFish = CreateNewFishForLevel(position, rotation, oldStats);
                 newFishList.Add(newFish);
@@ -760,7 +770,7 @@ public class GameController : MonoBehaviour
         {
             currentPlayerIndex = newCurrentPlayerIndex;
             currentPlayer = spawnedFishes[currentPlayerIndex];
-            
+
             // Update camera target
             if (cameraMovement != null)
             {
@@ -772,6 +782,9 @@ public class GameController : MonoBehaviour
         // Wait for a short delay to let everything settle
         yield return new WaitForSeconds(duration * 0.5f);
 
+        // Set input blocking flag for a grace period
+        StartCoroutine(BlockInputAfterTransition(1.0f));
+
         // Re-enable fish movement
         foreach (GameObject fish in spawnedFishes)
         {
@@ -780,7 +793,16 @@ public class GameController : MonoBehaviour
                 PlayerMovement movement = fish.GetComponent<PlayerMovement>();
                 if (movement != null)
                 {
+                    // Reset physics state again before enabling movement
+                    Rigidbody rb = fish.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.linearVelocity = Vector3.zero;
+                        rb.angularVelocity = Vector3.zero;
+                    }
+
                     movement.enabled = true;
+                    movement.ResetMovementState(); // Call new reset method
                 }
             }
         }
@@ -789,12 +811,44 @@ public class GameController : MonoBehaviour
         isTransitioning = false;
     }
 
+    // Add a new method to block input for a short period after transition
+    private System.Collections.IEnumerator BlockInputAfterTransition(float duration)
+    {
+        // Flag to block input - we'll add this to PlayerMovement
+        foreach (GameObject fish in spawnedFishes)
+        {
+            if (fish != null)
+            {
+                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.SetInputBlocked(true);
+                }
+            }
+        }
+
+        yield return new WaitForSeconds(duration);
+
+        // Re-enable input
+        foreach (GameObject fish in spawnedFishes)
+        {
+            if (fish != null)
+            {
+                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.SetInputBlocked(false);
+                }
+            }
+        }
+    }
+
     // Helper method to create a new fish with the appropriate prefab for the current level
     private GameObject CreateNewFishForLevel(Vector3 position, Quaternion rotation, PlayerStats oldStats)
     {
         // Select the appropriate prefab based on level
         GameObject prefab;
-        
+
         if (level == 1)
         {
             prefab = playerPrefabOcean;
