@@ -645,7 +645,7 @@ public class PlayerMovement : MonoBehaviour
                     // Show struggle instructions when player is grabbed by predator
                     if (gameController != null)
                     {
-                        gameController.ShowInstructionPanel("STRUGGLE!", "Press SPACE to try to escape\nEach attempt costs energy");
+                        gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
                     }
                 }
             }
