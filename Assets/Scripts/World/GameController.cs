@@ -695,7 +695,7 @@ public class GhostBehavior : MonoBehaviour
                 // Reduce emission to avoid overly bright ghost
                 if (uniqueMaterials[i].HasProperty("_EmissionColor"))
                 {
-                    Color emissionColor = uniqueMaterials[i].GetColor("_EmissionColor") * 0.5f;
+                    Color emissionColor = uniqueMaterials[i].GetColor("_EmissionColor") * 0.8f;
                     uniqueMaterials[i].SetColor("_EmissionColor", emissionColor);
                 }
 

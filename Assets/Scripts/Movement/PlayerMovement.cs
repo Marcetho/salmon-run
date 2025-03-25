@@ -1,5 +1,5 @@
 using UnityEngine;
-using System;
+using System.Collections;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using Unity.VisualScripting;
 using UnityEngine.Rendering.Universal;
@@ -24,18 +24,21 @@ public class PlayerMovement : MonoBehaviour
     [Header("Energy Settings")]
     [SerializeField] private float sprintDamageInterval = 0.5f;
     [SerializeField] private float sprintDamageAmount = 5f;
+    [SerializeField] private float struggleCost = 20f;
     [SerializeField] private float waterExitEnergyCost = 20f;
     [SerializeField] private float aiEnergyCostMultiplier = 0.5f; // How much energy AI fish use compared to player
     [SerializeField] private float aiSprintEnergyCostPerSecond = 10f; // Energy cost per second when AI fish sprints
 
     private float lastSprintDamageTime;
-
+    private float lastHurtTime;
     private float movementSpeed;
     private float targetMovementSpeed;
     private float baseYPosition;
     private Animator fishAnimator;
+    private bool isStruggling;
     private bool inWater;
     private bool isBeached;
+    private PredatorAI currentPredator;
     Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
@@ -188,6 +191,7 @@ public class PlayerMovement : MonoBehaviour
     {
         fishAnimator.SetBool("InWater", inWater);
         fishAnimator.SetBool("OnLand", isBeached);
+        fishAnimator.SetBool("Struggling", isStruggling);
         Vector3 movement;
 
         // Only control if this is the current player
@@ -353,113 +357,149 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            float moveInput = 0f;
-            // Handle rotation and tilt input
-
-            float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
-            if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
+            if (!isStruggling) // if not struggling control normally
             {
-                if (yawInput == 1f)
+                float moveInput = 0f;
+                // Handle rotation and tilt input
+
+                float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
+                if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
                 {
-                    fishAnimator.SetBool("TurnRight", true);
+                    if (yawInput == 1f)
+                    {
+                        fishAnimator.SetBool("TurnRight", true);
+                        fishAnimator.SetBool("TurnLeft", false);
+                        moveInput = 0.3f;
+                    }
+                    else if (yawInput == -1f)
+                    {
+                        fishAnimator.SetBool("TurnLeft", true);
+                        fishAnimator.SetBool("TurnRight", false);
+                        moveInput = 0.3f;
+                    }
+                }
+                else
+                {
                     fishAnimator.SetBool("TurnLeft", false);
-                    moveInput = 0.3f;
-                }
-                else if (yawInput == -1f)
-                {
-                    fishAnimator.SetBool("TurnLeft", true);
                     fishAnimator.SetBool("TurnRight", false);
-                    moveInput = 0.3f;
-                }
-            }
-            else
-            {
-                fishAnimator.SetBool("TurnLeft", false);
-                fishAnimator.SetBool("TurnRight", false);
-            }
-
-            float pitchInput = 0f;
-            if (inWater)
-            {
-                if (Input.GetKey(KeyCode.S))
-                {
-                    pitchInput = 1f;
-                }
-                else if (Input.GetKey(KeyCode.W) && canPitchUp)
-                {
-                    pitchInput = -1f;
                 }
 
-                if (!Input.GetKey(KeyCode.W))
-                {
-                    canPitchUp = true;
-                }
-            }
-
-            // Force pitch to 0 when out of water
-            float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
-
-            // Apply rotations
-            transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
-
-            // Calculate and apply tilt
-            float yaw = yawInput * yawAmount;
-            Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
-
-            // Handle speed changes based on shift/ctrl
-            if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
-            if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
-            float speed = maxForwardSpeed;
-            float acceleration = baseAcceleration;
-            float deceleration = baseDeceleration;
-            if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
-            {
+                float pitchInput = 0f;
                 if (inWater)
                 {
-                    speed = maxForwardSpeed * 2.5f;
-                    acceleration *= 60f;
-
-                    float energyCost = 20f * Time.fixedDeltaTime;
-                    if (!playerStats.TryUseEnergy(energyCost))
+                    if (Input.GetKey(KeyCode.S))
                     {
-                        if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
-                        {
-                            playerStats.ModifyHealth(-sprintDamageAmount);
-                            lastSprintDamageTime = Time.time;
-                        }
+                        pitchInput = 1f;
+                    }
+                    else if (Input.GetKey(KeyCode.W) && canPitchUp)
+                    {
+                        pitchInput = -1f;
                     }
 
-                    // Update UI for current player
-                    if (uiManager != null)
+                    if (!Input.GetKey(KeyCode.W))
                     {
-                        uiManager.SetEnergy(playerStats.CurrentEnergy);
-                        uiManager.SetHealth(playerStats.CurrentHealth);
+                        canPitchUp = true;
                     }
                 }
+
+                // Force pitch to 0 when out of water
+                float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
+
+                // Apply rotations
+                transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
+
+                // Calculate and apply tilt
+                float yaw = yawInput * yawAmount;
+                Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+
+                // Handle speed changes based on shift/ctrl
+                if (Input.GetKey(KeyCode.Space)) moveInput = 1f;
+                if (Input.GetKey(KeyCode.LeftControl)) moveInput = -0.3f;
+                float speed = maxForwardSpeed;
+                float acceleration = baseAcceleration;
+                float deceleration = baseDeceleration;
+                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Space)) //sprint
+                {
+                    if (inWater)
+                    {
+                        speed = maxForwardSpeed * 2.5f;
+                        acceleration *= 60f;
+
+                        float energyCost = 20f * Time.fixedDeltaTime;
+                        if (!playerStats.TryUseEnergy(energyCost))
+                        {
+                            if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
+                            {
+                                playerStats.ModifyHealth(-sprintDamageAmount);
+                                lastSprintDamageTime = Time.time;
+                            }
+                        }
+
+                        // Update UI for current player
+                        if (uiManager != null)
+                        {
+                            uiManager.SetEnergy(playerStats.CurrentEnergy);
+                            uiManager.SetHealth(playerStats.CurrentHealth);
+                        }
+                    }
+                }
+
+                targetMovementSpeed = moveInput * speed;
+                if (speed > targetMovementSpeed)
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
+                else
+                    movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
+                if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
+
+                // Apply movement in the direction the fish is facing
+                movement = transform.forward * movementSpeed;
+                if (isBeached && moveInput > 0)
+                {
+                    rb.AddForce(10 * movement + 20 * Vector3.up);
+                }
             }
-
-            targetMovementSpeed = moveInput * speed;
-            if (speed > targetMovementSpeed)
-                movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, deceleration * Time.fixedDeltaTime);
-            else
-                movementSpeed = Mathf.MoveTowards(movementSpeed, targetMovementSpeed, acceleration * Time.fixedDeltaTime);
-            if (movementSpeed < maxBackwardSpeed) movementSpeed = maxBackwardSpeed;
-
-            // Apply movement in the direction the fish is facing
-            movement = transform.forward * movementSpeed;
-            if (isBeached && moveInput > 0)
+            else if (isStruggling && currentPredator != null) // if struggling
             {
-                rb.AddForce(10 * movement + 20 * Vector3.up);
+                //check struggle input
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    if (playerStats.TryUseEnergy(struggleCost))//check if enough energy to struggle, use stamina
+                    {
+                        uiManager.SetEnergy(playerStats.CurrentEnergy);
+                        int escape = Random.Range(1, 6);
+                        if (escape == 1) // 1 in 5 chance to escape per attempt
+                        {
+                            currentPredator.EndStruggle(false);
+                            isStruggling = false;
+                        }
+                    }
+                }
+                movement = Vector3.zero; //fix fish position, rotation to predator mouth
+                transform.rotation = Quaternion.Euler(currentPredator.transform.eulerAngles + currentPredator.feedingRotationOffset);
+                transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.feedingOffset);
+                if (Time.time - lastHurtTime >= currentPredator.attackCooldown)
+                {
+                    //if player dies from this bite, release predator
+                    if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                        currentPredator.EndStruggle(true);
+                    gameController.OnPlayerDamaged(currentPredator.attackDmg);
+                    lastHurtTime = Time.time;
+                }
+            }
+            else //if struggling but no predator, release
+            {
+                movement = Vector3.zero;
+                isStruggling = false;
             }
         }
 
-        if (inWater)
+        if (inWater && !isStruggling)
         {
             rb.AddForce(movement);
             isBeached = false;
         }
-        else
+        else if (!isStruggling)
         {
             isBeached = Mathf.Abs(rb.linearVelocity.y) < 0.001f; //grounded
         }
@@ -526,6 +566,18 @@ public class PlayerMovement : MonoBehaviour
             maxForwardSpeed = 5f;
             eForceDir = new Vector3(0, 0, 0);
         }
+        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer)
+        {
+            currentPredator = other.gameObject.GetComponent<PredatorAI>();
+            if (currentPredator)
+            {
+                if (currentPredator.canAttack)
+                {
+                    isStruggling = true;
+                    currentPredator.StartStruggle();
+                }
+            }
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -536,7 +588,8 @@ public class PlayerMovement : MonoBehaviour
             rb.linearDamping = 0.1f;
             rotationSpeed = 0f;
             maxForwardSpeed = 0.5f;
-            eForceDir = new Vector3(0, -3, 0);
+            if (!isStruggling)
+                eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
 
             // Only apply energy cost/damage to player-controlled fish
@@ -569,6 +622,10 @@ public class PlayerMovement : MonoBehaviour
                 float speedFactor = 1.0f;
                 ApplyEnergyAndDamageForAI(aiEnergyCost, speedFactor);
             }
+        }
+        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer && !inWater)
+        {
+            eForceDir = new Vector3(0, -3, 0);
         }
     }
 }

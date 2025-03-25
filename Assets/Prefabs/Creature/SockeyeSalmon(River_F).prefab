@@ -634,6 +634,15 @@ MonoBehaviour:
   sprintDamageInterval: 0.5
   sprintDamageAmount: 5
   waterExitEnergyCost: 40
+  aiEnergyCostMultiplier: 0.5
+  aiSprintEnergyCostPerSecond: 10
+  rotationSmoothTime: 0.3
+  waterSurfaceYPosition: 0
+  independentMovementStrength: 0.5
+  forwardBiasStrength: 0.7
+  naturalMovementSpeed: 0.8
+  positionUpdateInterval: 3
+  aiFishSprintEnergyUse: 5
 --- !u!95 &3912722297355755388
 Animator:
   serializedVersion: 7
