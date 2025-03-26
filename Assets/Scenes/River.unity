@@ -776,9 +776,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 891937739}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f472c7de48671f4cbc6d58076e3834b, type: 3}
+  m_Script: {fileID: 11500000, guid: 82b6405bf1537cf4c8f60a2536559a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  playerMove: {fileID: 0}
+  anim: {fileID: 0}
+  bodyCollider: {fileID: 891937741}
+  detectionRadius: 20
+  attackCooldown: 1
+  attackDmg: 25
+  canAttack: 1
+  feedingOffset: {x: 0, y: 0, z: 0}
+  feedingRotationOffset: {x: 0, y: 0, z: 0}
+  fishingSpot: {x: 0, y: 0, z: 0}
+  feedingSpot: {x: 0, y: 0, z: 0}
 --- !u!1 &911404248
 GameObject:
   m_ObjectHideFlags: 0

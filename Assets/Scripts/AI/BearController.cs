@@ -2,15 +2,17 @@ using UnityEngine;
 using System;
 using Unity.Mathematics;
 
-public class BearAI : PredatorAI
+public class BearController : PredatorAI
 {
-    enum ActivityState { Fishing, Carrying, Feeding }
-    private UnityEngine.AI.NavMeshAgent agent;
-    private ActivityState actState;
+    enum BearState { Fishing, Carrying, Feeding }
 
     [Header("Bear Settings")]
     [SerializeField] private Vector3 fishingSpot;
     [SerializeField] private Vector3 feedingSpot;
+
+    private UnityEngine.AI.NavMeshAgent agent;
+    private BearState actState;
+    private Rigidbody rb;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -18,8 +20,7 @@ public class BearAI : PredatorAI
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        inWater = true;
-        actState = ActivityState.Fishing;
+        actState = BearState.Fishing;
         rb.useGravity = false;
         canAttack = false;
     }
@@ -28,11 +29,11 @@ public class BearAI : PredatorAI
     void FixedUpdate()
     {
         player = GameController.currentPlayer;
-        canAttack = actState == ActivityState.Fishing;
+        canAttack = actState == BearState.Fishing;
         float distanceToPlayer;
         if (player == null) // if no active player, stand around "fishing"
         {
-            actState = ActivityState.Fishing;
+            actState = BearState.Fishing;
             distanceToPlayer = Mathf.Infinity;
         }
         else
@@ -42,11 +43,11 @@ public class BearAI : PredatorAI
         }
         switch (actState)
         {
-            case ActivityState.Fishing:
+            case BearState.Fishing:
                 break;
-            case ActivityState.Carrying:
+            case BearState.Carrying:
                 break;
-            case ActivityState.Feeding:
+            case BearState.Feeding:
                 break;
         }
 
@@ -60,22 +61,21 @@ public class BearAI : PredatorAI
         }
     }
 
-    private void HandleBearAnims(ActivityState action)
+    private void HandleBearAnims(BearState action)
     {
-        anim.SetBool("InWater", inWater);
         switch (action) //handle activity based anims
         {
-            case ActivityState.Fishing:
+            case BearState.Fishing:
                 anim.SetBool("Feeding", false);
                 anim.SetBool("Fishing", true);
                 anim.SetBool("Carrying", false);
                 break;
-            case ActivityState.Carrying:
+            case BearState.Carrying:
                 anim.SetBool("Feeding", false);
                 anim.SetBool("Fishing", false);
                 anim.SetBool("Carrying", true);
                 break;
-            case ActivityState.Feeding:
+            case BearState.Feeding:
                 anim.SetBool("Feeding", true);
                 anim.SetBool("Fishing", false);
                 anim.SetBool("Carrying", false);
