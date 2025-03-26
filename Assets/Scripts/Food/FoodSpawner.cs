@@ -82,7 +82,7 @@ public class FoodSpawner : MonoBehaviour
     private void SpawnFood()
     {
         Vector3 spawnPos = GetRandomPositionInVolume();
-        GameObject food = Instantiate(foodPrefab, spawnPos, Random.rotation);
+        GameObject food = Instantiate(foodPrefab, spawnPos, Quaternion.identity);
 
         FoodItem foodItem = food.AddComponent<FoodItem>();
         foodItem.Initialize(foodLifetime);
