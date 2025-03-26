@@ -4,7 +4,7 @@ using Unity.Mathematics;
 
 public class SealAI : PredatorAI
 {
-    enum ActivityState {Surfacing, Floating, Hunting, Feeding}
+    enum ActivityState { Surfacing, Floating, Hunting, Feeding }
 
     [Header("Breath Settings")]
     public float maxBreathTime = 120f;
@@ -56,7 +56,10 @@ public class SealAI : PredatorAI
             distanceToPlayer = Mathf.Infinity;
         }
         else
+        {
+            playerMove = player.GetComponent<PlayerMovement>();
             distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        }
 
         float breathUseMultiplier = 1f;
         if (currentBreath <= 0) // return to surface if breath runs out
@@ -83,9 +86,17 @@ public class SealAI : PredatorAI
                 movement = Vector3.zero;
                 breathUseMultiplier = 0.5f; // reduce breath use rate by half if floating
                 if (distanceToPlayer <= detectionRadius && CanSeePlayer()) //if can detect player, pursue
-                    actState = ActivityState.Hunting;
+                {
+                    if (!playerMove.IsStruggling)
+                        actState = ActivityState.Hunting;
+                }
                 break;
             case ActivityState.Hunting:
+                if (playerMove.IsStruggling)
+                {
+                    actState = ActivityState.Floating;
+                    break;
+                }
                 targetPosition = player.transform.position;
                 // Calculate direction to target position
                 Vector3 directionToTarget = targetPosition - transform.position;
@@ -122,8 +133,8 @@ public class SealAI : PredatorAI
         // Recover breath if breached or surfacing
         if (canBreathe)
         {
-            float breathGain = breathGainPerSecond* Time.fixedDeltaTime; //restore half of breath per second
-            currentBreath = Mathf.Clamp(currentBreath + breathGain, 0, maxBreathTime); 
+            float breathGain = breathGainPerSecond * Time.fixedDeltaTime; //restore half of breath per second
+            currentBreath = Mathf.Clamp(currentBreath + breathGain, 0, maxBreathTime);
         }
         else //otherwise exhaust breath
         {
@@ -181,7 +192,7 @@ public class SealAI : PredatorAI
         }
     }
 
-     public override void StartStruggle()
+    public override void StartStruggle()
     {
         anim.SetBool("Feeding", true);
         actState = ActivityState.Feeding;
@@ -191,7 +202,7 @@ public class SealAI : PredatorAI
     {
         anim.SetBool("Feeding", false);
         if (success)
-            surfaceTime = maxSurfaceTime*2; //double surface time if successful catch
+            surfaceTime = maxSurfaceTime * 2; //double surface time if successful catch
         else
             surfaceTime = maxSurfaceTime;
         actState = ActivityState.Surfacing;
