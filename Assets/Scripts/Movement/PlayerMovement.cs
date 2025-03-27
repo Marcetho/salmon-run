@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private bool canPitchUp = true;
     private bool isInputBlocked = false;
+    public bool IsStruggling => isStruggling;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
@@ -477,6 +478,12 @@ public class PlayerMovement : MonoBehaviour
                         {
                             currentPredator.EndStruggle(false);
                             isStruggling = false;
+
+                            // Hide struggle instructions when player escapes
+                            if (gameController != null)
+                            {
+                                gameController.HideInstructionPanel();
+                            }
                         }
                     }
                 }
@@ -487,7 +494,15 @@ public class PlayerMovement : MonoBehaviour
                 {
                     //if player dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                    {
                         currentPredator.EndStruggle(true);
+
+                        // Hide struggle instructions when player dies
+                        if (gameController != null)
+                        {
+                            gameController.HideInstructionPanel();
+                        }
+                    }
                     gameController.OnPlayerDamaged(currentPredator.attackDmg);
                     lastHurtTime = Time.time;
                 }
@@ -496,6 +511,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 movement = Vector3.zero;
                 isStruggling = false;
+
+                // Hide struggle instructions when player is released
+                if (gameController != null)
+                {
+                    gameController.HideInstructionPanel();
+                }
             }
         }
 
@@ -617,10 +638,16 @@ public class PlayerMovement : MonoBehaviour
             currentPredator = other.gameObject.GetComponent<PredatorAI>();
             if (currentPredator)
             {
-                if (currentPredator.canAttack)
+                if (currentPredator.canAttack && !isStruggling)
                 {
                     isStruggling = true;
                     currentPredator.StartStruggle();
+
+                    // Show struggle instructions when player is grabbed by predator
+                    if (gameController != null)
+                    {
+                        gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
+                    }
                 }
             }
         }
