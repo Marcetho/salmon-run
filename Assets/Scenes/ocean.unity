@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36b9b5085be84a442bc6fc13d23c7f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneDuration: 60
+  sceneDuration: 30
 --- !u!4 &156918545
 Transform:
   m_ObjectHideFlags: 0
@@ -1022,7 +1022,8 @@ MonoBehaviour:
   transitionDuration: 2
   autoFindTransitionPoints: 1
   selectionTimeScale: 0.01
-  selectionModeText: {fileID: 0}
+  instructionBox: {fileID: 0}
+  instructionText: {fileID: 0}
   ghostColor: {r: 0.5, g: 0.5, b: 1, a: 0.2}
   ghostMoveSpeed: 2
   ghostMaterial: {fileID: 0}
