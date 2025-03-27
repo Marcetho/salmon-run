@@ -100,6 +100,13 @@ public class PlayerMovement : MonoBehaviour
         // Subscribe to AI fish death event
         playerStats.OnAIFishDeath += OnAIFishDeath;
 
+        // Subscribe to player stats events for UI updates
+        if (playerStats != null)
+        {
+            playerStats.OnHealthChanged += OnHealthChanged;
+            playerStats.OnEnergyChanged += OnEnergyChanged;
+        }
+
         // Sync UI with initial player stats
         if (uiManager != null && playerStats.IsCurrentPlayer)
         {
@@ -172,6 +179,8 @@ public class PlayerMovement : MonoBehaviour
         {
             playerStats.OnPlayerDeath -= OnPlayerDeath;
             playerStats.OnAIFishDeath -= OnAIFishDeath;
+            playerStats.OnHealthChanged -= OnHealthChanged;
+            playerStats.OnEnergyChanged -= OnEnergyChanged;
         }
     }
 
@@ -190,6 +199,23 @@ public class PlayerMovement : MonoBehaviour
         if (gameController != null)
         {
             gameController.OnAIFishDied(deadFish);
+        }
+    }
+
+    // Event handlers for updating UI
+    private void OnHealthChanged(float newHealth)
+    {
+        if (playerStats.IsCurrentPlayer && uiManager != null)
+        {
+            uiManager.SetHealth(newHealth);
+        }
+    }
+
+    private void OnEnergyChanged(float newEnergy)
+    {
+        if (playerStats.IsCurrentPlayer && uiManager != null)
+        {
+            uiManager.SetEnergy(newEnergy);
         }
     }
 
@@ -416,7 +442,7 @@ public class PlayerMovement : MonoBehaviour
                 float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
 
                 // Apply rotations - use actual rotation speed for both in water and on land
-                float effectiveRotationSpeed = inWater ? rotationSpeed : 150f; 
+                float effectiveRotationSpeed = inWater ? rotationSpeed : 150f;
 
                 // Only apply rotation if we can turn (in water or beached with space pressed)
                 if (canTurn)
@@ -642,6 +668,12 @@ public class PlayerMovement : MonoBehaviour
             rotationSpeed = 100f;
             maxForwardSpeed = 5f;
             eForceDir = new Vector3(0, 0, 0);
+
+            // Update player stats with water state
+            if (playerStats != null)
+            {
+                playerStats.SetInWater(true);
+            }
         }
         if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer)
         {
@@ -674,6 +706,12 @@ public class PlayerMovement : MonoBehaviour
             if (!isStruggling)
                 eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
+
+            // Update player stats with water state
+            if (playerStats != null)
+            {
+                playerStats.SetInWater(false);
+            }
 
             // Only apply energy cost/damage to player-controlled fish
             if (playerStats.IsCurrentPlayer)
@@ -709,6 +747,16 @@ public class PlayerMovement : MonoBehaviour
         if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer && !inWater)
         {
             eForceDir = new Vector3(0, -3, 0);
+        }
+    }
+
+    // Add method to force set water state
+    public void ForceSetWaterState(bool inWaterState)
+    {
+        inWater = inWaterState;
+        if (playerStats != null)
+        {
+            playerStats.SetInWater(inWaterState);
         }
     }
 }

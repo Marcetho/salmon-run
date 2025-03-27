@@ -817,6 +817,16 @@ public class GameController : MonoBehaviour
                 if (movement != null)
                 {
                     movement.SetInputBlocked(true);
+
+                    // Force update water state
+                    movement.ForceSetWaterState(true);
+                }
+
+                // Force update PlayerStats water state
+                PlayerStats stats = fish.GetComponent<PlayerStats>();
+                if (stats != null)
+                {
+                    stats.SetInWater(true);
                 }
             }
         }
@@ -873,6 +883,10 @@ public class GameController : MonoBehaviour
             newStats.SetHealth(oldStats.CurrentHealth);
             newStats.SetEnergy(oldStats.CurrentEnergy);
             newStats.OnPlayerDeath += OnCurrentPlayerDied;
+
+            // Ensure water state is properly set based on level context
+            // For transitions, assume fish start in water
+            newStats.SetInWater(true);
         }
 
         // Set up player movement

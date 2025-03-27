@@ -11,9 +11,19 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float maxEnergy = 100f;
     [SerializeField] private float currentEnergy = 100f;
     [SerializeField] private float energyRegenRate = 0.2f;
+    [SerializeField] private float outOfWaterDrainDelay = 3f; // Seconds before drain starts
+    [SerializeField] private float outOfWaterDrainRate = 3f; // Energy drained per second
+
+    [Header("Zero Energy Damage")]
+    [SerializeField] private float zeroEnergyDamageInterval = 1.0f; // How often to apply damage when energy is zero
+    [SerializeField] private float zeroEnergyDamageAmount = 1.0f; // Health damage per interval when energy is zero
+    [SerializeField] private float aiFishDamageMultiplier = 0.3f; // AI fish take less damage (30% of player damage)
 
     [Header("Status")]
     [SerializeField] private bool isCurrentPlayer = false;
+    private bool isInWater = true; // Default to true since fish start in water
+    private float outOfWaterTime = 0f;
+    private float lastZeroEnergyDamageTime = 0f;
 
     // Events
     public event Action<float> OnHealthChanged;
@@ -33,12 +43,54 @@ public class PlayerStats : MonoBehaviour
         set => isCurrentPlayer = value;
     }
 
+    public bool IsInWater => isInWater;
+
     private void FixedUpdate()
     {
-        // Regenerate energy over time
-        if (currentEnergy < maxEnergy)
+        // Handle energy regeneration and out-of-water drain
+        if (isInWater)
         {
-            ModifyEnergy(energyRegenRate);
+            // Reset out of water timer when in water
+            outOfWaterTime = 0f;
+
+            // Only regenerate energy when in water
+            if (currentEnergy < maxEnergy)
+            {
+                ModifyEnergy(energyRegenRate);
+            }
+        }
+        else
+        {
+            // Track time out of water
+            outOfWaterTime += Time.fixedDeltaTime;
+
+            // After delay, start draining energy
+            if (outOfWaterTime > outOfWaterDrainDelay && currentEnergy > 0)
+            {
+                float drainAmount = outOfWaterDrainRate * Time.fixedDeltaTime;
+                ModifyEnergy(-drainAmount);
+            }
+        }
+
+        // Apply health damage when energy is zero (both in and out of water)
+        if (currentEnergy <= 0)
+        {
+            if (Time.time - lastZeroEnergyDamageTime >= zeroEnergyDamageInterval)
+            {
+                // Apply reduced damage for AI fish
+                float damageAmount = isCurrentPlayer ?
+                    zeroEnergyDamageAmount :
+                    zeroEnergyDamageAmount * aiFishDamageMultiplier;
+
+                ModifyHealth(-damageAmount);
+                lastZeroEnergyDamageTime = Time.time;
+
+                if (isCurrentPlayer && currentHealth <= 20f)
+                {
+                    // Visual/audio feedback that health is critical when player-controlled
+                    // This could trigger a UI effect, screen vignette, etc.
+                }
+            }
         }
     }
 
@@ -102,5 +154,16 @@ public class PlayerStats : MonoBehaviour
     {
         SetHealth(maxHealth);
         SetEnergy(maxEnergy);
+    }
+
+    public void SetInWater(bool inWater)
+    {
+        isInWater = inWater;
+
+        // Reset timer if entering water
+        if (inWater)
+        {
+            outOfWaterTime = 0f;
+        }
     }
 }
