@@ -7,8 +7,12 @@ public class BearController : PredatorAI
     enum BearState { Fishing, Carrying, Feeding }
 
     [Header("Bear Settings")]
-    [SerializeField] private Vector3 fishingSpot;
-    [SerializeField] private Vector3 feedingSpot;
+    [SerializeField] private Transform fishingSpot;
+    [SerializeField] private Transform feedingSpot;
+    [SerializeField] int feedingRadius;
+    [SerializeField] float carryAtkCooldown = 10f;
+
+    [SerializeField] float feedAtkCooldown = 1f;
 
     private UnityEngine.AI.NavMeshAgent agent;
     private BearState actState;
@@ -23,6 +27,8 @@ public class BearController : PredatorAI
         actState = BearState.Fishing;
         rb.useGravity = false;
         canAttack = false;
+        if (!fishingSpot || !feedingSpot)
+            Debug.Log("Feeding and fishing spot for bear must be assigned!");
     }
 
     // Update is called once per frame
@@ -44,21 +50,44 @@ public class BearController : PredatorAI
         switch (actState)
         {
             case BearState.Fishing:
+                float distanceToFishingSpot = Vector3.Distance(transform.position, fishingSpot.position);
+                if (distanceToFishingSpot > feedingRadius) //if not in fishing spot, navigate to pos
+                    agent.SetDestination(fishingSpot.position);
+                else // if within fishing spot, look for player
+                {
+                    if (distanceToPlayer <= detectionRadius && CanSeePlayer())
+                        if (!playerMove.IsStruggling)
+                            agent.SetDestination(player.transform.position);
+                }
                 break;
             case BearState.Carrying:
+                float distanceToFeedingSpot = Vector3.Distance(transform.position, feedingSpot.position);
+                if (distanceToFeedingSpot > feedingRadius) //if not in feeding spot, navigate to pos
+                    agent.SetDestination(feedingSpot.position);
+                else // if reached feeding spot, feed
+                {
+                    actState = BearState.Feeding;
+                    attackCooldown = feedAtkCooldown;
+                }
                 break;
             case BearState.Feeding:
                 break;
         }
-
-        if (distanceToPlayer <= detectionRadius)
+        if (anim != null)
         {
-            if (CanSeePlayer())
-            {
-                agent.SetDestination(player.transform.position);
-
-            }
+            HandleBearAnims(actState);
+            anim.SetFloat("Speed", agent.speed);
         }
+    }
+    public override void StartStruggle()
+    {
+        actState = BearState.Carrying;
+        attackCooldown = carryAtkCooldown;
+    }
+
+    public override void EndStruggle(bool success)
+    {
+        actState = BearState.Fishing;
     }
 
     private void HandleBearAnims(BearState action)
