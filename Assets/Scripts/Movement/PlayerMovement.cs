@@ -33,18 +33,18 @@ public class PlayerMovement : MonoBehaviour
     private float lastHurtTime;
     private float movementSpeed;
     private float targetMovementSpeed;
-    private float baseYPosition;
+
     private Animator fishAnimator;
     private bool isStruggling;
     private bool inWater;
     private bool isBeached;
     private PredatorAI currentPredator;
-    Transform cam;
     private Rigidbody rb;
     private bool canPitchUp = true;
     private bool isInputBlocked = false;
     public bool IsStruggling => isStruggling;
     public bool InWater => inWater;
+    public bool IsBeached => isBeached;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
@@ -80,7 +80,6 @@ public class PlayerMovement : MonoBehaviour
     {
         fishAnimator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        baseYPosition = transform.position.y;
         inWater = true;
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
@@ -489,12 +488,12 @@ public class PlayerMovement : MonoBehaviour
                     }
                 }
                 movement = Vector3.zero; //fix fish position, rotation to predator mouth
-                transform.rotation = Quaternion.Euler(currentPredator.transform.eulerAngles + currentPredator.feedingRotationOffset);
-                transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.feedingOffset);
-                if (Time.time - lastHurtTime >= currentPredator.attackCooldown)
+                transform.rotation = Quaternion.Euler(currentPredator.transform.eulerAngles + currentPredator.FeedingRotationOffset);
+                transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.FeedingOffset);
+                if (Time.time - lastHurtTime >= currentPredator.AttackCooldown)
                 {
                     //if player dies from this bite, release predator
-                    if (playerStats.CurrentHealth - currentPredator.attackDmg <= 0)
+                    if (playerStats.CurrentHealth - currentPredator.AttackDmg <= 0)
                     {
                         currentPredator.EndStruggle(true);
 
@@ -504,7 +503,7 @@ public class PlayerMovement : MonoBehaviour
                             gameController.HideInstructionPanel();
                         }
                     }
-                    gameController.OnPlayerDamaged(currentPredator.attackDmg);
+                    gameController.OnPlayerDamaged(currentPredator.AttackDmg);
                     lastHurtTime = Time.time;
                 }
             }
@@ -531,7 +530,8 @@ public class PlayerMovement : MonoBehaviour
             isBeached = Mathf.Abs(rb.linearVelocity.y) < 0.001f; //grounded
         }
 
-        eForce.force = eForceDir;
+        if (!isStruggling)
+            eForce.force = eForceDir;
 
         if (fishAnimator != null)
         {
@@ -634,20 +634,27 @@ public class PlayerMovement : MonoBehaviour
             maxForwardSpeed = 5f;
             eForceDir = new Vector3(0, 0, 0);
         }
-        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer)
-        {
-            currentPredator = other.gameObject.GetComponent<PredatorAI>();
-            if (currentPredator)
-            {
-                if (currentPredator.canAttack && !isStruggling)
-                {
-                    isStruggling = true;
-                    currentPredator.StartStruggle();
+    }
 
-                    // Show struggle instructions when player is grabbed by predator
-                    if (gameController != null)
+    private void OnTriggerStay(Collider other)
+    {
+        if (!isStruggling)
+        {
+            if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer)
+            {
+                currentPredator = other.gameObject.GetComponent<PredatorAI>();
+                if (currentPredator)
+                {
+                    if (currentPredator.CanAttack)
                     {
-                        gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
+                        isStruggling = true;
+                        currentPredator.StartStruggle();
+
+                        // Show struggle instructions when player is grabbed by predator
+                        if (gameController != null)
+                        {
+                            gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
+                        }
                     }
                 }
             }
@@ -662,8 +669,7 @@ public class PlayerMovement : MonoBehaviour
             rb.linearDamping = 0.1f;
             rotationSpeed = 0f;
             maxForwardSpeed = 0.5f;
-            if (!isStruggling)
-                eForceDir = new Vector3(0, -3, 0);
+            eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
 
             // Only apply energy cost/damage to player-controlled fish
@@ -696,10 +702,6 @@ public class PlayerMovement : MonoBehaviour
                 float speedFactor = 1.0f;
                 ApplyEnergyAndDamageForAI(aiEnergyCost, speedFactor);
             }
-        }
-        if (other.gameObject.CompareTag("Predator") && playerStats.IsCurrentPlayer && !inWater)
-        {
-            eForceDir = new Vector3(0, -3, 0);
         }
     }
 }

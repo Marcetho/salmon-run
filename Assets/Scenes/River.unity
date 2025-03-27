@@ -2369,10 +2369,6 @@ PrefabInstance:
       propertyPath: fishingSpot
       value: 
       objectReference: {fileID: 996904598}
-    - target: {fileID: 6959176000339706248, guid: e3ce52e410ee5404080271f171f2c888, type: 3}
-      propertyPath: m_Speed
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 8524502348000592497, guid: e3ce52e410ee5404080271f171f2c888, type: 3}
       propertyPath: m_LocalPosition.x
       value: 479.84

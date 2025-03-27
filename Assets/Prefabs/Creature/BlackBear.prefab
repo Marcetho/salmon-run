@@ -96,22 +96,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b6405bf1537cf4c8f60a2536559a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  playerMove: {fileID: 0}
-  anim: {fileID: 5113562192612965848}
   bodyCollider: {fileID: 5711926533786507883}
-  detectionRadius: 20
+  detectionRadius: 10
   attackCooldown: 1
   attackDmg: 25
   canAttack: 1
   feedingOffset: {x: 0, y: 0.62, z: 1.2}
   feedingRotationOffset: {x: 0, y: 90, z: 0}
+  maxBreathTime: 2
   fishingSpot: {fileID: 0}
   feedingSpot: {fileID: 0}
   feedingRadius: 4
   carryAtkCooldown: 10
   feedAtkCooldown: 1
-  carryingOffset: {x: 0, y: 0.62, z: 1.2}
+  carryingOffset: {x: -0.05, y: 0.62, z: 1.2}
   eatingOffset: {x: -0.1, y: 0.05, z: 0.8}
 --- !u!54 &4721099038143543938
 Rigidbody:
@@ -181,10 +179,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.4
-  m_Height: 1.5
+  m_Radius: 0.2
+  m_Height: 1.4
   m_Direction: 2
-  m_Center: {x: 0, y: 0.7, z: 0}
+  m_Center: {x: 0, y: 0.95, z: 0.1}
 --- !u!136 &2548209154192415223
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -218,7 +216,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 5
+  m_Speed: 4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
