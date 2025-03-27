@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e1381217eec1dd44384700c2016b7afb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 487.23
+      value: 479.84
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1381217eec1dd44384700c2016b7afb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1381217eec1dd44384700c2016b7afb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 748.8442
+      value: 745.94
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e1381217eec1dd44384700c2016b7afb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -104,13 +104,15 @@ MonoBehaviour:
   attackCooldown: 1
   attackDmg: 25
   canAttack: 1
-  feedingOffset: {x: 0, y: 0, z: 0}
-  feedingRotationOffset: {x: 0, y: 0, z: 0}
+  feedingOffset: {x: 0, y: 0.62, z: 1.2}
+  feedingRotationOffset: {x: 0, y: 90, z: 0}
   fishingSpot: {fileID: 0}
   feedingSpot: {fileID: 0}
-  feedingRadius: 3
+  feedingRadius: 4
   carryAtkCooldown: 10
   feedAtkCooldown: 1
+  carryingOffset: {x: 0, y: 0.62, z: 1.2}
+  eatingOffset: {x: -0.1, y: 0.05, z: 0.8}
 --- !u!54 &4721099038143543938
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -203,9 +205,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.7
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.5, z: 0.8}
+  m_Height: 2
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.5, z: 0.4}
 --- !u!195 &6959176000339706248
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -216,7 +218,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

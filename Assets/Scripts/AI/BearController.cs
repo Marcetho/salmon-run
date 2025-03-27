@@ -9,10 +9,12 @@ public class BearController : PredatorAI
     [Header("Bear Settings")]
     [SerializeField] private Transform fishingSpot;
     [SerializeField] private Transform feedingSpot;
-    [SerializeField] int feedingRadius;
-    [SerializeField] float carryAtkCooldown = 10f;
+    [SerializeField] private int feedingRadius;
+    [SerializeField] private float carryAtkCooldown = 10f;
 
-    [SerializeField] float feedAtkCooldown = 1f;
+    [SerializeField] private float feedAtkCooldown = 1f;
+    [SerializeField] private Vector3 carryingOffset;
+    [SerializeField] private Vector3 eatingOffset;
 
     private UnityEngine.AI.NavMeshAgent agent;
     private BearState actState;
@@ -51,8 +53,8 @@ public class BearController : PredatorAI
         {
             case BearState.Fishing:
                 float distanceToFishingSpot = Vector3.Distance(transform.position, fishingSpot.position);
-                if (distanceToFishingSpot > feedingRadius) //if not in fishing spot, navigate to pos
-                    agent.SetDestination(fishingSpot.position);
+                if (distanceToFishingSpot > feedingRadius && playerMove.InWater) //if not in fishing spot, navigate to pos
+                    agent.SetDestination(fishingSpot.position); // if player is out of water, prioritize pursuing
                 else // if within fishing spot, look for player
                 {
                     if (distanceToPlayer <= detectionRadius && CanSeePlayer())
@@ -68,6 +70,7 @@ public class BearController : PredatorAI
                 {
                     actState = BearState.Feeding;
                     attackCooldown = feedAtkCooldown;
+                    feedingOffset = eatingOffset;
                 }
                 break;
             case BearState.Feeding:
@@ -76,18 +79,20 @@ public class BearController : PredatorAI
         if (anim != null)
         {
             HandleBearAnims(actState);
-            anim.SetFloat("Speed", agent.speed);
+            anim.SetFloat("Speed", agent.velocity.magnitude/agent.speed);
         }
     }
     public override void StartStruggle()
     {
         actState = BearState.Carrying;
         attackCooldown = carryAtkCooldown;
+        feedingOffset = carryingOffset;
     }
 
     public override void EndStruggle(bool success)
     {
         actState = BearState.Fishing;
+        feedingOffset = carryingOffset;
     }
 
     private void HandleBearAnims(BearState action)
@@ -96,22 +101,18 @@ public class BearController : PredatorAI
         {
             case BearState.Fishing:
                 anim.SetBool("Feeding", false);
-                anim.SetBool("Fishing", true);
                 anim.SetBool("Carrying", false);
                 break;
             case BearState.Carrying:
                 anim.SetBool("Feeding", false);
-                anim.SetBool("Fishing", false);
                 anim.SetBool("Carrying", true);
                 break;
             case BearState.Feeding:
                 anim.SetBool("Feeding", true);
-                anim.SetBool("Fishing", false);
                 anim.SetBool("Carrying", false);
                 break;
             default:
                 anim.SetBool("Feeding", false);
-                anim.SetBool("Fishing", false);
                 anim.SetBool("Carrying", false);
                 break;
         }

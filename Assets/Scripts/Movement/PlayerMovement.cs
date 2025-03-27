@@ -44,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canPitchUp = true;
     private bool isInputBlocked = false;
     public bool IsStruggling => isStruggling;
+    public bool InWater => inWater;
 
     [Header("AI Settings")]
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
