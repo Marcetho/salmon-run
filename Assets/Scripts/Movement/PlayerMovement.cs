@@ -369,7 +369,11 @@ public class PlayerMovement : MonoBehaviour
                 // Handle rotation and tilt input
 
                 float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
-                if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
+
+                // Only process turning when in water or when beached and space is pressed
+                bool canTurn = inWater || (isBeached && Input.GetKey(KeyCode.Space));
+
+                if (canTurn && Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
                 {
                     if (yawInput == 1f)
                     {
@@ -411,8 +415,14 @@ public class PlayerMovement : MonoBehaviour
                 // Force pitch to 0 when out of water
                 float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
 
-                // Apply rotations
-                transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
+                // Apply rotations - use actual rotation speed for both in water and on land
+                float effectiveRotationSpeed = inWater ? rotationSpeed : 150f; 
+
+                // Only apply rotation if we can turn (in water or beached with space pressed)
+                if (canTurn)
+                {
+                    transform.Rotate(Vector3.up, yawInput * effectiveRotationSpeed * Time.deltaTime);
+                }
 
                 // Calculate and apply tilt
                 float yaw = yawInput * yawAmount;
@@ -649,7 +659,7 @@ public class PlayerMovement : MonoBehaviour
                         gameController.ShowInstructionPanel("In a struggle", "Spam the spacebar to escape");
                     }
                 }
-            }
+            } // We'll handle rotation differently when beached
         }
     }
 
