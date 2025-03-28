@@ -3,20 +3,25 @@ using System;
 
 public class PredatorAI : MonoBehaviour
 {
-    [Header("References")]
-    public GameObject player;
-    public PlayerMovement playerMove;
-    public Animator anim;
+    protected GameObject player;
+    protected PlayerMovement playerMove;
+    protected Animator anim;
 
     [Header("Stats")]
-    public Collider bodyCollider;
-    public float detectionRadius = 20f;
-    public float attackCooldown = 1f; //dmg interval (in seconds) during struggle
-    public int attackDmg = 25; //dmg per interval
-    public bool canAttack = true; // if can currently attack
+    [SerializeField] protected Collider bodyCollider;
+    [SerializeField] protected float detectionRadius = 20f;
+    [SerializeField] protected float attackCooldown = 1f; //dmg interval (in seconds) during struggle
+    [SerializeField] protected int attackDmg = 25; //dmg per interval
+    [SerializeField] protected bool canAttack = true; // if can currently attack
     [Header("Visual")]
-    public Vector3 feedingOffset; //relative position of player when being fed on
-    public Vector3 feedingRotationOffset; //relative position of player when being fed on
+    [SerializeField] protected Vector3 feedingOffset; //relative position of player when being fed on
+    [SerializeField] protected Vector3 feedingRotationOffset; //relative position of player when being fed on
+
+    public float AttackCooldown => attackCooldown;
+    public int AttackDmg => attackDmg;
+    public Vector3 FeedingOffset => feedingOffset;
+    public Vector3 FeedingRotationOffset => feedingRotationOffset;
+    public bool CanAttack => canAttack;
 
     public bool CanSeePlayer()
     {

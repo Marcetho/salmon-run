@@ -84,7 +84,7 @@ public class GameController : MonoBehaviour
         // Safety check
         if (uiManager == null)
         {
-            Debug.LogError("GameController: Cannot initialize game. uiManager is null!");
+            Debug.LogWarning("GameController: Cannot initialize game. uiManager is null!");
             return;
         }
         if (instructionBox)
@@ -560,7 +560,8 @@ public class GameController : MonoBehaviour
         if (deadFish == null) return;
 
         // Don't decrease lives for AI fish
-
+        remainingLives--;
+        uiManager.DecreaseLives();
         // Find and remove the fish from our list
         int fishIndex = spawnedFishes.IndexOf(deadFish);
         if (fishIndex >= 0)

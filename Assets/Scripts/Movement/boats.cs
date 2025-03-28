@@ -9,7 +9,6 @@ public class boats : MonoBehaviour
     [SerializeField] private float spawnInterval = 2f;
     [SerializeField] private BoxCollider spawnVolume;
     [SerializeField] private FoodSpawner foodSpawner;
-    [SerializeField] private string collisionTargetTag = "Player";
     private int pointsLostOnHit = 5;
 
     private List<GameObject> activeBoats = new List<GameObject>();
@@ -27,7 +26,7 @@ public class boats : MonoBehaviour
         }
         if (foodSpawner == null)
         {
-            foodSpawner = FindObjectOfType<FoodSpawner>();
+            foodSpawner = FindFirstObjectByType<FoodSpawner>();
         }
         nextSpawnTime = Time.time;
     }
