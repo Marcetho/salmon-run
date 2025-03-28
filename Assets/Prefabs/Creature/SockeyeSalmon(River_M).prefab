@@ -774,7 +774,7 @@ GameObject:
   - component: {fileID: 8991906190539825284}
   m_Layer: 0
   m_Name: SockeyeSalmon(River_M)
-  m_TagString: Untagged
+  m_TagString: Fish
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -818,9 +818,11 @@ MonoBehaviour:
   pitchAmount: 15
   sprintDamageInterval: 0.5
   sprintDamageAmount: 5
+  struggleCost: 20
   waterExitEnergyCost: 40
   aiEnergyCostMultiplier: 0.5
   aiSprintEnergyCostPerSecond: 10
+  struggleInterval: 0.5
   rotationSmoothTime: 0.3
   waterSurfaceYPosition: 0
   independentMovementStrength: 0.5
@@ -828,6 +830,14 @@ MonoBehaviour:
   naturalMovementSpeed: 0.8
   positionUpdateInterval: 3
   aiFishSprintEnergyUse: 5
+  levelSpeedMultipliers:
+  - 1
+  - 1.2
+  - 1.5
+  levelEnergyUseMultipliers:
+  - 1
+  - 1.3
+  - 1.6
 --- !u!95 &4166190077935289679
 Animator:
   serializedVersion: 7

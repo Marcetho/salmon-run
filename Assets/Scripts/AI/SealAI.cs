@@ -7,18 +7,17 @@ public class SealAI : PredatorAI
     enum ActivityState { Surfacing, Floating, Hunting, Feeding }
 
     [Header("Breath Settings")]
-    public float maxBreathTime = 120f;
-    public float maxSurfaceTime = 10f;
+    [SerializeField] private float maxBreathTime = 120f;
+    [SerializeField] private float maxSurfaceTime = 10f;
     private float surfaceTime;
     private float currentBreath;
     [SerializeField] private float breathCostPerSecond = 1f; // breath cost per second when seal underwater
     [SerializeField] private float breathGainPerSecond = 50f; // breath gain per second when seal out of water
 
     [Header("Movement Settings")]
-    public float maxForwardSpeed = 10f;
-    public float baseAcceleration = 7f;
-    public float baseDeceleration = 16f;
-    public float rotationSpeed = 100f;
+    [SerializeField] private float maxForwardSpeed = 10f;
+    [SerializeField] private float baseAcceleration = 7f;
+    [SerializeField] private float baseDeceleration = 16f;
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
@@ -87,12 +86,12 @@ public class SealAI : PredatorAI
                 breathUseMultiplier = 0.5f; // reduce breath use rate by half if floating
                 if (distanceToPlayer <= detectionRadius && CanSeePlayer()) //if can detect player, pursue
                 {
-                    if (!playerMove.IsStruggling)
+                    if (!playerMove.IsStruggling && playerMove.InWater)
                         actState = ActivityState.Hunting;
                 }
                 break;
             case ActivityState.Hunting:
-                if (playerMove.IsStruggling)
+                if (playerMove.IsStruggling || !playerMove.InWater)
                 {
                     actState = ActivityState.Floating;
                     break;
@@ -164,7 +163,6 @@ public class SealAI : PredatorAI
         {
             inWater = true;
             rb.linearDamping = 1.5f;
-            rotationSpeed = 100f;
             maxForwardSpeed = 10f;
             eForceDir = new Vector3(0, 0, 0);
         }
@@ -186,7 +184,6 @@ public class SealAI : PredatorAI
             inWater = false;
             canBreathe = true;
             rb.linearDamping = 0.1f;
-            rotationSpeed = 0f;
             maxForwardSpeed = 0.5f;
             eForceDir = new Vector3(0, -3, 0);
         }

@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: db0aeae227281b443b1bbdbf58662e5d, type: 3}
+      propertyPath: m_TagString
+      value: Fish
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -103,9 +107,11 @@ MonoBehaviour:
   pitchAmount: 15
   sprintDamageInterval: 0.5
   sprintDamageAmount: 5
+  struggleCost: 20
   waterExitEnergyCost: 20
   aiEnergyCostMultiplier: 0.5
   aiSprintEnergyCostPerSecond: 10
+  struggleInterval: 0.5
   rotationSmoothTime: 0.3
   waterSurfaceYPosition: 0
   independentMovementStrength: 0.5
@@ -113,6 +119,14 @@ MonoBehaviour:
   naturalMovementSpeed: 0.8
   positionUpdateInterval: 3
   aiFishSprintEnergyUse: 5
+  levelSpeedMultipliers:
+  - 1
+  - 1.2
+  - 1.5
+  levelEnergyUseMultipliers:
+  - 1
+  - 1.3
+  - 1.6
 --- !u!95 &4541544816445233931
 Animator:
   serializedVersion: 7
