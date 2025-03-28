@@ -9,6 +9,7 @@ public class TitleScreenUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI subtitleText;
     [SerializeField] private Button startButton;
+    [SerializeField] private Animator fishAnimator;
     
     [Header("Text Content")]
     [SerializeField] private string titleString = "Salmon Run";
@@ -16,6 +17,9 @@ public class TitleScreenUI : MonoBehaviour
     
     [Header("Scene Management")]
     [SerializeField] private string gameSceneName = "ocean";
+
+    [Header("Music")]
+    [SerializeField] AudioClip titleMusic;
 
     private void Start()
     {
@@ -27,6 +31,10 @@ public class TitleScreenUI : MonoBehaviour
         titleText.text = titleString;
         subtitleText.text = subtitleString;
         startButton.onClick.AddListener(HandleStartClick);
+        fishAnimator.SetBool("InWater", true);
+        fishAnimator.SetFloat("Speed", 0.43f);
+        if (titleMusic)
+            AudioManager.i.PlayMusic(titleMusic, true, true);
     }
 
     private void OnDestroy()

@@ -43,6 +43,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private float ghostMoveSpeed = 2.0f; // Moderate speed for smooth transitions
     [SerializeField] private Material ghostMaterial; // Optional: base material for ghost (can be null)
     private GameObject ghostFish; // Reference to the ghost fish object
+    [Header("Music")]
+    [SerializeField] AudioClip oceanMusic;
+    [SerializeField] AudioClip riverMusic;
 
     // Camera adjustments during selection
     private Transform originalCameraTarget;
