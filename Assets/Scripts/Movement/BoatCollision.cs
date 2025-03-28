@@ -6,7 +6,7 @@ public class BoatCollision : MonoBehaviour
 
     private void Start()
     {
-        boatManager = FindObjectOfType<boats>();
+        boatManager = FindFirstObjectByType<boats>();
     }
 
     private void OnTriggerEnter(Collider other)

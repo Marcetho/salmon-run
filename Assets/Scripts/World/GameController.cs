@@ -84,7 +84,7 @@ public class GameController : MonoBehaviour
         // Safety check
         if (uiManager == null)
         {
-            Debug.LogError("GameController: Cannot initialize game. uiManager is null!");
+            Debug.LogWarning("GameController: Cannot initialize game. uiManager is null!");
             return;
         }
         if (instructionBox)

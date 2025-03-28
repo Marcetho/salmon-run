@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public class PlayerMovementCopy : MonoBehaviour
+public class PlayerMovementOcean : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIManager uiManager;
@@ -22,31 +22,22 @@ public class PlayerMovementCopy : MonoBehaviour
     [Header("Energy Settings")]
     [SerializeField] private float sprintDamageInterval = 0.5f;
     [SerializeField] private float sprintDamageAmount = 5f;
-    [SerializeField] private float waterExitEnergyCost = 40f;
 
 
     private float lastSprintDamageTime;
 
-
     private float movementSpeed;  // renamed from currentSpeed
     private float targetMovementSpeed;  // renamed from targetSpeed
-    private Vector3 velocity;
-    private float baseYPosition;
     private Animator fishAnimator;
     private bool inWater; // maybe use later for animation purposes
     Transform cam;
     private Rigidbody rb;
-    private bool isJumping = false;
-    private bool isExitingWater = false;
-    private bool canTiltUp = true;
-
 
     private void Start()
     {
         cam = Camera.main.transform;
         fishAnimator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        baseYPosition = transform.position.y;
         inWater = true;  // Ensure inWater is always true
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
@@ -58,29 +49,45 @@ public class PlayerMovementCopy : MonoBehaviour
     }
     void FixedUpdate()
     {
-        float yawInput = Input.GetKey(KeyCode.D) ? 1f : (Input.GetKey(KeyCode.A) ? -1f : 0f);
-
+        fishAnimator.SetBool("InWater", inWater);
+        float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
+        float moveInput = 0f;
+        if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
+        {
+            if (yawInput == 1f)
+            {
+                fishAnimator.SetBool("TurnRight", true);
+                fishAnimator.SetBool("TurnLeft", false);
+                moveInput = 0.3f;
+            }
+            else if (yawInput == -1f)
+            {
+                fishAnimator.SetBool("TurnLeft", true);
+                fishAnimator.SetBool("TurnRight", false);
+                moveInput = 0.3f;
+            }
+        }
+        else
+        {
+            fishAnimator.SetBool("TurnLeft", false);
+            fishAnimator.SetBool("TurnRight", false);
+        }
 
         // Remove pitch input logic
         float pitchInput = 0f;
 
+        //enable rotations, regardless of speed
+        transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
 
-        // Apply rotations only if forward velocity is not zero
-        if (movementSpeed != 0)
-        {
-            transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
-
-
-            // Calculate and apply tilt
-            float yaw = yawInput * yawAmount;
-            float pitch = pitchInput * pitchAmount;
-            Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
-        }
+        // Calculate and apply tilt
+        float yaw = yawInput * yawAmount;
+        float pitch = pitchInput * pitchAmount;
+        Quaternion targetRotation = Quaternion.Euler(pitch, transform.eulerAngles.y, yaw);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
 
 
         // Handle speed changes based on shift/ctrl
-        float moveInput = Input.GetKey(KeyCode.Space) ? 1f : 0f;  // "W" moves forward, "S" does nothing
+        if (Input.GetKey(KeyCode.Space)) moveInput = 1f;  // "W" moves forward, "S" does nothing
         float speed = maxForwardSpeed;
         // Debug.Log("Speed: " + speed + " Max Forward Speed: " + maxForwardSpeed);
         float acceleration = baseAcceleration;

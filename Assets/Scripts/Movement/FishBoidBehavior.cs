@@ -11,6 +11,7 @@ public class FishBoidBehavior : MonoBehaviour
     public float separationWeight = 1.5f;
     public float alignmentWeight = 1f;
     public float neighborRadius = 5f;
+    [SerializeField] private Animator fishAnimator;
 
     [Header("Speed Settings")]
     public float maxSpeed = 5f;
@@ -29,6 +30,8 @@ public class FishBoidBehavior : MonoBehaviour
 
     void Start()
     {
+        fishAnimator = GetComponent<Animator>();
+        fishAnimator.SetBool("InWater", true);
         lastTargetPosition = targetFish.position;
     }
 
@@ -59,7 +62,7 @@ public class FishBoidBehavior : MonoBehaviour
     void UpdateNearbyFish()
     {
         nearbyFish.Clear();
-        foreach (var fish in FindObjectsOfType<FishBoidBehavior>())
+        foreach (var fish in FindObjectsByType<FishBoidBehavior>(FindObjectsSortMode.None))
         {
             if (fish != this && Vector3.Distance(transform.position, fish.transform.position) <= neighborRadius)
             {
@@ -144,6 +147,10 @@ public class FishBoidBehavior : MonoBehaviour
         if (isTargetMoving || distanceToTarget > minSpeedDistance)
         {
             transform.position += transform.forward * currentSpeed * Time.deltaTime;
+        }
+        if (fishAnimator != null)
+        {
+            fishAnimator.SetFloat("Speed", currentSpeed);
         }
     }
 

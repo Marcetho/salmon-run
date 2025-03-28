@@ -53,7 +53,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float forwardBiasStrength = 0.7f; // Tendency to swim forward
     [SerializeField] private float naturalMovementSpeed = 0.8f; // Base speed for natural movement
     [SerializeField] private float positionUpdateInterval = 3f; // How often to update natural position
-    [SerializeField] private float aiFishSprintEnergyUse = 5f; // Energy use when AI fish sprints
 
     // For rotation smoothing
     private Quaternion targetRotation;

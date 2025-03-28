@@ -17,7 +17,6 @@ public class SealAI : PredatorAI
     [Header("Movement Settings")]
     [SerializeField] private float maxForwardSpeed = 10f;
     [SerializeField] private float baseAcceleration = 7f;
-    [SerializeField] private float baseDeceleration = 16f;
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force

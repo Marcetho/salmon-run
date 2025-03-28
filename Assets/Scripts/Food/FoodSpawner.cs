@@ -51,7 +51,7 @@ public class FoodSpawner : MonoBehaviour
             }
         }
 
-        sceneController = FindObjectOfType<TimedSceneController>();
+        sceneController = FindFirstObjectByType<TimedSceneController>();
         if (sceneController == null)
         {
             Debug.LogWarning("TimedSceneController reference not found!");
@@ -184,7 +184,7 @@ public class FoodItem : MonoBehaviour
 
     public void Initialize(float lifetime)
     {
-        spawner = FindObjectOfType<FoodSpawner>();
+        spawner = FindFirstObjectByType<FoodSpawner>();
         destroyTime = Time.time + lifetime;
         StartCoroutine(DestroyAfterDelay());
     }
