@@ -560,7 +560,8 @@ public class GameController : MonoBehaviour
         if (deadFish == null) return;
 
         // Don't decrease lives for AI fish
-
+        remainingLives--;
+        uiManager.DecreaseLives();
         // Find and remove the fish from our list
         int fishIndex = spawnedFishes.IndexOf(deadFish);
         if (fishIndex >= 0)

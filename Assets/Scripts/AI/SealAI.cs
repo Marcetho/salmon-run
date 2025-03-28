@@ -86,12 +86,12 @@ public class SealAI : PredatorAI
                 breathUseMultiplier = 0.5f; // reduce breath use rate by half if floating
                 if (distanceToPlayer <= detectionRadius && CanSeePlayer()) //if can detect player, pursue
                 {
-                    if (!playerMove.IsStruggling && !playerMove.IsBeached)
+                    if (!playerMove.IsStruggling && playerMove.InWater)
                         actState = ActivityState.Hunting;
                 }
                 break;
             case ActivityState.Hunting:
-                if (playerMove.IsStruggling || playerMove.IsBeached)
+                if (playerMove.IsStruggling || !playerMove.InWater)
                 {
                     actState = ActivityState.Floating;
                     break;

@@ -47,9 +47,10 @@ public class BearController : PredatorAI
         player = GameController.currentPlayer;
         canAttack = actState == BearState.Fishing;
         float distanceToPlayer;
-        if (player == null) // if no active player, rest
+        float distanceToFeedingSpot;
+        if (player == null) // if no active player
         {
-            actState = BearState.Resting;
+            actState = BearState.Fishing;
             distanceToPlayer = Mathf.Infinity;
         }
         else
@@ -71,8 +72,8 @@ public class BearController : PredatorAI
                     break;     
                 } 
                 float distanceToFishingSpot = Vector3.Distance(transform.position, fishingSpot.position);
-                // if breath runs out, or if away from fishing spot and player is in water, return to fishing spot
-                if (distanceToFishingSpot > feedingRadius && playerMove.InWater)
+                // if away from fishing spot and player is not visibly out of water, return to fishing spot
+                if (distanceToFishingSpot > feedingRadius && !(!playerMove.InWater && distanceToPlayer <= detectionRadius))
                     agent.SetDestination(fishingSpot.position);
                 else // if within fishing spot, look for player
                 {
@@ -95,7 +96,7 @@ public class BearController : PredatorAI
                 }
                 break;
             case BearState.Carrying:
-                float distanceToFeedingSpot = Vector3.Distance(transform.position, feedingSpot.position);
+                distanceToFeedingSpot = Vector3.Distance(transform.position, feedingSpot.position);
                 if (distanceToFeedingSpot > feedingRadius) //if not in feeding spot, navigate to pos
                     agent.SetDestination(feedingSpot.position);
                 else // if reached feeding spot, feed
@@ -106,8 +107,16 @@ public class BearController : PredatorAI
                 }
                 break;
             case BearState.Feeding:
+                distanceToFeedingSpot = Vector3.Distance(transform.position, feedingSpot.position);
+                if (distanceToFeedingSpot > feedingRadius) //if fish died before reaching spot, navigate to pos
+                    agent.SetDestination(feedingSpot.position);
+                else
+                {
+                    actState = BearState.Resting;
+                }
                 break;
             case BearState.Resting:
+                canBreathe = true;
                 if (currentBreath >= maxBreathTime)
                     actState = BearState.Fishing;
                 break;
@@ -127,9 +136,18 @@ public class BearController : PredatorAI
 
     public override void EndStruggle(bool success)
     {
-        currentBreath = 0;
-        actState = BearState.Resting;
-        feedingOffset = carryingOffset;
+        if (!success)
+        {
+            currentBreath = 0;
+            actState = BearState.Resting;
+            feedingOffset = carryingOffset;
+        }
+        else
+        {
+            currentBreath = 0;
+            feedingOffset = eatingOffset;
+            actState = BearState.Feeding;
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
