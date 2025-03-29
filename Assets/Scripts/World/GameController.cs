@@ -53,6 +53,10 @@ public class GameController : MonoBehaviour
     private float originalCameraSmoothTime;
     private bool hasOriginalCameraSettings = false;
 
+    [Header("Scoring")]
+    private static int totalGameScore = 0;
+    private bool hasCalculatedOceanScore = false;
+
     private void Start()
     {
         int sceneID = SceneManager.GetActiveScene().buildIndex;
@@ -79,6 +83,13 @@ public class GameController : MonoBehaviour
 
         remainingLives = initialLivesCount;
         currentLevel = 1;
+
+        // Reset total score when starting a new game (title screen or ocean level)
+        if (sceneID <= 1)
+        {
+            totalGameScore = 0;
+            hasCalculatedOceanScore = false;
+        }
 
         if (currentState == GameState.Freshwater)
         {
@@ -653,6 +664,20 @@ public class GameController : MonoBehaviour
     {
         currentState = GameState.Lost;
 
+        // Calculate final score if we haven't done it yet for the current level
+        if (currentLevel == 1 && !hasCalculatedOceanScore)
+        {
+            // Ocean phase score is the number of surviving fish
+            totalGameScore += spawnedFishes.Count;
+        }
+        else if (currentLevel >= 2)
+        {
+            // Add final river score
+            totalGameScore += spawnedFishes.Count * 10;
+        }
+
+        Debug.Log($"Game Over - Final score: {totalGameScore}");
+
         // Slow down time for dramatic effect but don't completely pause
         // (UI needs to work, so we don't set to 0)
         Time.timeScale = 0.1f;
@@ -667,25 +692,16 @@ public class GameController : MonoBehaviour
             }
         }
 
-        // Stop all fish movement
+        // Destroy all fish
         foreach (GameObject fish in spawnedFishes)
         {
             if (fish != null)
             {
-                Rigidbody rb = fish.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.linearVelocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-                }
-
-                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
-                if (movement != null)
-                {
-                    movement.enabled = false;
-                }
+                Destroy(fish);
             }
         }
+        // Clear the list of spawned fish
+        spawnedFishes.Clear();
 
         // Notify UI
         uiManager.OnGameOver();
@@ -757,6 +773,23 @@ public class GameController : MonoBehaviour
         if (isTransitioning) return;
 
         Debug.Log($"Transitioning from level {currentLevel} to level {nextLevel}");
+
+        // Calculate score based on remaining fish
+        if (currentLevel == 1 && !hasCalculatedOceanScore)
+        {
+            // Ocean phase score is the number of surviving fish
+            int oceanScore = spawnedFishes.Count;
+            totalGameScore += oceanScore;
+            hasCalculatedOceanScore = true;
+            Debug.Log($"Ocean phase completed with {oceanScore} fish. Total score: {totalGameScore}");
+        }
+        else if (currentLevel >= 2)
+        {
+            // River phase score is 10 * remaining fish
+            int riverLevelScore = spawnedFishes.Count * 10;
+            totalGameScore += riverLevelScore;
+            Debug.Log($"River level {currentLevel} completed with {spawnedFishes.Count} fish. Level score: {riverLevelScore}. Total score: {totalGameScore}");
+        }
 
         // Update level state
         int previousLevel = currentLevel;
@@ -1089,6 +1122,12 @@ public class GameController : MonoBehaviour
         {
             instructionBox.SetActive(false);
         }
+    }
+
+    // Public getter for the total game score
+    public static int GetTotalScore()
+    {
+        return totalGameScore;
     }
 }
 

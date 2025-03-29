@@ -43,6 +43,15 @@ public class TimedSceneController : MonoBehaviour
 
     void LoadNextScene()
     {
+        // Before loading the next scene, ensure any score data is properly stored
+        // (Our implementation uses GameController's static variable for persistence)
+        GameController gameController = FindFirstObjectByType<GameController>();
+        if (gameController != null)
+        {
+            // If we're transitioning from a minigame or special scene back to main game,
+            // we could add additional score processing here if needed
+        }
+
         // Load the next scene in the build index
         int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
         SceneManager.LoadScene(nextSceneIndex);

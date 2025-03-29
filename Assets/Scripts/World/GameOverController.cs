@@ -43,7 +43,10 @@ public class GameOverController : UIComponent
         if (scoreText != null)
         {
             int currentLevel = FindAnyObjectByType<GameController>()?.GetCurrentLevel() ?? 1;
-            scoreText.text = $"You reached level {currentLevel}";
+            int totalScore = GameController.GetTotalScore();
+            scoreText.text = $"You reached level {currentLevel}\n\nTotal Score: {totalScore}";
+
+
         }
 
         // Pause game (will be handled by GameController, but as a backup)
