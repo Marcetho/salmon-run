@@ -812,7 +812,7 @@ MonoBehaviour:
   ghostMoveSpeed: 2
   ghostMaterial: {fileID: 0}
   oceanMusic: {fileID: 8300000, guid: 0e53cc53db8208f4fa057a4ec6871ab8, type: 3}
-  riverMusic: {fileID: 8300000, guid: 6e861176700ce3b479a1616a53f872a4, type: 3}
+  riverMusic: {fileID: 8300000, guid: d63ab54d381eee54cb839a3db4084910, type: 3}
 --- !u!4 &1066299924
 Transform:
   m_ObjectHideFlags: 0

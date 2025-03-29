@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 331f4a1a909d3d3429542ca8c4fbc813, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.4
+      value: 516.96
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 331f4a1a909d3d3429542ca8c4fbc813, type: 3}
       propertyPath: m_LocalPosition.y
@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 331f4a1a909d3d3429542ca8c4fbc813, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 32.3
+      value: 908.54
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 331f4a1a909d3d3429542ca8c4fbc813, type: 3}
       propertyPath: m_LocalRotation.w
@@ -100,22 +100,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcd7a19b07afc6409e5f2b3089e1071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  anim: {fileID: 0}
   bodyCollider: {fileID: 6513038951154589414}
-  detectionRadius: 20
+  detectionRadius: 25
   attackCooldown: 1
   attackDmg: 15
+  canAttack: 1
   feedingOffset: {x: -0.05, y: 0.25, z: 0.9}
   feedingRotationOffset: {x: 0, y: 90, z: 0}
-  maxBreathTime: 120
+  maxBreathTime: 60
   maxSurfaceTime: 10
   breathCostPerSecond: 1
-  breathGainPerSecond: 50
-  maxForwardSpeed: 10
-  baseAcceleration: 7
-  baseDeceleration: 16
-  rotationSpeed: 100
+  breathGainPerSecond: 30
+  maxForwardSpeed: 12
+  baseAcceleration: 9
   rotationSmoothTime: 0.3
 --- !u!54 &7554466614890080883
 Rigidbody:

@@ -927,6 +927,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HarborSeal (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
+      propertyPath: maxBreathTime
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4227584614290078770, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
+      propertyPath: breathGainPerSecond
+      value: 30
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2181,7 +2189,7 @@ MonoBehaviour:
   ghostMoveSpeed: 2
   ghostMaterial: {fileID: 2100000, guid: 03c843be06fe9034f84cd8087308a9b4, type: 2}
   oceanMusic: {fileID: 8300000, guid: 0e53cc53db8208f4fa057a4ec6871ab8, type: 3}
-  riverMusic: {fileID: 8300000, guid: 6e861176700ce3b479a1616a53f872a4, type: 3}
+  riverMusic: {fileID: 8300000, guid: d63ab54d381eee54cb839a3db4084910, type: 3}
 --- !u!4 &1941380930
 Transform:
   m_ObjectHideFlags: 0
