@@ -610,13 +610,16 @@ public class GameController : MonoBehaviour
     {
         if (deadFish == null) return;
 
-        // Don't decrease lives for AI fish
-        remainingLives--;
-        uiManager.DecreaseLives();
-        // Find and remove the fish from our list
+        Debug.Log($"AI Fish died: {deadFish.name}");
+
+        // Decrease lives, but only if the fish is in our managed list
         int fishIndex = spawnedFishes.IndexOf(deadFish);
         if (fishIndex >= 0)
         {
+            remainingLives--;
+            uiManager.DecreaseLives();
+            Debug.Log($"Lives decreased to {remainingLives}");
+
             // If this is somehow the current player index, we need to fix that
             if (fishIndex == currentPlayerIndex)
             {
@@ -666,6 +669,20 @@ public class GameController : MonoBehaviour
                     currentPlayerIndex--;
                 }
             }
+
+            // Check if game should end after life decrease
+            if (remainingLives <= 0)
+            {
+                GameOver();
+                return;
+            }
+
+            // Force UI refresh to ensure lives are displayed correctly
+            uiManager.SetLives(remainingLives);
+        }
+        else
+        {
+            Debug.LogWarning($"AI Fish {deadFish.name} died but wasn't in spawnedFishes list");
         }
 
         // Now destroy the fish

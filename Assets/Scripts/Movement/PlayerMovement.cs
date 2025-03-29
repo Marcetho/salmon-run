@@ -195,10 +195,23 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnAIFishDeath(GameObject deadFish)
     {
+        Debug.Log($"PlayerMovement detected AI fish death: {deadFish.name}");
+
         // Notify GameController about AI fish death
         if (gameController != null)
         {
             gameController.OnAIFishDied(deadFish);
+        }
+        else
+        {
+            Debug.LogError("Cannot notify GameController of AI fish death - gameController reference is null");
+
+            // Try to find the GameController as a fallback
+            gameController = FindFirstObjectByType<GameController>();
+            if (gameController != null)
+            {
+                gameController.OnAIFishDied(deadFish);
+            }
         }
     }
 

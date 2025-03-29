@@ -108,11 +108,13 @@ public class PlayerStats : MonoBehaviour
                 if (isCurrentPlayer)
                 {
                     // Only invoke player death for the current player
+                    Debug.Log("Player-controlled fish died");
                     OnPlayerDeath?.Invoke();
                 }
                 else
                 {
                     // For AI fish, invoke AI death event
+                    Debug.Log("AI-controlled fish died");
                     OnAIFishDeath?.Invoke(this.gameObject);
                 }
             }
