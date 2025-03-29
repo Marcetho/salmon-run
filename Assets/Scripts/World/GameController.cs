@@ -76,7 +76,7 @@ public class GameController : MonoBehaviour
             else if (currentState == GameState.Freshwater && riverMusic != null)
                 AudioManager.i.PlayMusic(riverMusic);
         }
-        
+
         remainingLives = initialLivesCount;
         currentLevel = 1;
 
@@ -85,7 +85,7 @@ public class GameController : MonoBehaviour
             // Find all level transition points in the scene if auto-find is enabled
             if (autoFindTransitionPoints)
             {
-            FindAllLevelTransitionPoints();
+                FindAllLevelTransitionPoints();
             }
 
             // Initialize game systems
@@ -652,8 +652,76 @@ public class GameController : MonoBehaviour
     private void GameOver()
     {
         currentState = GameState.Lost;
+
+        // Slow down time for dramatic effect but don't completely pause
+        // (UI needs to work, so we don't set to 0)
+        Time.timeScale = 0.1f;
+
+        // Disable player controls
+        if (currentPlayer != null)
+        {
+            PlayerMovement playerMovement = currentPlayer.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                playerMovement.SetInputBlocked(true);
+            }
+        }
+
+        // Stop all fish movement
+        foreach (GameObject fish in spawnedFishes)
+        {
+            if (fish != null)
+            {
+                Rigidbody rb = fish.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+
+                PlayerMovement movement = fish.GetComponent<PlayerMovement>();
+                if (movement != null)
+                {
+                    movement.enabled = false;
+                }
+            }
+        }
+
+        // Notify UI
         uiManager.OnGameOver();
         Debug.Log("Game Over - No lives remaining");
+
+        // Listen for ESC key to return to main menu
+        StartCoroutine(ListenForMainMenuInput());
+    }
+
+    private System.Collections.IEnumerator ListenForMainMenuInput()
+    {
+        // Give a slight delay before accepting input
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        while (currentState == GameState.Lost)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                ReturnToMainMenu();
+                break;
+            }
+
+            yield return null;
+        }
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene(0); // Assuming main menu is scene 0
     }
 
     // Add methods to handle player state changes

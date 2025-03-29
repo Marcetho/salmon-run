@@ -13,7 +13,7 @@ public class AudioManager : MonoBehaviour
     float originalMusicVolume;
     Dictionary<SfxId, SfxData> sfxLookup;
 
-    public static AudioManager i {get; private set;}
+    public static AudioManager i { get; private set; }
     private void Awake()
     {
         i = this;
@@ -75,14 +75,14 @@ public class AudioManager : MonoBehaviour
     IEnumerator PlayMusicAsync(AudioClip clip, bool loop, bool fade)
     {
         if (fade)
-           yield return musicPlayer.DOFade(0, fadeDuration).WaitForCompletion();
+            yield return musicPlayer.DOFade(0, fadeDuration).WaitForCompletion();
 
         musicPlayer.clip = clip;
         musicPlayer.loop = loop;
         musicPlayer.Play();
 
         if (fade)
-           yield return musicPlayer.DOFade(originalMusicVolume, fadeDuration).WaitForCompletion();
+            yield return musicPlayer.DOFade(originalMusicVolume, fadeDuration).WaitForCompletion();
     }
 }
 

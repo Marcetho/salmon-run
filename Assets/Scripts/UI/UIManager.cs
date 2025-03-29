@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private PlayerHudUI playerHud;
-    [SerializeField] private GameoverTextUI gameOverTextUI;
+    [SerializeField] private GameOverController gameOverController;
 
     [Header("Level Transition UI")]
     [SerializeField] private GameObject levelTransitionPanel;
@@ -32,15 +32,15 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (gameOverTextUI == null)
+        if (gameOverController == null)
         {
-            Debug.LogWarning("UIManager: gameOverTextUI is null! Game over screen won't be shown.");
+            Debug.LogWarning("UIManager: gameOverController is null! Game over screen won't be shown.");
         }
 
         // Initialize UI components
         playerHud.Initialize();
-        if (gameOverTextUI != null)
-            gameOverTextUI.Initialize();
+        if (gameOverController != null)
+            gameOverController.Initialize();
 
         isInitialized = true;
 
@@ -76,11 +76,32 @@ public class UIManager : MonoBehaviour
 
     internal void OnGameOver()
     {
-        if (gameOverTextUI != null)
-            gameOverTextUI.ShowGameOver();
+        if (gameOverController != null)
+        {
+            gameOverController.ShowGameOver();
+
+            // Hide other UI elements that shouldn't appear during game over
+            if (levelTransitionPanel != null)
+                levelTransitionPanel.SetActive(false);
+        }
 
         if (playerHud != null)
             playerHud.OnGameOver();
+    }
+
+
+    // Add method to directly access main menu functionality
+    public void ReturnToMainMenu()
+    {
+        if (gameOverController != null)
+        {
+            // Use reflection to call ReturnToMainMenu since it's private
+            var method = gameOverController.GetType().GetMethod("ReturnToMainMenu",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (method != null)
+                method.Invoke(gameOverController, null);
+        }
     }
 
     #endregion
