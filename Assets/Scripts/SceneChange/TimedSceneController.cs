@@ -7,12 +7,13 @@ public class TimedSceneController : MonoBehaviour
     private float timeRemaining;
 
     // This variable will be incremented by player actions
-    public static int playerScore = 0;
+    public static int playerScore = -1;
 
     void Start()
     {
         // Initialize the timer
         timeRemaining = sceneDuration;
+        playerScore = 0;
     }
 
     void Update()
@@ -32,6 +33,10 @@ public class TimedSceneController : MonoBehaviour
     // This method can be called when player does something
     public void IncrementScore(int amount = 1)
     {
+        if (playerScore == -1)
+        {
+            playerScore = 0;
+        }
         playerScore = Mathf.Max(0, playerScore + amount);
         Debug.Log("Score increased to: " + playerScore);
     }

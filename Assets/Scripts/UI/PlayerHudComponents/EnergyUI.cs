@@ -82,9 +82,5 @@ public class EnergyUI : UIComponent
 
     void FixedUpdate()
     {
-        if (!isGameOver && energy < 100)
-        {
-            UpdateEnergy(energy + energyRegenRate);
-        }
     }
 }

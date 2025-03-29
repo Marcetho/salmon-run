@@ -100,6 +100,13 @@ public class PlayerMovement : MonoBehaviour
         // Subscribe to AI fish death event
         playerStats.OnAIFishDeath += OnAIFishDeath;
 
+        // Subscribe to player stats events for UI updates
+        if (playerStats != null)
+        {
+            playerStats.OnHealthChanged += OnHealthChanged;
+            playerStats.OnEnergyChanged += OnEnergyChanged;
+        }
+
         // Sync UI with initial player stats
         if (uiManager != null && playerStats.IsCurrentPlayer)
         {
@@ -172,6 +179,8 @@ public class PlayerMovement : MonoBehaviour
         {
             playerStats.OnPlayerDeath -= OnPlayerDeath;
             playerStats.OnAIFishDeath -= OnAIFishDeath;
+            playerStats.OnHealthChanged -= OnHealthChanged;
+            playerStats.OnEnergyChanged -= OnEnergyChanged;
         }
     }
 
@@ -190,6 +199,23 @@ public class PlayerMovement : MonoBehaviour
         if (gameController != null)
         {
             gameController.OnAIFishDied(deadFish);
+        }
+    }
+
+    // Event handlers for updating UI
+    private void OnHealthChanged(float newHealth)
+    {
+        if (playerStats.IsCurrentPlayer && uiManager != null)
+        {
+            uiManager.SetHealth(newHealth);
+        }
+    }
+
+    private void OnEnergyChanged(float newEnergy)
+    {
+        if (playerStats.IsCurrentPlayer && uiManager != null)
+        {
+            uiManager.SetEnergy(newEnergy);
         }
     }
 
@@ -409,7 +435,11 @@ public class PlayerMovement : MonoBehaviour
                 // Handle rotation and tilt input
 
                 float yawInput = Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) ? 1f : (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) ? -1f : 0f);
-                if (Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
+
+                // Only process turning when in water or when beached and space is pressed
+                bool canTurn = inWater || (isBeached && Input.GetKey(KeyCode.Space));
+
+                if (canTurn && Mathf.Abs(movementSpeed) < 5f && yawInput != 0)
                 {
                     if (yawInput == 1f)
                     {
@@ -451,8 +481,14 @@ public class PlayerMovement : MonoBehaviour
                 // Force pitch to 0 when out of water
                 float pitch = inWater ? (pitchInput * pitchAmount) : 0f;
 
-                // Apply rotations
-                transform.Rotate(Vector3.up, yawInput * rotationSpeed * Time.deltaTime);
+                // Apply rotations - use actual rotation speed for both in water and on land
+                float effectiveRotationSpeed = inWater ? rotationSpeed : 150f;
+
+                // Only apply rotation if we can turn (in water or beached with space pressed)
+                if (canTurn)
+                {
+                    transform.Rotate(Vector3.up, yawInput * effectiveRotationSpeed * Time.deltaTime);
+                }
 
                 // Calculate and apply tilt
                 float yaw = yawInput * yawAmount;
@@ -676,6 +712,12 @@ public class PlayerMovement : MonoBehaviour
             rotationSpeed = 100f;
             maxForwardSpeed = 5f;
             eForceDir = new Vector3(0, 0, 0);
+
+            // Update player stats with water state
+            if (playerStats != null)
+            {
+                playerStats.SetInWater(true);
+            }
         }
     }
 
@@ -701,7 +743,7 @@ public class PlayerMovement : MonoBehaviour
                         }
                     }
                 }
-            }
+            } // We'll handle rotation differently when beached
         }
     }
 
@@ -717,6 +759,12 @@ public class PlayerMovement : MonoBehaviour
             maxForwardSpeed = 0.5f;
             eForceDir = new Vector3(0, -3, 0);
             canPitchUp = false;
+
+            // Update player stats with water state
+            if (playerStats != null)
+            {
+                playerStats.SetInWater(false);
+            }
 
             // Only apply energy cost/damage to player-controlled fish
             if (playerStats.IsCurrentPlayer)
@@ -748,6 +796,16 @@ public class PlayerMovement : MonoBehaviour
                 float speedFactor = 1.0f;
                 ApplyEnergyAndDamageForAI(aiEnergyCost, speedFactor);
             }
+        }
+    }
+
+    // Add method to force set water state
+    public void ForceSetWaterState(bool inWaterState)
+    {
+        inWater = inWaterState;
+        if (playerStats != null)
+        {
+            playerStats.SetInWater(inWaterState);
         }
     }
 }
