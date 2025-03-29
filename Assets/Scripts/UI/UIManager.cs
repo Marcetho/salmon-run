@@ -89,6 +89,20 @@ public class UIManager : MonoBehaviour
             playerHud.OnGameOver();
     }
 
+    internal void OnVictory()
+    {
+        if (gameOverController != null)
+        {
+            gameOverController.ShowVictory();
+
+            // Hide other UI elements that shouldn't appear during victory
+            if (levelTransitionPanel != null)
+                levelTransitionPanel.SetActive(false);
+        }
+
+        if (playerHud != null)
+            playerHud.OnGameOver(); // Can reuse the same OnGameOver method for disabling HUD
+    }
 
     // Add method to directly access main menu functionality
     public void ReturnToMainMenu()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
 
-public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition, TitleScreen }
+public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition, TitleScreen, Victory }
 public class GameController : MonoBehaviour
 {
     [Header("References")]
@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private int initialLivesCount = 10;
+    [SerializeField] private int finalLevel = 4; // Define the final level
     private GameState currentState;
     private List<GameObject> spawnedFishes = new List<GameObject>();
     private int currentPlayerIndex = 0;
@@ -110,12 +111,23 @@ public class GameController : MonoBehaviour
         LevelTransition[] points = FindObjectsByType<LevelTransition>(FindObjectsSortMode.None);
         levelTransitionPoints.Clear();
 
+        int highestLevelFound = 1;
+
         foreach (LevelTransition point in points)
         {
             levelTransitionPoints.Add(point);
+
+            // Update the highest level number found
+            if (point.LevelNumber > highestLevelFound)
+            {
+                highestLevelFound = point.LevelNumber;
+            }
         }
 
-        Debug.Log($"Found {levelTransitionPoints.Count} level transition points in the scene.");
+        // Update finalLevel based on what's in the scene
+        finalLevel = highestLevelFound;
+
+        Debug.Log($"Found {levelTransitionPoints.Count} level transition points in the scene. Highest level: {finalLevel}");
     }
 
     private void InitializeGame()
@@ -716,7 +728,7 @@ public class GameController : MonoBehaviour
         // Give a slight delay before accepting input
         yield return new WaitForSecondsRealtime(0.5f);
 
-        while (currentState == GameState.Lost)
+        while (currentState == GameState.Lost || currentState == GameState.Victory)
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -777,15 +789,15 @@ public class GameController : MonoBehaviour
         // Calculate score based on remaining fish
         if (currentLevel == 1 && !hasCalculatedOceanScore)
         {
-            // Ocean phase score is the number of surviving fish
+            // Changed: Ocean to river transition - 1 point per fish spawned
             int oceanScore = spawnedFishes.Count;
             totalGameScore += oceanScore;
             hasCalculatedOceanScore = true;
-            Debug.Log($"Ocean phase completed with {oceanScore} fish. Total score: {totalGameScore}");
+            Debug.Log($"Ocean phase completed with {oceanScore} fish. 1 point per fish. Total score: {totalGameScore}");
         }
         else if (currentLevel >= 2)
         {
-            // River phase score is 10 * remaining fish
+            // Standard level completion - 10 points per fish
             int riverLevelScore = spawnedFishes.Count * 10;
             totalGameScore += riverLevelScore;
             Debug.Log($"River level {currentLevel} completed with {spawnedFishes.Count} fish. Level score: {riverLevelScore}. Total score: {totalGameScore}");
@@ -801,7 +813,9 @@ public class GameController : MonoBehaviour
 
         if (nextLevelStartPoint == null)
         {
-            Debug.LogError($"No start point found for level {nextLevel}. Cannot transition!");
+            Debug.LogWarning($"No start point found for level {nextLevel}. Treating as victory instead.");
+            // If there's no next level, consider this a victory
+            TriggerVictory();
             return;
         }
 
@@ -1128,6 +1142,70 @@ public class GameController : MonoBehaviour
     public static int GetTotalScore()
     {
         return totalGameScore;
+    }
+
+    private void TriggerVictory()
+    {
+        currentState = GameState.Victory;
+
+        // Calculate final score - double the score for the final level
+        int finalLevelScore = spawnedFishes.Count * 10 * 2; // Double score for final level
+        totalGameScore += finalLevelScore;
+
+        Debug.Log($"Victory! Final level score: {finalLevelScore}. Total score: {totalGameScore}");
+
+        // Slow down time for dramatic effect but don't completely pause
+        Time.timeScale = 0.05f;
+
+        // Disable player controls
+        if (currentPlayer != null)
+        {
+            PlayerMovement playerMovement = currentPlayer.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                playerMovement.SetInputBlocked(true);
+            }
+        }
+
+        // Notify UI
+        uiManager.OnVictory();
+        Debug.Log("Victory - Salmon Run completed!");
+
+        // Listen for ESC key to return to main menu
+        StartCoroutine(ListenForMainMenuInput());
+    }
+
+    public void CheckForVictory(LevelTransition endPoint)
+    {
+        if (endPoint.GetPointType != LevelTransition.PointType.End)
+            return;
+
+        // Check if this is the final level (either matches finalLevel or there are no start points for the next level)
+        bool isFinalLevel = (endPoint.LevelNumber == finalLevel);
+
+        // Double check if there's a next level start point
+        int nextLevel = endPoint.LevelNumber + 1;
+        bool hasNextLevel = false;
+
+        foreach (LevelTransition point in levelTransitionPoints)
+        {
+            if (point.LevelNumber == nextLevel && point.GetPointType == LevelTransition.PointType.Start)
+            {
+                hasNextLevel = true;
+                break;
+            }
+        }
+
+        // If this is the final level or there's no next level, trigger victory
+        if (isFinalLevel || !hasNextLevel)
+        {
+            TriggerVictory();
+        }
+        else
+        {
+            // Not the final level, so transition to the next level
+            TransitionToNextLevel(nextLevel);
+        }
     }
 }
 

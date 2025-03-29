@@ -15,6 +15,9 @@ public class GameOverController : UIComponent
     [Header("Audio")]
     [SerializeField] private AudioClip gameOverSound;
 
+    [Header("Victory")]
+    [SerializeField] private AudioClip victorySound;
+
     private UIManager uiManager;
 
     public override void Initialize()
@@ -45,11 +48,30 @@ public class GameOverController : UIComponent
             int currentLevel = FindAnyObjectByType<GameController>()?.GetCurrentLevel() ?? 1;
             int totalScore = GameController.GetTotalScore();
             scoreText.text = $"You reached level {currentLevel}\n\nTotal Score: {totalScore}";
-
-
         }
 
+
         // Pause game (will be handled by GameController, but as a backup)
+        Time.timeScale = 0.1f;
+    }
+
+    public void ShowVictory()
+    {
+        // Show the game over panel or text
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+        else if (gameoverText != null)
+            gameoverText.gameObject.SetActive(true);
+
+        // Update score if available
+        if (scoreText != null)
+        {
+            int totalScore = GameController.GetTotalScore();
+            scoreText.text = $"VICTORY!\n\nYou completed the salmon run!\n\nTotal Score: {totalScore}";
+        }
+
+
+        // Slow time but don't stop completely
         Time.timeScale = 0.1f;
     }
 
