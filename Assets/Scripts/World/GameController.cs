@@ -80,15 +80,18 @@ public class GameController : MonoBehaviour
         remainingLives = initialLivesCount;
         currentLevel = 1;
 
-        // Find all level transition points in the scene if auto-find is enabled
-        if (autoFindTransitionPoints)
+        if (currentState == GameState.Freshwater)
         {
+            // Find all level transition points in the scene if auto-find is enabled
+            if (autoFindTransitionPoints)
+            {
             FindAllLevelTransitionPoints();
-        }
+            }
 
-        // Initialize game systems
-        InitializeGame();
-        Debug.Log("Game initialized");
+            // Initialize game systems
+            InitializeGame();
+            Debug.Log("Game initialized");
+        }
     }
 
     private void FindAllLevelTransitionPoints()

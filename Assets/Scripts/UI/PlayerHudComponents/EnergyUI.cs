@@ -10,8 +10,6 @@ using Unity.VisualScripting;
 public class EnergyUI : UIComponent
 {
     [SerializeField] private Image energyMeter;
-    [SerializeField] private float energyRegenRate = 0.2f;
-    [SerializeField] private UIManager uiManager;
 
     private float energy = 100f;
     private bool isGameOver = false;

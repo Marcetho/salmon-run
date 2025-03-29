@@ -1345,8 +1345,6 @@ MonoBehaviour:
   rotationSpeed: 100
   yawAmount: 5
   pitchAmount: 45
-  sprintDamageInterval: 0.5
-  sprintDamageAmount: 5
 --- !u!1 &2071370074
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,14 +18,6 @@ public class PlayerMovementOcean : MonoBehaviour
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
 
-
-    [Header("Energy Settings")]
-    [SerializeField] private float sprintDamageInterval = 0.5f;
-    [SerializeField] private float sprintDamageAmount = 5f;
-
-
-    private float lastSprintDamageTime;
-
     private float movementSpeed;  // renamed from currentSpeed
     private float targetMovementSpeed;  // renamed from targetSpeed
     private Animator fishAnimator;
@@ -96,20 +88,6 @@ public class PlayerMovementOcean : MonoBehaviour
         {
             speed = maxForwardSpeed * 2.5f;
             acceleration *= 60f;
-
-
-            if (!uiManager.HasEnoughEnergy(40f * Time.fixedDeltaTime))
-            {
-                if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
-                {
-                    uiManager.DecreaseHealth(sprintDamageAmount);
-                    lastSprintDamageTime = Time.time;
-                }
-            }
-            else
-            {
-                uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
-            }
         }
 
 
