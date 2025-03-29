@@ -568,7 +568,15 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (!isStruggling)
         {
-            isBeached = Mathf.Abs(rb.linearVelocity.y) < 0.001f; //grounded
+            if (Mathf.Abs(rb.linearVelocity.y) < 0.001f)
+            {
+                if (!isBeached)
+                    AudioManager.i.PlaySfx(SfxId.FishFlopping);
+                isBeached = true; //grounded
+            }
+            else
+                isBeached = false;
+            
         }
 
         if (!isStruggling)

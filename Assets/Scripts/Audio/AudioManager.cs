@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 using System.Linq;
 
 public class AudioManager : MonoBehaviour
@@ -10,7 +9,6 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource musicPlayer;
     [SerializeField] AudioSource sfxPlayer;
     [SerializeField] float fadeDuration = 1f;
-    float originalMusicVolume;
     Dictionary<SfxId, SfxData> sfxLookup;
 
     public static AudioManager i {get; private set;}
@@ -21,16 +19,13 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        originalMusicVolume = musicPlayer.volume;
         sfxLookup = sfxList.ToDictionary(x => x.id);
     }
 
     public IEnumerator UnpauseMusic(float delay)
     {
         yield return new WaitForSeconds(delay);
-        musicPlayer.volume = 0;
         musicPlayer.UnPause();
-        musicPlayer.DOFade(0.1f, fadeDuration);
     }
 
     public void ResumeMusic()
@@ -57,6 +52,25 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySfx(SfxId sfxId, bool pauseMusic = false, bool priority = false)
     {
+        if (sfxId == SfxId.FishFlopping)
+        {
+            int flop = Random.Range(1, 5);
+            switch (flop)
+            {
+                case 1:
+                    sfxId = SfxId.FishFlop1;
+                    break;
+                case 2:
+                    sfxId = SfxId.FishFlop2;
+                    break;
+                case 3:
+                    sfxId = SfxId.FishFlop3;
+                    break;
+                default:
+                    sfxId = SfxId.FishFlop4;
+                    break;
+            }
+        }
         if (!sfxLookup.ContainsKey(sfxId))
             return;
         if (priority)
@@ -64,31 +78,20 @@ public class AudioManager : MonoBehaviour
         var audioData = sfxLookup[sfxId];
         PlaySfx(audioData.clip, pauseMusic);
     }
-    public void PlayMusic(AudioClip clip, bool loop = true, bool fade = false)
+    public void PlayMusic(AudioClip clip, bool loop = true)
     {
         if (clip == null)
             return;
 
-        StartCoroutine(PlayMusicAsync(clip, loop, fade));
-    }
-
-    IEnumerator PlayMusicAsync(AudioClip clip, bool loop, bool fade)
-    {
-        if (fade)
-           yield return musicPlayer.DOFade(0, fadeDuration).WaitForCompletion();
-
         musicPlayer.clip = clip;
         musicPlayer.loop = loop;
         musicPlayer.Play();
-
-        if (fade)
-           yield return musicPlayer.DOFade(originalMusicVolume, fadeDuration).WaitForCompletion();
     }
 }
 
 public enum SfxId
 {
-    Splash, Crunch, FishFlop
+    Splash, Crunch, FishFlopping, FishFlop1, FishFlop2, FishFlop3, FishFlop4
 }
 
 [System.Serializable]
