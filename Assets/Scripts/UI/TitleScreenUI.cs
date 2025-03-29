@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
 public class TitleScreenUI : MonoBehaviour
 {
@@ -9,10 +10,7 @@ public class TitleScreenUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI subtitleText;
     [SerializeField] private Button startButton;
-    [SerializeField] private Button controlsButton;
-    [SerializeField] private Button closeControlsButton;
     [SerializeField] private Button quitButton;
-    [SerializeField] private GameObject controlsScreen;
     [SerializeField] private Animator fishAnimator;
     
     [Header("Text Content")]
@@ -34,11 +32,8 @@ public class TitleScreenUI : MonoBehaviour
     {
         titleText.text = titleString;
         subtitleText.text = subtitleString;
-        controlsScreen.SetActive(false);
         startButton.onClick.AddListener(HandleStartClick);
-        controlsButton.onClick.AddListener(ShowControls);
-        closeControlsButton.onClick.AddListener(HideControls);
-        quitButton.onClick.AddListener(Application.Quit);
+        quitButton.onClick.AddListener(CloseGame); 
         fishAnimator.SetBool("InWater", true);
         fishAnimator.SetFloat("Speed", 0.43f);
         if (titleMusic)
@@ -55,12 +50,9 @@ public class TitleScreenUI : MonoBehaviour
         // Add loading screen or transition animation here
         SceneManager.LoadScene(gameSceneName);
     }
-    private void ShowControls()
+    private void CloseGame()
     {
-        controlsScreen.SetActive(true);
-    }
-    private void HideControls()
-    {
-        controlsScreen.SetActive(false);
+        EditorApplication.isPlaying = false; //for illustrative purposes using unity editor
+        Application.Quit(); //only works after building the game
     }
 }

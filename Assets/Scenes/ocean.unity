@@ -521,7 +521,7 @@ GameObject:
   - component: {fileID: 498585527}
   - component: {fileID: 498585526}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -541,11 +541,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1248847943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -716.92, y: 463.74}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 11, y: 0}
   m_SizeDelta: {x: 400, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &498585526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -811,6 +811,8 @@ MonoBehaviour:
   ghostColor: {r: 0.5, g: 0.5, b: 1, a: 0.2}
   ghostMoveSpeed: 2
   ghostMaterial: {fileID: 0}
+  oceanMusic: {fileID: 0}
+  riverMusic: {fileID: 0}
 --- !u!4 &1066299924
 Transform:
   m_ObjectHideFlags: 0
