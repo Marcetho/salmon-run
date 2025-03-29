@@ -15,12 +15,13 @@ public class SealAI : PredatorAI
     [SerializeField] private float breathGainPerSecond = 50f; // breath gain per second when seal out of water
 
     [Header("Movement Settings")]
-    [SerializeField] private float maxForwardSpeed = 10f;
+    [SerializeField] private float maxForwardSpeed = 12f;
     [SerializeField] private float baseAcceleration = 7f;
     [SerializeField] private float rotationSmoothTime = 0.3f; // Time to smooth rotations
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
     private float movementSpeed;
+    private float maxSpeed;
     private bool inWater;
     private bool canBreathe;
     private bool isBeached;
@@ -42,6 +43,7 @@ public class SealAI : PredatorAI
         eForce = GetComponent<ConstantForce>();
         rb.useGravity = false;
         canAttack = false;
+        maxSpeed = maxForwardSpeed;
     }
 
     void FixedUpdate()
@@ -90,7 +92,7 @@ public class SealAI : PredatorAI
                 }
                 break;
             case ActivityState.Hunting:
-                if (playerMove.IsStruggling || !playerMove.InWater)
+                if (playerMove.IsStruggling)
                 {
                     actState = ActivityState.Floating;
                     break;
@@ -109,7 +111,7 @@ public class SealAI : PredatorAI
                 );
 
                 // Smooth acceleration to target speed
-                movementSpeed = Mathf.MoveTowards(movementSpeed, maxForwardSpeed, baseAcceleration * 1.5f * Time.fixedDeltaTime);
+                movementSpeed = Mathf.MoveTowards(movementSpeed, maxSpeed, baseAcceleration * 1.5f * Time.fixedDeltaTime);
                 // Apply movement in the direction the seal is facing
                 movement = transform.forward * movementSpeed;
 
@@ -158,11 +160,13 @@ public class SealAI : PredatorAI
 
     private void OnTriggerEnter(Collider other)
     { //in water
+        if (!inWater)
+            AudioManager.i.PlaySfx(SfxId.Splash);
         if (other.gameObject.CompareTag("Water"))
         {
             inWater = true;
             rb.linearDamping = 1.5f;
-            maxForwardSpeed = 10f;
+            maxSpeed = maxForwardSpeed;
             eForceDir = new Vector3(0, 0, 0);
         }
     }
@@ -180,10 +184,12 @@ public class SealAI : PredatorAI
     { //out of water
         if (other.gameObject.CompareTag("Water"))
         {
+            if (inWater)
+                AudioManager.i.PlaySfx(SfxId.Splash);
             inWater = false;
             canBreathe = true;
             rb.linearDamping = 0.1f;
-            maxForwardSpeed = 0.5f;
+            maxSpeed = 0.5f;
             eForceDir = new Vector3(0, -3, 0);
         }
     }

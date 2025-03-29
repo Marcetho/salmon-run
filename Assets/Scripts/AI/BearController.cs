@@ -153,6 +153,8 @@ public class BearController : PredatorAI
     {
         if (other.gameObject.CompareTag("Water"))
         {
+            if (canBreathe)
+                AudioManager.i.PlaySfx(SfxId.Splash);
             canBreathe = false;
         }
     }
@@ -160,6 +162,8 @@ public class BearController : PredatorAI
     {
         if (other.gameObject.CompareTag("Water"))
         {
+            if (!canBreathe)
+                AudioManager.i.PlaySfx(SfxId.Splash);
             canBreathe = true;
         }
     }

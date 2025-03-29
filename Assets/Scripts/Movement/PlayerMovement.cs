@@ -385,6 +385,7 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.FeedingOffset);
                 if (Time.time - lastHurtTime >= currentPredator.AttackCooldown)
                 {
+                    AudioManager.i.PlaySfx(SfxId.Crunch);
                     //if ai fish dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.AttackDmg <= 0)
                     {
@@ -531,6 +532,7 @@ public class PlayerMovement : MonoBehaviour
                 transform.position = currentPredator.transform.position + currentPredator.transform.TransformDirection(currentPredator.FeedingOffset);
                 if (Time.time - lastHurtTime >= currentPredator.AttackCooldown)
                 {
+                    AudioManager.i.PlaySfx(SfxId.Crunch);
                     //if player dies from this bite, release predator
                     if (playerStats.CurrentHealth - currentPredator.AttackDmg <= 0)
                     {
@@ -665,6 +667,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     { //in water
+        if (!inWater)
+            AudioManager.i.PlaySfx(SfxId.Splash);
         if (other.gameObject.CompareTag("Water"))
         {
             inWater = true;
@@ -687,6 +691,7 @@ public class PlayerMovement : MonoBehaviour
                     if (currentPredator.CanAttack)
                     {
                         isStruggling = true;
+                        AudioManager.i.PlaySfx(SfxId.Crunch);
                         currentPredator.StartStruggle();
 
                         // Show struggle instructions when player is grabbed by predator
@@ -704,6 +709,8 @@ public class PlayerMovement : MonoBehaviour
     { //out of water
         if (other.gameObject.CompareTag("Water"))
         {
+            if (inWater)
+                AudioManager.i.PlaySfx(SfxId.Splash);
             inWater = false;
             rb.linearDamping = 0.1f;
             rotationSpeed = 0f;
