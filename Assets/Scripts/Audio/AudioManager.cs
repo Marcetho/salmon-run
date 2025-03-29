@@ -88,7 +88,7 @@ public class AudioManager : MonoBehaviour
 
 public enum SfxId
 {
-    BearAngry, BearAlert, SealAngry, SealAlert, FishFlop
+    Splash, Crunch, FishFlop
 }
 
 [System.Serializable]
