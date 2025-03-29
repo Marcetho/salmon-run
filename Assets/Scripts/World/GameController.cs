@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.SceneManagement;
 
-public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition }
+public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition, TitleScreen }
 public class GameController : MonoBehaviour
 {
     [Header("References")]
@@ -54,7 +55,28 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        currentState = GameState.Ocean;
+        int sceneID = SceneManager.GetActiveScene().buildIndex;
+
+        switch (sceneID)
+        {
+            case 0:
+                currentState = GameState.TitleScreen;
+                break;
+            case 1:
+                currentState = GameState.Ocean;
+                break;
+            default:
+                currentState = GameState.Freshwater;
+                break;
+        }
+        if (AudioManager.i != null)
+        {
+            if (currentState == GameState.Ocean && oceanMusic != null)
+                AudioManager.i.PlayMusic(oceanMusic);
+            else if (currentState == GameState.Freshwater && riverMusic != null)
+                AudioManager.i.PlayMusic(riverMusic);
+        }
+        
         remainingLives = initialLivesCount;
         currentLevel = 1;
 
