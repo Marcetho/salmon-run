@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Underwater
-  m_Shader: {fileID: -6465566751694194690, guid: d17a14960bf347545ad50aa79b9012e6, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 8eef88ae773ef5f4dbe4da56da89303b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -77,7 +77,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SurfaceFoamTexture:
-        m_Texture: {fileID: 2800000, guid: 1540a158080f0a0448c47fbe24112540, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -125,7 +125,7 @@ Material:
     - _QueueControl: 1
     - _QueueOffset: -49
     - _REFLECTIONS: 1
-    - _ReflectionBlend: 0.6
+    - _ReflectionBlend: 0.328
     - _ReflectionDistortion: 0.38
     - _RefractionScale: 10
     - _RefractionSpeed: 0.05
@@ -140,7 +140,7 @@ Material:
     - _SurfaceFoamTiling: 0.53
     - _TileSize: 200
     - _WORLD_SPACE_UV: 1
-    - _WaterAlpha: 0
+    - _WaterAlpha: 0.5
     - _WaterMetallic: 0.5
     - _WaterSmoothness: 0.241
     - _WaveLength: 4
@@ -157,7 +157,7 @@ Material:
     - _FoamUVsOffset: {r: 1, g: 1, b: 0, a: 0}
     - _FresnelColor: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0}
     - _HorizonColor: {r: 7.3772106, g: 3.6607668, b: 6.6577153, a: 1}
-    - _IntersectionFoamColor: {r: 2.297397, g: 2.297397, b: 2.297397, a: 0.9254902}
+    - _IntersectionFoamColor: {r: 2.297397, g: 2.297397, b: 2.297397, a: 0}
     - _PositionRipples: {r: 0, g: 0, b: 0, a: 0}
     - _SecondaryFoamColor: {r: 0, g: 0.002903101, b: 0.19245279, a: 0}
     - _ShallowColor: {r: 0, g: 1.3426038, b: 1.5849056, a: 0.78431374}
