@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f989b0e08ab6cc34f9643e90fcb99cd8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/kMirrors/Editor/MirrorEditor.cs
+  uploadId: 700359

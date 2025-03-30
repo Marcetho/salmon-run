@@ -8,7 +8,6 @@ public class AudioManager : MonoBehaviour
     [SerializeField] List<SfxData> sfxList;
     [SerializeField] AudioSource musicPlayer;
     [SerializeField] AudioSource sfxPlayer;
-    [SerializeField] float fadeDuration = 1f;
     Dictionary<SfxId, SfxData> sfxLookup;
 
     public static AudioManager i {get; private set;}

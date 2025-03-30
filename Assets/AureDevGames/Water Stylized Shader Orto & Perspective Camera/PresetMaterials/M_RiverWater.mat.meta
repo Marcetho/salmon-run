@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3feda66d2d021334c912416a6209787e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/PresetMaterials/M_RiverWater.mat
+  uploadId: 700359
