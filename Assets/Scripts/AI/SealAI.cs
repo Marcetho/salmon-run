@@ -160,10 +160,10 @@ public class SealAI : PredatorAI
 
     private void OnTriggerEnter(Collider other)
     { //in water
-        if (!inWater)
-            AudioManager.i.PlaySfx(SfxId.Splash);
         if (other.gameObject.CompareTag("Water"))
         {
+            if (!inWater && actState != ActivityState.Surfacing)
+                AudioManager.i.PlaySfx(SfxId.Splash);
             inWater = true;
             rb.linearDamping = 1.5f;
             maxSpeed = maxForwardSpeed;
@@ -184,7 +184,7 @@ public class SealAI : PredatorAI
     { //out of water
         if (other.gameObject.CompareTag("Water"))
         {
-            if (inWater)
+            if (inWater && actState != ActivityState.Surfacing)
                 AudioManager.i.PlaySfx(SfxId.Splash);
             inWater = false;
             canBreathe = true;

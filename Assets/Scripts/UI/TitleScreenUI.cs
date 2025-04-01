@@ -37,7 +37,7 @@ public class TitleScreenUI : MonoBehaviour
         fishAnimator.SetBool("InWater", true);
         fishAnimator.SetFloat("Speed", 0.43f);
         if (titleMusic)
-            AudioManager.i.PlayMusic(titleMusic, true, true);
+            AudioManager.i.PlayMusic(titleMusic, true);
     }
 
     private void OnDestroy()

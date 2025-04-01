@@ -174,7 +174,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.7
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -309,6 +309,14 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: a15a70b3668e12b4ba169246a2d56bea, type: 3}
   - id: 1
     clip: {fileID: 8300000, guid: b303fb6a29e69ef4490d5db4a3da6b82, type: 3}
+  - id: 3
+    clip: {fileID: 8300000, guid: 923c45574bfea894b98d0bcda65b35ac, type: 3}
+  - id: 4
+    clip: {fileID: 8300000, guid: eeaeb1943c772924e924d1d08d62f937, type: 3}
+  - id: 5
+    clip: {fileID: 8300000, guid: c65e85f51b7dbdc40a0a49ee15065933, type: 3}
+  - id: 6
+    clip: {fileID: 8300000, guid: cf5b474edf417db4086e73c432b28087, type: 3}
   musicPlayer: {fileID: 1873700868143898791}
   sfxPlayer: {fileID: 5259220145377505027}
   fadeDuration: 1

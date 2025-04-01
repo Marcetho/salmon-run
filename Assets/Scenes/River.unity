@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0, g: 0, b: 0, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: fd68d29f2abada148989c97064e706a0, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -617,6 +617,10 @@ PrefabInstance:
     - target: {fileID: 2115156242376808132, guid: 668fab8130525064eb63431f951eb0bc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5259220145377505027, guid: 668fab8130525064eb63431f951eb0bc, type: 3}
+      propertyPath: m_Volume
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 5658971104412594346, guid: 668fab8130525064eb63431f951eb0bc, type: 3}
       propertyPath: m_Name
@@ -1380,7 +1384,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3671025170309377903, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 516.96
+      value: 526.5
       objectReference: {fileID: 0}
     - target: {fileID: 3671025170309377903, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2070,7 +2074,7 @@ Skybox:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1380781415}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CustomSkybox: {fileID: 2100000, guid: 56113b3b655ab7349bab4d7d405c258a, type: 2}
 --- !u!1 &1650667961
 GameObject:
