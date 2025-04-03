@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 84eeacf7409dd9e4a8cbfab15c1cb3c7
+ShaderIncludeImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/Shader/HLSL/DistortUV.hlsl
+  uploadId: 700359

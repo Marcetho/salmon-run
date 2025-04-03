@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8f00757bc3dce824fa26206670cde47c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/Scripts/FloatingObject.cs
+  uploadId: 700359

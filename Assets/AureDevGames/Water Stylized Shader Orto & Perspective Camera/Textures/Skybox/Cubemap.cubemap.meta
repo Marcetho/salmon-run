@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3cd3fe69444167c499843b73f2dbe6ae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8900000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/Textures/Skybox/Cubemap.cubemap
+  uploadId: 700359

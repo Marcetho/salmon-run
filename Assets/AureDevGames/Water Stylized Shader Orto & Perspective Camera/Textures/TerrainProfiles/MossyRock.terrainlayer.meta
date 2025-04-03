@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ff3be8f3830357047819cbb6e1481f3f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/Textures/TerrainProfiles/MossyRock.terrainlayer
+  uploadId: 700359
