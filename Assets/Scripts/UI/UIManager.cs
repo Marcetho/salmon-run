@@ -296,9 +296,18 @@ public class UIManager : MonoBehaviour
             string environmentFrom = GetEnvironmentName(previousLevel);
             string environmentTo = GetEnvironmentName(nextLevel);
 
-            levelTransitionText.text = $"LEVEL {previousLevel} COMPLETE\n" +
+            if (GetEnvironmentName(previousLevel) == "Ocean")
+            {
+                levelTransitionText.text = $"<b>OCEAN PHASE COMPLETE</b>\n" +
+                                           $"Moving from {environmentFrom} to {environmentTo}\n" +
+                                           $"Get ready for Level {nextLevel}!";
+            }
+            else
+            {
+                levelTransitionText.text = $"LEVEL {previousLevel} COMPLETE\n" +
                                        $"Moving from {environmentFrom} to {environmentTo}\n" +
                                        $"Get ready for Level {nextLevel}!";
+            }
         }
     }
 
@@ -328,7 +337,14 @@ public class UIManager : MonoBehaviour
         // Set the text for pre-level info
         if (levelTransitionText != null)
         {
-            levelTransitionText.text = $"<b>LEVEL {levelNumber}: {GetEnvironmentName(levelNumber)}</b>";
+            if (GetEnvironmentName(levelNumber) == "Ocean")
+            {
+                levelTransitionText.text = "<b>OCEAN PHASE</b>";
+            }
+            else
+            {
+                levelTransitionText.text = $"<b>LEVEL {levelNumber}: {GetEnvironmentName(levelNumber)}</b>";
+            }
         }
 
         // Set the description text
