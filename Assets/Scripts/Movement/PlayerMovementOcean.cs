@@ -18,6 +18,9 @@ public class PlayerMovementOcean : MonoBehaviour
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
 
+    [Header("Height Control")]
+    [SerializeField] private float maxHeight = 10f;
+    [SerializeField] private float gravityForce = 2f;
 
     [Header("Energy Settings")]
     [SerializeField] private float sprintDamageInterval = 0.5f;
@@ -127,6 +130,11 @@ public class PlayerMovementOcean : MonoBehaviour
 
         rb.AddForce(movement);
 
+        // Apply downward force if above threshold
+        if (transform.position.y > maxHeight)
+        {
+            rb.AddForce(Vector3.down * gravityForce, ForceMode.Force);
+        }
 
         eForce.force = eForceDir;
 
