@@ -5,6 +5,7 @@ public class PlayerMovementOcean : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private FoodSpawner foodSpawner;  // Changed to SerializeField
 
 
     [Header("Movement Settings")]
@@ -17,6 +18,17 @@ public class PlayerMovementOcean : MonoBehaviour
     public float pitchAmount = 45f;  // For up/down tilt
     private ConstantForce eForce; // external force (river current, gravity, water buoyancy)
     private Vector3 eForceDir; // net direction of external force
+
+    [Header("Height Control")]
+    [SerializeField] private float maxHeight = 10f;
+    [SerializeField] private float gravityForce = 2f;
+
+    [Header("Energy Settings")]
+    [SerializeField] private float sprintDamageInterval = 0.5f;
+    [SerializeField] private float sprintDamageAmount = 5f;
+
+
+    private float lastSprintDamageTime;
 
     private float movementSpeed;  // renamed from currentSpeed
     private float targetMovementSpeed;  // renamed from targetSpeed
@@ -39,6 +51,17 @@ public class PlayerMovementOcean : MonoBehaviour
         eForceDir = new Vector3(0, 0, 0);
         gameObject.tag = "Player"; // Ensure the player has the correct tag
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Predator") && foodSpawner != null)
+        {
+            foodSpawner.DecrementFoodCollected();
+        }
+    }
+
+
+
     void FixedUpdate()
     {
         fishAnimator.SetBool("InWater", inWater);
@@ -105,6 +128,11 @@ public class PlayerMovementOcean : MonoBehaviour
 
         rb.AddForce(movement);
 
+        // Apply downward force if above threshold
+        if (transform.position.y > maxHeight)
+        {
+            rb.AddForce(Vector3.down * gravityForce, ForceMode.Force);
+        }
 
         eForce.force = eForceDir;
 

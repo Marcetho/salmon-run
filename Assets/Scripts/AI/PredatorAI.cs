@@ -5,6 +5,8 @@ public class PredatorAI : MonoBehaviour
 {
     protected GameObject player;
     protected PlayerMovement playerMove;
+
+    protected PlayerMovementOcean playerMoveOcean;
     protected Animator anim;
 
     [Header("Stats")]
