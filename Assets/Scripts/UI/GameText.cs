@@ -30,7 +30,8 @@ public static class GameText
         "Collect points by swimming into schools of food (zooplankton and shrimp), and avoid getting caught by predators and fishing boats. Gathering more points will attract more fish to join your school, so try to get as many as you can before time runs out!",
 
         "After braving the dangers of the ocean, you and your school are among the millions of salmon that eventually begin the long journey home this year.\n\n" +
-        "Make it past the river mouth by avoiding hungry Harbor Seals. They're quick and can sense movement in the water with their whiskers, but they need to return to the surface to breathe. If one chases you, stay away from the surface and swim as fast as you can. You'll gain points for each fish you lead safely to the end of the level.",
+        "Make it past the river mouth by avoiding hungry Harbor Seals. They're quick and can sense movement in the water with their whiskers, but they need to return to the surface to breathe. If one chases you, stay away from the surface and swim as fast as you can. You'll gain points for each fish you lead safely to the end of the level." +
+        "\n\nControls:\nSPACE - Swim, Struggle\nW, S - Pitch Up/Down\nA, D - Turn Left/Right\nSHIFT - Sprint",
 
         "You and your school have been swimming for days, and your bodies have begun to change, adapting to the freshwater river. As you get closer to the stream where you where born, you also begin to show your spawning colours. The males of your kind have even grown humped backs and hooked jaws to show off their strength!\n\n" +
         "Survive bears as you continue upstream. Once they grab you, they'll start carrying you to land, making it hard to struggle free and get back to the water. Although they can plunge after you, they can't swim out into deeper water. Lead as many fish as you can upstream to score points.",
