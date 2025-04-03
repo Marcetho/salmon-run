@@ -9,8 +9,6 @@ public class TimedSceneController : MonoBehaviour
     private bool hasShownIntro = false;
 
     [SerializeField] private UIManager uiManager;
-    [SerializeField] private string oceanIntroText = "Welcome to the ocean phase! Survive and navigate to the river mouth.";
-    [SerializeField] private string oceanCompletionText = "You've survived the ocean and found the river mouth. Your journey inland begins!";
 
     // This variable will be incremented by player actions
     public static int playerScore = -1;

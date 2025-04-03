@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36b9b5085be84a442bc6fc13d23c7f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneDuration: 10
+  sceneDuration: 60
   uiManager: {fileID: 1766120081}
   oceanIntroText: Welcome to the ocean phase! Survive and navigate to the river mouth.
   oceanCompletionText: You've survived the ocean and found the river mouth. Your
@@ -857,29 +857,6 @@ MonoBehaviour:
   ghostMaterial: {fileID: 0}
   oceanMusic: {fileID: 8300000, guid: 0e53cc53db8208f4fa057a4ec6871ab8, type: 3}
   riverMusic: {fileID: 8300000, guid: d63ab54d381eee54cb839a3db4084910, type: 3}
-  levelDescriptions:
-  - The vast ocean is where your journey begins. Navigate the currents and avoid
-    predators as you make your way to the river mouth.
-  - The lower river presents new challenges with stronger currents and obstacles.
-    Stay in the water to conserve energy.
-  - The upper river grows narrower and more treacherous. Watch out for predators
-    and shallow water sections.
-  - You've reached the spawning grounds! Navigate to your final destination to complete
-    the cycle of life.
-  levelCompletionTexts:
-  - You've survived the ocean and found the river mouth. Your journey inland begins!
-  - The lower river has been conquered. Continue upstream toward your ancestral spawning
-    grounds.
-  - You've navigated the upper river's challenges. The spawning grounds are within
-    reach!
-  - Congratulations! You've reached the spawning grounds and completed the cycle
-    of life!
-  scoringDescriptions:
-  - In the ocean phase, you earn 1 point for each fish that survives.
-  - In the river phase, you earn 10 points for each fish that survives.
-  - In the upper river, you earn 10 points for each fish that survives.
-  - At the spawning grounds, you earn 20 points (double) for each fish that reaches
-    the end!
 --- !u!4 &1066299924
 Transform:
   m_ObjectHideFlags: 0
