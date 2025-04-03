@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0feec35a2e5b9e24cbf36fc074d44390
+ShaderIncludeImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297566
+  packageName: Water Stylized Shader Orto & Perspective Camera
+  packageVersion: 1.0
+  assetPath: Assets/AureDevGames/Water Stylized Shader Orto & Perspective Camera/Shader/HLSL/GrestnerWaves.hlsl
+  uploadId: 700359
