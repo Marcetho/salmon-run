@@ -8,7 +8,6 @@ public class LevelTransition : MonoBehaviour
     [SerializeField] private int levelNumber = 1;
     [SerializeField] private PointType pointType = PointType.Start;
     [SerializeField] private float detectionRadius = 5f;
-    [SerializeField] private int nextLevelNumber = 2;
 
     [Header("Visual Settings")]
     [SerializeField] private Color gizmoColor = Color.green;
@@ -35,7 +34,8 @@ public class LevelTransition : MonoBehaviour
                 // Player has reached the end point
                 if (gameController != null)
                 {
-                    gameController.TransitionToNextLevel(nextLevelNumber);
+                    // Use CheckForVictory instead of directly transitioning
+                    gameController.CheckForVictory(this);
 
                     // Disable this end point temporarily to prevent multiple transitions
                     this.enabled = false;

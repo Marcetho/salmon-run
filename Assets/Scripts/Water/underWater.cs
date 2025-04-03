@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI; // Required for UI elements
 using UnityEngine.Rendering.PostProcessing;
 
-public class UnderwaterEffect : MonoBehaviour
+public class underWater : MonoBehaviour
 {
     public Transform playerCamera;
     public Color underwaterFogColor = new Color(0.2f, 0.5f, 0.7f, 1f);

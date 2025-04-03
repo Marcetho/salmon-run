@@ -13,11 +13,15 @@ public class NewSceneController : MonoBehaviour
         // Set your derived value based on the previous score
         // For example, maybe it's double the score
         derivedValue = 1 + (previousScore * 2);
+        
         // Get the GameController and set its initial lives
         GameController gameController = FindFirstObjectByType<GameController>();
         if (gameController != null && previousScore >= 0)
         {
             gameController.SetInitialLives(derivedValue);
+            
+            // Make sure to pass the ocean score to the GameController
+            GameController.SetOceanScore(derivedValue);
         }
         else
         {

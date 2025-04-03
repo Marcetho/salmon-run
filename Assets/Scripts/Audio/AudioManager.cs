@@ -10,7 +10,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource sfxPlayer;
     Dictionary<SfxId, SfxData> sfxLookup;
 
-    public static AudioManager i {get; private set;}
+    public static AudioManager i { get; private set; }
     private void Awake()
     {
         i = this;

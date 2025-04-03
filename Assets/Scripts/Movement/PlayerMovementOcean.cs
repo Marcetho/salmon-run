@@ -111,20 +111,6 @@ public class PlayerMovementOcean : MonoBehaviour
         {
             speed = maxForwardSpeed * 2.5f;
             acceleration *= 60f;
-
-
-            if (!uiManager.HasEnoughEnergy(40f * Time.fixedDeltaTime))
-            {
-                if (Time.time - lastSprintDamageTime >= sprintDamageInterval)
-                {
-                    uiManager.DecreaseHealth(sprintDamageAmount);
-                    lastSprintDamageTime = Time.time;
-                }
-            }
-            else
-            {
-                uiManager.DecreaseEnergy(40f * Time.fixedDeltaTime);
-            }
         }
 
 
