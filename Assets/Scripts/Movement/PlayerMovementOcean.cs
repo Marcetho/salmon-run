@@ -5,6 +5,7 @@ public class PlayerMovementOcean : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private FoodSpawner foodSpawner;  // Changed to SerializeField
 
 
     [Header("Movement Settings")]
@@ -50,6 +51,17 @@ public class PlayerMovementOcean : MonoBehaviour
         eForceDir = new Vector3(0, 0, 0);
         gameObject.tag = "Player"; // Ensure the player has the correct tag
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Predator") && foodSpawner != null)
+        {
+            foodSpawner.DecrementFoodCollected();
+        }
+    }
+
+
+
     void FixedUpdate()
     {
         fishAnimator.SetBool("InWater", inWater);

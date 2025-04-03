@@ -166,6 +166,7 @@ public class SealAIOcean : PredatorAI
             if (!inWater && actState != ActivityState.Surfacing)
                 AudioManager.i.PlaySfx(SfxId.Splash);
             actState = ActivityState.Feeding;
+            
         }
     }
 
