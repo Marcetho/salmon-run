@@ -5,7 +5,6 @@ using Unity.Mathematics;
 public class SealAIOcean : PredatorAI
 {
     enum ActivityState { Surfacing, Floating, Hunting, Feeding }
-
     [Header("Breath Settings")]
     [SerializeField] private float maxBreathTime = 120f;
     [SerializeField] private float maxSurfaceTime = 10f;
@@ -44,11 +43,11 @@ public class SealAIOcean : PredatorAI
         rb.useGravity = false;
         canAttack = false;
         maxSpeed = maxForwardSpeed;
+        player = GameObject.FindWithTag("Player");
     }
 
     void FixedUpdate()
     {
-        player = GameController.currentPlayer;
         float distanceToPlayer;
         if (player == null) // if no active player, surface
         {
@@ -57,7 +56,6 @@ public class SealAIOcean : PredatorAI
         }
         else
         {
-            playerMoveOcean = player.GetComponent<PlayerMovementOcean>();
             distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
         }
 
@@ -87,16 +85,10 @@ public class SealAIOcean : PredatorAI
                 breathUseMultiplier = 0.5f; // reduce breath use rate by half if floating
                 if (distanceToPlayer <= detectionRadius && CanSeePlayer()) //if can detect player, pursue
                 {
-                    if (!playerMove.IsStruggling && playerMove.InWater)
-                        actState = ActivityState.Hunting;
+                    actState = ActivityState.Hunting;
                 }
                 break;
             case ActivityState.Hunting:
-                if (playerMove.IsStruggling)
-                {
-                    actState = ActivityState.Floating;
-                    break;
-                }
                 targetPosition = player.transform.position;
                 // Calculate direction to target position
                 Vector3 directionToTarget = targetPosition - transform.position;
@@ -168,6 +160,12 @@ public class SealAIOcean : PredatorAI
             rb.linearDamping = 1.5f;
             maxSpeed = maxForwardSpeed;
             eForceDir = new Vector3(0, 0, 0);
+        }
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if (!inWater && actState != ActivityState.Surfacing)
+                AudioManager.i.PlaySfx(SfxId.Splash);
+            actState = ActivityState.Feeding;
         }
     }
 
