@@ -148,7 +148,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36b9b5085be84a442bc6fc13d23c7f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneDuration: 30
+  sceneDuration: 10
+  uiManager: {fileID: 1766120081}
+  oceanIntroText: Welcome to the ocean phase! Survive and navigate to the river mouth.
+  oceanCompletionText: You've survived the ocean and found the river mouth. Your
+    journey inland begins!
 --- !u!4 &156918545
 Transform:
   m_ObjectHideFlags: 0
@@ -693,6 +697,119 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90.615, z: 0}
+--- !u!1001 &957332129
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2563683543267125780, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5211317743815939927, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5537929162004402017, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6484699613147215404, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_Name
+      value: UICanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967838571073720320, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
 --- !u!1 &1066299922
 GameObject:
   m_ObjectHideFlags: 0
@@ -729,6 +846,7 @@ MonoBehaviour:
   playerPrefabF: {fileID: 0}
   spawnPoints: []
   initialLivesCount: 5
+  finalLevel: 4
   transitionDuration: 2
   autoFindTransitionPoints: 1
   selectionTimeScale: 0.01
@@ -739,6 +857,29 @@ MonoBehaviour:
   ghostMaterial: {fileID: 0}
   oceanMusic: {fileID: 8300000, guid: 0e53cc53db8208f4fa057a4ec6871ab8, type: 3}
   riverMusic: {fileID: 8300000, guid: d63ab54d381eee54cb839a3db4084910, type: 3}
+  levelDescriptions:
+  - The vast ocean is where your journey begins. Navigate the currents and avoid
+    predators as you make your way to the river mouth.
+  - The lower river presents new challenges with stronger currents and obstacles.
+    Stay in the water to conserve energy.
+  - The upper river grows narrower and more treacherous. Watch out for predators
+    and shallow water sections.
+  - You've reached the spawning grounds! Navigate to your final destination to complete
+    the cycle of life.
+  levelCompletionTexts:
+  - You've survived the ocean and found the river mouth. Your journey inland begins!
+  - The lower river has been conquered. Continue upstream toward your ancestral spawning
+    grounds.
+  - You've navigated the upper river's challenges. The spawning grounds are within
+    reach!
+  - Congratulations! You've reached the spawning grounds and completed the cycle
+    of life!
+  scoringDescriptions:
+  - In the ocean phase, you earn 1 point for each fish that survives.
+  - In the river phase, you earn 10 points for each fish that survives.
+  - In the upper river, you earn 10 points for each fish that survives.
+  - At the spawning grounds, you earn 20 points (double) for each fish that reaches
+    the end!
 --- !u!4 &1066299924
 Transform:
   m_ObjectHideFlags: 0
@@ -1172,6 +1313,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 668fab8130525064eb63431f951eb0bc, type: 3}
+--- !u!114 &1766120081 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3184821261432490107, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+  m_PrefabInstance: {fileID: 957332129}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5967f63003d93cc4f9fea7eabcf470ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1918025282
 GameObject:
   m_ObjectHideFlags: 0
@@ -2698,6 +2850,7 @@ SceneRoots:
   m_Roots:
   - {fileID: 287194935}
   - {fileID: 1703149528}
+  - {fileID: 957332129}
   - {fileID: 1230086161}
   - {fileID: 6770369581057337418}
   - {fileID: 6444924921617038227}

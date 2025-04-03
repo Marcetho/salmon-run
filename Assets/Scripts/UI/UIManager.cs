@@ -1,4 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System;
 
 /// <summary>
 /// Manages all UI components and provides the public interface for UI interactions.
@@ -14,6 +17,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject levelTransitionPanel;
     [SerializeField] private TMPro.TextMeshProUGUI levelTransitionText;
     [SerializeField] private float transitionDisplayTime = 3f;
+    [SerializeField] private Button continueButton;
+    [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI descriptionText; // New additional description text
 
     private bool isInitialized = false;
     private float transitionTimer = 0f;
@@ -21,6 +27,12 @@ public class UIManager : MonoBehaviour
     private int pendingLivesValue = -1;
     private float pendingHealthValue = -1f;
     private float pendingEnergyValue = -1f;
+
+    // Events for level transition interactions
+    public event Action OnContinueClicked;
+
+    private enum TransitionMode { Auto, PreLevel, PostLevel }
+    private TransitionMode currentTransitionMode = TransitionMode.Auto;
 
     #region Internal Methods
 
@@ -53,18 +65,28 @@ public class UIManager : MonoBehaviour
 
         if (pendingEnergyValue >= 0)
             playerHud.SetEnergy(pendingEnergyValue);
+
+        // Set up continue button listener
+        if (continueButton != null)
+        {
+            continueButton.onClick.AddListener(OnContinueButtonClicked);
+        }
     }
 
     private void OnDestroy()
     {
         if (playerHud != null)
             playerHud.Cleanup();
+
+        // Clean up button listener
+        if (continueButton != null)
+            continueButton.onClick.RemoveAllListeners();
     }
 
     private void Update()
     {
-        // Handle level transition display timer
-        if (isShowingTransition)
+        // Handle auto-hiding for automatic transitions only
+        if (isShowingTransition && currentTransitionMode == TransitionMode.Auto)
         {
             transitionTimer -= Time.unscaledDeltaTime;
             if (transitionTimer <= 0)
@@ -72,6 +94,12 @@ public class UIManager : MonoBehaviour
                 HideLevelTransition();
             }
         }
+    }
+
+    private void OnContinueButtonClicked()
+    {
+        HideLevelTransition();
+        OnContinueClicked?.Invoke();
     }
 
     internal void OnGameOver()
@@ -250,6 +278,17 @@ public class UIManager : MonoBehaviour
         levelTransitionPanel.SetActive(true);
         isShowingTransition = true;
         transitionTimer = transitionDisplayTime;
+        currentTransitionMode = TransitionMode.Auto;
+
+        // Hide the continue button and score text for auto-transitions
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(false);
+
+        if (scoreText != null)
+            scoreText.gameObject.SetActive(false);
+
+        if (descriptionText != null)
+            descriptionText.gameObject.SetActive(false);
 
         // Set the transition text if available
         if (levelTransitionText != null)
@@ -263,6 +302,114 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Shows a pre-level popup with information about the upcoming level
+    /// </summary>
+    public void ShowPreLevelPopup(int levelNumber, string description)
+    {
+        if (levelTransitionPanel == null)
+        {
+            Debug.LogWarning("UIManager: Level transition panel not assigned, can't show pre-level popup.");
+            return;
+        }
+
+        // Show the transition panel
+        levelTransitionPanel.SetActive(true);
+        isShowingTransition = true;
+        currentTransitionMode = TransitionMode.PreLevel;
+
+        // Show continue button but hide score for pre-level
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(true);
+
+        if (scoreText != null)
+            scoreText.gameObject.SetActive(false);
+
+        // Set the text for pre-level info
+        if (levelTransitionText != null)
+        {
+            levelTransitionText.text = $"<b>LEVEL {levelNumber}: {GetEnvironmentName(levelNumber)}</b>";
+        }
+
+        // Set the description text
+        if (descriptionText != null)
+        {
+            descriptionText.gameObject.SetActive(true);
+            descriptionText.text = description;
+        }
+    }
+
+    /// <summary>
+    /// Shows a post-level popup with information about the completed level and score
+    /// </summary>
+    public void ShowPostLevelPopup(int levelNumber, string description, int levelScore, int oceanScore, int totalScore)
+    {
+        if (levelTransitionPanel == null)
+        {
+            Debug.LogWarning("UIManager: Level transition panel not assigned, can't show post-level popup.");
+            return;
+        }
+
+        // Show the transition panel
+        levelTransitionPanel.SetActive(true);
+        isShowingTransition = true;
+        currentTransitionMode = TransitionMode.PostLevel;
+
+        // Show continue button and score text for post-level
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(true);
+
+        // Set the text for post-level info
+        if (levelTransitionText != null)
+        {
+            // Special case for ocean phase
+            if (levelNumber == 0)
+            {
+                levelTransitionText.text = GameText.OceanCompleteTitle;
+            }
+            else
+            {
+                levelTransitionText.text = string.Format(GameText.LevelCompleteFormat, levelNumber);
+            }
+        }
+
+        // Set the description text
+        if (descriptionText != null)
+        {
+            descriptionText.gameObject.SetActive(true);
+            descriptionText.text = description;
+        }
+
+        // Show score information with both ocean and river scores
+        if (scoreText != null)
+        {
+            scoreText.gameObject.SetActive(true);
+
+            // If this is the ocean phase (level 0) or the river phase (level > 0)
+            if (levelNumber == 0)
+            {
+                // Show only ocean score for ocean phase
+                scoreText.text = string.Format(GameText.OceanScoreFormat, levelScore);
+            }
+            else
+            {
+                // For river phase, show both ocean score and river score
+                int riverScore = totalScore - oceanScore;
+
+                scoreText.text = string.Format(GameText.OceanScoreFormat, oceanScore) + "\n" +
+                                 string.Format(GameText.RiverScoreFormat, riverScore) + "\n" +
+                                 string.Format(GameText.TotalScoreFormat, totalScore);
+            }
+        }
+    }
+
+    // Overload to maintain compatibility with existing code
+    public void ShowPostLevelPopup(int levelNumber, string description, int levelScore)
+    {
+        // Single score version (for backward compatibility)
+        ShowPostLevelPopup(levelNumber, description, levelScore, levelScore, levelScore);
+    }
+
     private void HideLevelTransition()
     {
         if (levelTransitionPanel != null)
@@ -274,11 +421,7 @@ public class UIManager : MonoBehaviour
 
     private string GetEnvironmentName(int level)
     {
-        switch (level)
-        {
-            default:
-                return $"Level {level}";
-        }
+        return GameText.GetEnvironmentName(level);
     }
 
     #endregion

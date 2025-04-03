@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
-public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition, TitleScreen, Victory }
+public enum GameState { Ocean, Freshwater, Won, Lost, FishSelection, LevelTransition, TitleScreen, Victory, TransitionPopup }
 public class GameController : MonoBehaviour
 {
     [Header("References")]
@@ -56,7 +57,12 @@ public class GameController : MonoBehaviour
 
     [Header("Scoring")]
     private static int totalGameScore = 0;
+    private static int oceanScore = 0;
     private bool hasCalculatedOceanScore = false;
+
+    private bool isWaitingForContinue = false;
+    private int pendingNextLevel = -1;
+    private bool shouldTriggerVictory = false;
 
     private void Start()
     {
@@ -103,6 +109,27 @@ public class GameController : MonoBehaviour
             // Initialize game systems
             InitializeGame();
             Debug.Log("Game initialized");
+        }
+
+        // Subscribe to UI continue button event
+        if (uiManager != null)
+        {
+            uiManager.OnContinueClicked += HandleContinueButtonClicked;
+        }
+
+        // If in Ocean or Freshwater mode, show the pre-level popup for current level
+        if (currentState == GameState.Ocean || currentState == GameState.Freshwater)
+        {
+            ShowPreLevelPopup(currentLevel);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe from UI events
+        if (uiManager != null)
+        {
+            uiManager.OnContinueClicked -= HandleContinueButtonClicked;
         }
     }
 
@@ -796,6 +823,117 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void HandleContinueButtonClicked()
+    {
+        if (!isWaitingForContinue) return;
+
+        isWaitingForContinue = false;
+
+        // Resume normal game state
+        Time.timeScale = 1f;
+
+        // Re-enable player movement if we have a current player
+        if (currentPlayer != null)
+        {
+            PlayerMovement movement = currentPlayer.GetComponent<PlayerMovement>();
+            if (movement != null)
+            {
+                movement.SetInputBlocked(false);
+            }
+        }
+
+        // Check if we need to proceed to next level
+        if (pendingNextLevel > 0)
+        {
+            int nextLevel = pendingNextLevel;
+            pendingNextLevel = -1;
+            PerformLevelTransition(nextLevel);
+        }
+        // Check if we need to trigger victory
+        else if (shouldTriggerVictory)
+        {
+            shouldTriggerVictory = false;
+            TriggerVictory();
+        }
+        // Otherwise just return to normal gameplay
+        else
+        {
+            currentState = currentLevel == 1 ? GameState.Ocean : GameState.Freshwater;
+        }
+    }
+
+    private void ShowPreLevelPopup(int level)
+    {
+        // Pause game and block input
+        Time.timeScale = 0f;
+        isWaitingForContinue = true;
+        currentState = GameState.TransitionPopup;
+
+        // Block player input
+        if (currentPlayer != null)
+        {
+            PlayerMovement movement = currentPlayer.GetComponent<PlayerMovement>();
+            if (movement != null)
+            {
+                movement.SetInputBlocked(true);
+            }
+        }
+
+        // Get level description
+        string description = "Prepare for your journey!";
+        if (level >= 0 && level < GameText.LevelDescriptions.Length)
+        {
+            description = GameText.LevelDescriptions[level];
+        }
+
+        // Show the popup
+        if (uiManager != null)
+        {
+            uiManager.ShowPreLevelPopup(level, description);
+        }
+    }
+
+    private void ShowPostLevelPopup(int completedLevel, int levelScore)
+    {
+        // Pause game and block input
+        Time.timeScale = 0f;
+        isWaitingForContinue = true;
+        currentState = GameState.TransitionPopup;
+
+        // Block player input
+        if (currentPlayer != null)
+        {
+            PlayerMovement movement = currentPlayer.GetComponent<PlayerMovement>();
+            if (movement != null)
+            {
+                movement.SetInputBlocked(true);
+            }
+        }
+
+        // Get level completion text
+        string completionText = "Level complete!";
+        if (completedLevel >= 0 && completedLevel < GameText.LevelCompletionTexts.Length)
+        {
+            completionText = GameText.LevelCompletionTexts[completedLevel];
+        }
+
+        // Add scoring description
+        string scoringText = "";
+        if (completedLevel >= 0 && completedLevel < GameText.ScoringDescriptions.Length)
+        {
+            scoringText = GameText.ScoringDescriptions[completedLevel];
+        }
+
+        // Combine completion text and scoring description
+        string fullDescription = $"{completionText}\n\n{scoringText}";
+
+        // Show the popup with ocean, river, and total scores
+        if (uiManager != null)
+        {
+            uiManager.ShowPostLevelPopup(completedLevel, fullDescription, levelScore, oceanScore, totalGameScore);
+        }
+    }
+
     // New method to handle transitioning to the next level
     public void TransitionToNextLevel(int nextLevel)
     {
@@ -803,23 +941,24 @@ public class GameController : MonoBehaviour
 
         Debug.Log($"Transitioning from level {currentLevel} to level {nextLevel}");
 
-        // Calculate score based on remaining fish
-        if (currentLevel == 1 && !hasCalculatedOceanScore)
-        {
-            // Changed: Ocean to river transition - 1 point per fish spawned
-            int oceanScore = spawnedFishes.Count;
-            totalGameScore += oceanScore;
-            hasCalculatedOceanScore = true;
-            Debug.Log($"Ocean phase completed with {oceanScore} fish. 1 point per fish. Total score: {totalGameScore}");
-        }
-        else if (currentLevel >= 2)
-        {
-            // Standard level completion - 10 points per fish
-            int riverLevelScore = spawnedFishes.Count * 10;
-            totalGameScore += riverLevelScore;
-            Debug.Log($"River level {currentLevel} completed with {spawnedFishes.Count} fish. Level score: {riverLevelScore}. Total score: {totalGameScore}");
-        }
+        // Calculate score for the current level only
+        int levelScore = 0;
 
+        // Standard level completion - 10 points per fish
+        levelScore = spawnedFishes.Count * 10;
+        totalGameScore += levelScore;
+        Debug.Log($"River level {currentLevel} completed with {spawnedFishes.Count} fish. Level score: {levelScore}.");
+
+        // Show post-level popup with score
+        ShowPostLevelPopup(currentLevel, levelScore);
+
+        // Store the next level for after user clicks continue
+        pendingNextLevel = nextLevel;
+    }
+
+    // Method to actually perform the level transition after user clicks Continue
+    private void PerformLevelTransition(int nextLevel)
+    {
         // Update level state
         int previousLevel = currentLevel;
         currentLevel = nextLevel;
@@ -837,7 +976,6 @@ public class GameController : MonoBehaviour
         }
 
         // Change game state
-        GameState previousState = currentState;
         currentState = GameState.LevelTransition;
         isTransitioning = true;
 
@@ -845,12 +983,6 @@ public class GameController : MonoBehaviour
         if (nextLevel == 2 && previousLevel == 1)
         {
             currentState = GameState.Freshwater;
-        }
-
-        // Update the UI or other game systems as needed based on level change
-        if (uiManager != null)
-        {
-            uiManager.ShowLevelTransition(previousLevel, nextLevel);
         }
 
         // Relocate all fish to the new starting point
@@ -964,6 +1096,9 @@ public class GameController : MonoBehaviour
 
         // Transition complete
         isTransitioning = false;
+
+        // Show pre-level popup for the new level
+        ShowPreLevelPopup(currentLevel);
     }
 
     // Add a new method to block input for a short period after transition
@@ -1161,6 +1296,19 @@ public class GameController : MonoBehaviour
         return totalGameScore;
     }
 
+    // Add static method to set ocean score from other scripts
+    public static void SetOceanScore(int score)
+    {
+        oceanScore = score;
+        totalGameScore = oceanScore; // Reset total score to ocean score when setting from ocean phase
+    }
+
+    // Add getter for ocean score
+    public static int GetOceanScore()
+    {
+        return oceanScore;
+    }
+
     private void TriggerVictory()
     {
         currentState = GameState.Victory;
@@ -1213,15 +1361,25 @@ public class GameController : MonoBehaviour
             }
         }
 
-        // If this is the final level or there's no next level, trigger victory
+        // Calculate level score
+        int levelScore = spawnedFishes.Count * 10;
+
+        // If the final level, double the score
         if (isFinalLevel || !hasNextLevel)
         {
-            TriggerVictory();
+            levelScore *= 2;
+            totalGameScore += levelScore;
+
+            // Show post-level popup then trigger victory after continue
+            ShowPostLevelPopup(endPoint.LevelNumber, levelScore);
+            shouldTriggerVictory = true;
         }
         else
         {
-            // Not the final level, so transition to the next level
-            TransitionToNextLevel(nextLevel);
+            // Not the final level, add score and transition to next level
+            totalGameScore += levelScore;
+            ShowPostLevelPopup(endPoint.LevelNumber, levelScore);
+            pendingNextLevel = nextLevel;
         }
     }
 }
