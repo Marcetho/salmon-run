@@ -505,6 +505,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AudioManager
       objectReference: {fileID: 0}
+    - target: {fileID: 5658971104412594346, guid: 668fab8130525064eb63431f951eb0bc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -819,6 +823,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HarborSeal (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4159577135872128469, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -926,7 +934,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1100369157}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
@@ -1603,6 +1611,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HarborSeal
       objectReference: {fileID: 0}
+    - target: {fileID: 4159577135872128469, guid: c8821bbdc09ef6e4c84320365db02138, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1623,6 +1635,10 @@ PrefabInstance:
     - target: {fileID: 6484699613147215404, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
       propertyPath: m_Name
       value: UICanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6484699613147215404, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7020806858198799285, guid: 8c92959718642db4eab15c638f00cd3a, type: 3}
       propertyPath: m_Pivot.x
@@ -1759,6 +1775,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444924922289292160, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8968907341964439012, guid: 13069434013bab54bb5142b8b21dca8b, type: 3}
